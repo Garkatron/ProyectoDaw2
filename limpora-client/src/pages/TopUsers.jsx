@@ -1,6 +1,7 @@
 import Base from '../layouts/Base';
 
-export function Booking({}) {
+export function TopUsers({}) {
+    
     return (
         <Base>
             content
