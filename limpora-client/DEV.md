@@ -50,7 +50,7 @@ Revisar si estan:
 ```sh
 docker-compose up --build   # Ejecutar la primera vez
 
-docker-compose up --build   # Ejecutar el proyecto las demas veces
+docker-compose up           # Ejecutar el proyecto las demas veces
 docker-compose up -d        # Ejecutar en segundo plano
 
 docker-compose logs -f      # Ver logs
