@@ -5,9 +5,15 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  watch: {
+    usePolling: true
+  },
   server: {
-    host: true,   
+    host: true,
     port: 5173
+  },
+  hmr: {
+    host: 'localhost', 
   }
 })
 
