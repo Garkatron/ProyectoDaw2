@@ -12,6 +12,7 @@ import { AdminUsersView } from "./pages/admin/AdminUsersView";
 import { Booking } from "./pages/Booking";
 import { Routes, Route } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute";
+import Appointments from "./pages/Appointments";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -26,6 +27,7 @@ function App() {
         <Route path="/me" element={<UserPanel />} />
         <Route path="/currency" element={<Currency />} />
         <Route path="/booking" element={<Booking />} />
+        <Route path="/appointments" element={<Appointments />} />
         <Route path="/top" element={<TopUsers />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/admin/panel" element={<AdminPanel />} />
