@@ -1,10 +1,11 @@
-import React from 'react';
+import Navbar from '../components/Navbar';
 
-// Este componente base solo proporciona el fondo general y la estructura mínima.
+// Este componente base proporciona el fondo general y asegura la altura completa.
 const Base = ({ children }) => {
     return (
-        // Aplica el fondo gris muy claro a toda la aplicación, siguiendo la regla 1.
+        // Usamos min-h-screen para que ocupe al menos la altura del viewport
         <div className="min-h-screen bg-gray-50">
+          <Navbar />
             {children}
         </div>
     );
