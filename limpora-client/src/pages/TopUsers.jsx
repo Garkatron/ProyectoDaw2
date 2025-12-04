@@ -122,7 +122,7 @@ export function TopUsers({ }) {
                 
                 {/* Header Superior */}
                 <header className="bg-white p-6 rounded-lg shadow-md border border-gray-300/20 flex justify-center flex-shrink-0">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center">
                         <img
                             src={logo}
                             alt="provisional"
