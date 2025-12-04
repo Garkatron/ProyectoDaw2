@@ -4,7 +4,7 @@ export function Currency({}) {
     
     return (
         <Base>
-            content
+            <h1>Soy las ganancias</h1>
         </Base>
     )
 }

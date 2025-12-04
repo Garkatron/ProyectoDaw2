@@ -3,7 +3,7 @@ import Base from "../layouts/Base";
 export function Reviews({}) {
     return (
         <Base>
-            content
+            <h1>soy las reseñas</h1>
         </Base>
     )
 }

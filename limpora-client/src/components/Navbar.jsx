@@ -1,60 +1,47 @@
 import { Link } from "react-router-dom";
 
-export default function Navbar() {
+import React from 'react';
+import { UserCircleIcon } from '@heroicons/react/24/outline'; // Asegúrate de tener instalados los íconos (ej: npm install @heroicons/react)
+import { Link } from 'react-router-dom';
+
+const navItems = [
+
+  { name: 'Home', to: '/' }, 
+  { name: 'Ganancias', to: '/currency' },
+  { name: 'Reseñas', to: '/reviews' },
+  { name: 'Citas', to: '/citas' },
+  { name: 'Top', to: '/top' },
+];
+
+const Navbar = () => {
   return (
-    <nav className="w-full bg-white border-b border-gray-300/20 shadow-sm">
-      <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="text-gray-800 font-semibold text-lg">
-          Panel
-        </div>
-
-        <ul className="flex gap-6 text-gray-700">
-          <li>
-            <Link
-              to="/me"
-              className="px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              Me
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              to="/currency"
-              className="px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              Currency
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              to="/booking"
-              className="px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              Booking
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              to="/top"
-              className="px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              Top Users
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              to="/reviews"
-              className="px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
-            >
-              Reviews
-            </Link>
-          </li>
-        </ul>
+    <nav className="bg-white p-4 rounded-lg shadow-md border border-gray-300/20 flex justify-between items-center">
+      {/* Items de Navegación */}
+      <div className="flex space-x-4 md:space-x-8 overflow-x-auto">
+        {navItems.map((item) => (
+          // 💡 Corrección 2: Usar el componente Link y el atributo 'to'
+          <Link
+            key={item.name}
+            to={item.to} // Usamos 'to' para la ruta interna
+            className="text-gray-700 text-sm md:text-base font-medium p-2 rounded-md transition-colors whitespace-nowrap hover:bg-gray-100/50 hover:text-gray-800"
+          >
+            {item.name}
+          </Link>
+        ))}
       </div>
+      
+      {/* Ícono de Perfil (usualmente lleva a la configuración o perfil del usuario) */}
+      {/* Lo convertimos en un Link para que sea navegable */}
+      <Link 
+        to="/me" // Ruta de ejemplo para el perfil
+        className="p-2 rounded-full transition-colors hover:bg-gray-100/50 cursor-pointer flex-shrink-0"
+      >
+        <UserCircleIcon className="h-8 w-8 text-gray-600" />
+      </Link>
     </nav>
   );
-}
+};
+
+export default Navbar;
+
+
