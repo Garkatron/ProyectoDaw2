@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Home } from "./pages/Home";
 import { TopUsers } from "./pages/TopUsers";
 import { UserPanel } from "./pages/UserPanel";
@@ -13,6 +13,7 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import Appointments from "./pages/Appointments";
 import { UserFinder } from "./pages/UserFinder";
 import BookingConfirmation from "./pages/BookingConfirmation";
+import { initLangManager } from "./utils/LangManager";
 
 function App() {
 
@@ -25,7 +26,7 @@ function App() {
       <Route element={<PrivateRoute />}>
         <Route path="/me" element={<UserPanel />} />
         <Route path="/currency" element={<Currency />} />
-        <Route path="/find" element={<UserFinder />} />
+        <Route path="/userfinder" element={<UserFinder />} />
         <Route path="/booking" element={<BookingConfirmation />} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/top" element={<TopUsers />} />

@@ -1,0 +1,22 @@
+# Testing
+info.text.default = es_ES Default text
+
+# Navbar
+nav.items.path.root = Inicio
+nav.items.path.currency = Ganancias
+nav.items.path.appointments = Citas
+nav.items.path.userfinder = Buscar Profesionales
+nav.items.path.topusers = Top Usuarios
+
+# Top Users Page
+topusers.title = Top Usuarios
+topusers.title.ranking = Ranking Global
+topusers.title.otherrankeds = Otros Rankeados
+
+# User Panel
+userpanel.p.membersince = Miembro desde
+userpanel.label.birthdate = Fecha de Nacimiento
+userpanel.label.email = Email
+userpanel.label.completed_appointments = Citas Completas
+userpanel.label.total_points = Puntos totales
+userpanel.title.reviews = Reseñas

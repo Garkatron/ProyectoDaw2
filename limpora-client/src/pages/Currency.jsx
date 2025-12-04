@@ -3,7 +3,6 @@ import Base from "../layouts/Base";
 function UserInfoDisplay() {
     return (
         <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col md:flex-col h-full gap-6">
-            {/* Imagen del usuario */}
             <div className="flex justify-center md:justify-start">
                 <img
                     src="https://placehold.co/300x300"
@@ -12,7 +11,6 @@ function UserInfoDisplay() {
                 />
             </div>
 
-            {/* Stats verticales */}
             <div className="flex flex-col gap-4 flex-1">
                 <StatCard label="Citas cerradas" value="0" />
                 <StatCard label="Citas canceladas" value="0" />
@@ -23,7 +21,6 @@ function UserInfoDisplay() {
     );
 }
 
-// Tarjeta de estadística
 function StatCard({ label, value }) {
     return (
         <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-center shadow-sm flex-1">

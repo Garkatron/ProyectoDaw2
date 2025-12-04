@@ -1,0 +1,22 @@
+# Testing
+info.text.default = en_US Default text
+
+# Navbar
+nav.items.path.root = Home
+nav.items.path.currency = Earnings
+nav.items.path.appointments = Appointments
+nav.items.path.userfinder = Find Professionals
+nav.items.path.topusers = Top Users
+
+# Top Users Page
+topusers.title = Top Users
+topusers.title.ranking = Global Ranking
+topusers.title.otherrankeds = Other Ranked
+
+# User Panel
+userpanel.p.membersince = Member since
+userpanel.label.birthdate = Birthdate
+userpanel.label.email = Email
+userpanel.label.completed_appointments = Completed Appointments
+userpanel.label.total_points = Total Points
+userpanel.title.reviews = Reviews
