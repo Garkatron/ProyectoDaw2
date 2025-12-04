@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "./App.css";
 import { Home } from "./pages/Home";
 import { TopUsers } from "./pages/TopUsers";
 import { UserPanel } from "./pages/UserPanel";
@@ -9,13 +8,13 @@ import { Rergister } from "./pages/Register";
 import { Reviews } from "./pages/Reviews";
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import { AdminUsersView } from "./pages/admin/AdminUsersView";
-import { Booking } from "./pages/Booking";
 import { Routes, Route } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute";
 import Appointments from "./pages/Appointments";
+import { UserFinder } from "./pages/UserFinder";
+import BookingConfirmation from "./pages/BookingConfirmation";
 
 function App() {
-  const [count, setCount] = useState(0);
 
   return (
     <Routes>
@@ -26,11 +25,12 @@ function App() {
       <Route element={<PrivateRoute />}>
         <Route path="/me" element={<UserPanel />} />
         <Route path="/currency" element={<Currency />} />
-        <Route path="/booking" element={<Booking />} />
+        <Route path="/find" element={<UserFinder />} />
+        <Route path="/booking" element={<BookingConfirmation />} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/top" element={<TopUsers />} />
         <Route path="/reviews" element={<Reviews />} />
-        <Route path="/admin/panel" element={<AdminPanel />} />
+        <Route path="/admin" element={<AdminPanel />} />
         <Route path="/admin/users" element={<AdminUsersView />} />
       </Route>
     </Routes>
