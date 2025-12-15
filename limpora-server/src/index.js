@@ -37,20 +37,11 @@ import { asyncHandler } from './helpers/utils.js'
 // Routes
 
 // Database
-// import { connectDB } from './databases/mongoose.js'
+import {connectWithRetry} from './databases/mysql.js'
 
 // Load environment
-switch (process.env.NODE_ENV) {
-    case 'production':
-        dotenv.config({ path: '.env.production' })
-        break
-    case 'test':
-        dotenv.config({ path: '.env.test' })
-        break
-    default:
-        dotenv.config({ path: '.env' })
-        break
-}
+dotenv.config({ path: '.env' })
+
 
 const PORT = process.env.PORT || 3000
 
@@ -89,14 +80,15 @@ app.use(express.static('public'))
 app.use(pinoHttp({ logger }))
 
 // Connect database
-// ! await connectDB()
+
+await connectWithRetry();
 
 // Root
 app.get(
     '/',
     asyncHandler(async (req, res) => {
         req.log.info('Route /')
-        res.status(200).json({ message: 'My Express + MongoDB + JS API!' })
+        res.status(200).json({ message: 'My Express + MySQL + JS API!' })
     })
 )
 
