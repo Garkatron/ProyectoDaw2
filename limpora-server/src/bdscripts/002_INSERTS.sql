@@ -1,4 +1,4 @@
-USE Limpora;
+USE limpora;
 
 INSERT INTO UserTypes (name) VALUES
 ('Admin'),

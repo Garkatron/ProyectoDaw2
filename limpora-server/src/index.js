@@ -37,13 +37,13 @@ import { asyncHandler } from './helpers/utils.js'
 // Routes
 
 // Database
-import {connectWithRetry} from './databases/mysql.js'
+import { pingDB } from './databases/mysql.js'
+import { requiredEnv } from './utils/utils.js'
 
 // Load environment
 dotenv.config({ path: '.env' })
 
-
-const PORT = process.env.PORT || 3000
+const PORT = Number(process.env.PORT) || 3000
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -81,7 +81,7 @@ app.use(pinoHttp({ logger }))
 
 // Connect database
 
-await connectWithRetry();
+await pingDB();
 
 // Root
 app.get(
@@ -93,8 +93,8 @@ app.get(
 )
 
 // API prefix
-const API_PREFIX = process.env.API_PREFIX
-const API_VERSION = process.env.API_VERSION
+const API_PREFIX = requiredEnv("API_PREFIX");
+const API_VERSION = requiredEnv("API_VERSION");
 const PREFIX = `${API_PREFIX}/${API_VERSION}`
 
 logger.info(`Using prefix: ${PREFIX}`)
