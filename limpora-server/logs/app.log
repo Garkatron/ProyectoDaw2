@@ -82,3 +82,76 @@
 {"level":30,"time":1766933663561,"pid":72,"hostname":"69e1376433e2","msg":"Using prefix: /api/v1"}
 {"level":30,"time":1766933667056,"pid":87,"hostname":"69e1376433e2","msg":"Using prefix: /api/v1"}
 {"level":30,"time":1766933857592,"pid":86,"hostname":"e46477a093f6","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767272918013,"pid":42,"hostname":"d5c0eafa1982","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767272933550,"pid":57,"hostname":"d5c0eafa1982","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767272933557,"pid":57,"hostname":"d5c0eafa1982","msg":"Failed to start server:"}
+{"level":30,"time":1767272934049,"pid":69,"hostname":"d5c0eafa1982","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767272934057,"pid":69,"hostname":"d5c0eafa1982","msg":"Failed to start server:"}
+{"level":30,"time":1767272936040,"pid":81,"hostname":"d5c0eafa1982","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767272936044,"pid":81,"hostname":"d5c0eafa1982","msg":"Failed to start server:"}
+{"level":30,"time":1767272949583,"pid":93,"hostname":"d5c0eafa1982","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767272949588,"pid":93,"hostname":"d5c0eafa1982","msg":"Failed to start server:"}
+{"level":30,"time":1767273015708,"pid":30,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273015713,"pid":30,"hostname":"aef0d3aa7469","msg":"Failed to start server:"}
+{"level":30,"time":1767273090869,"pid":42,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273090874,"pid":42,"hostname":"aef0d3aa7469","msg":"Failed to start server:"}
+{"level":30,"time":1767273197070,"pid":54,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273197075,"pid":54,"hostname":"aef0d3aa7469","err":{"type":"ReferenceError","message":"connectWithRetry is not defined","stack":"ReferenceError: connectWithRetry is not defined\n    at startServer (file:///app/src/index.js:118:9)\n    at file:///app/src/index.js:130:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273273231,"pid":66,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273273237,"pid":66,"hostname":"aef0d3aa7469","err":{"type":"ReferenceError","message":"connectWithRetry is not defined","stack":"ReferenceError: connectWithRetry is not defined\n    at startServer (file:///app/src/index.js:118:9)\n    at file:///app/src/index.js:130:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273276707,"pid":78,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273276711,"pid":78,"hostname":"aef0d3aa7469","err":{"type":"ReferenceError","message":"connectWithRetry is not defined","stack":"ReferenceError: connectWithRetry is not defined\n    at startServer (file:///app/src/index.js:118:9)\n    at file:///app/src/index.js:130:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273280712,"pid":90,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273280717,"pid":90,"hostname":"aef0d3aa7469","err":{"type":"ReferenceError","message":"connectWithRetry is not defined","stack":"ReferenceError: connectWithRetry is not defined\n    at startServer (file:///app/src/index.js:118:9)\n    at file:///app/src/index.js:129:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273281221,"pid":102,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273281226,"pid":102,"hostname":"aef0d3aa7469","err":{"type":"ReferenceError","message":"connectWithRetry is not defined","stack":"ReferenceError: connectWithRetry is not defined\n    at startServer (file:///app/src/index.js:118:9)\n    at file:///app/src/index.js:130:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273288752,"pid":114,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273288757,"pid":114,"hostname":"aef0d3aa7469","err":{"type":"ReferenceError","message":"connectWithRetry is not defined","stack":"ReferenceError: connectWithRetry is not defined\n    at startServer (file:///app/src/index.js:118:9)\n    at file:///app/src/index.js:130:1\n    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)\n    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273299265,"pid":126,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273299301,"pid":126,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273355912,"pid":141,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273355941,"pid":141,"hostname":"aef0d3aa7469","err":{"type":"TypeError","message":"Cannot read properties of undefined (reading 'listen')","stack":"TypeError: Cannot read properties of undefined (reading 'listen')\n    at startServer (file:///app/src/index.js:121:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273374919,"pid":153,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273374948,"pid":153,"hostname":"aef0d3aa7469","err":{"type":"TypeError","message":"object is not iterable (cannot read property Symbol(Symbol.iterator))","stack":"TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at startServer (file:///app/src/index.js:119:24)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273376926,"pid":165,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273376955,"pid":165,"hostname":"aef0d3aa7469","err":{"type":"TypeError","message":"object is not iterable (cannot read property Symbol(Symbol.iterator))","stack":"TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at startServer (file:///app/src/index.js:119:24)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273384946,"pid":177,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273384973,"pid":177,"hostname":"aef0d3aa7469","err":{"type":"TypeError","message":"object is not iterable (cannot read property Symbol(Symbol.iterator))","stack":"TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))\n    at startServer (file:///app/src/index.js:119:24)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273425024,"pid":189,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273425053,"pid":189,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273436053,"pid":204,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273436086,"pid":204,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273442559,"pid":219,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273442590,"pid":219,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273453089,"pid":233,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273453120,"pid":233,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273457091,"pid":249,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273457122,"pid":249,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273459096,"pid":264,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273459129,"pid":264,"hostname":"aef0d3aa7469","err":{"type":"ReferenceError","message":"v is not defined","stack":"ReferenceError: v is not defined\n    at startServer (file:///app/src/index.js:121:21)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273460105,"pid":276,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273460134,"pid":276,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273560805,"pid":291,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273560834,"pid":291,"hostname":"aef0d3aa7469","err":{"type":"TypeError","message":"table.split is not a function","stack":"TypeError: table.split is not a function\n    at startServer (file:///app/src/index.js:125:32)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"},"msg":"Failed to start server"}
+{"level":30,"time":1767273572825,"pid":303,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273572862,"pid":303,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273591362,"pid":318,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273591396,"pid":318,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273600889,"pid":333,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273600922,"pid":333,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273605400,"pid":348,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273605433,"pid":348,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273639961,"pid":363,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273639992,"pid":363,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273646975,"pid":378,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767273647006,"pid":378,"hostname":"aef0d3aa7469","msg":"Server running on port 3000"}
+{"level":30,"time":1767273770736,"pid":393,"hostname":"aef0d3aa7469","msg":"Using prefix: /api/v1"}
+{"level":50,"time":1767273770765,"pid":393,"hostname":"aef0d3aa7469","err":{"type":"Error","message":"Table 'limpora.Services' doesn't exist","stack":"Error: Table 'limpora.Services' doesn't exist\n    at PromisePoolConnection.query (/app/node_modules/mysql2/lib/promise/connection.js:29:22)\n    at startServer (file:///app/src/index.js:120:35)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","code":"ER_NO_SUCH_TABLE","errno":1146,"sql":"DESCRIBE Services;","sqlState":"42S02","sqlMessage":"Table 'limpora.Services' doesn't exist"},"msg":"Failed to start server"}
+{"level":30,"time":1767274102471,"pid":30,"hostname":"de6a1d5b367c","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767274105511,"pid":30,"hostname":"de6a1d5b367c","msg":"Server running on port 3000"}
+{"level":30,"time":1767274168630,"pid":45,"hostname":"de6a1d5b367c","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767274168663,"pid":45,"hostname":"de6a1d5b367c","msg":"Server running on port 3000"}
+{"level":30,"time":1767274186164,"pid":60,"hostname":"de6a1d5b367c","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767274186192,"pid":60,"hostname":"de6a1d5b367c","msg":"Server running on port 3000"}
+{"level":30,"time":1767274190667,"pid":75,"hostname":"de6a1d5b367c","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1767274190699,"pid":75,"hostname":"de6a1d5b367c","msg":"Server running on port 3000"}

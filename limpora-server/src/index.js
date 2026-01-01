@@ -37,7 +37,7 @@ import { asyncHandler } from './helpers/utils.js'
 // Routes
 
 // Database
-import { pingDB } from './databases/mysql.js'
+import { connectWithRetry, pingDB } from './databases/mysql.js'
 import { requiredEnv } from './utils/utils.js'
 
 // Load environment
@@ -79,10 +79,6 @@ app.use(express.static('public'))
 // Logging
 app.use(pinoHttp({ logger }))
 
-// Connect database
-
-await pingDB();
-
 // Root
 app.get(
     '/',
@@ -116,8 +112,22 @@ app.use(
 )
 
 // Finished
-app.listen(app.get('port'), () => {
-    console.log(`Server running on port ${app.get('port')}`)
-})
+async function startServer() {
+    try {
+        // Wait for MySQL (with retries)
+        const conn = await connectWithRetry();
+        conn.release();
+        
+        app.listen(app.get('port'), () => {
+            logger.info(`Server running on port ${app.get('port')}`);
+        });
+
+    } catch (err) {
+        logger.error({ err }, 'Failed to start server');
+        process.exit(1);
+    }
+}
+
+startServer();
 
 export default app
