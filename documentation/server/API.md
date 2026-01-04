@@ -66,3 +66,43 @@ Prefijo: /api/v1
 
 Gestionado por la API de usuarios externa (Firebase, microservicio).
 Los endpoints de usuario incluyen autenticación y manejo de datos personales.
+
+---
+
+# FORMATO JSON DE RESPUESTA DE LOS ENDPOINTS
+Todos los endpoints de la API devuelven respuestas en formato JSON y siguen una estructura común para éxito y error.
+El estado de la operación se determina siempre por el código HTTP.
+
+### Exito (codigo 2xx)
+Se devuelve cuando la petición se procesa correctamente.
+```json
+{
+  "success": false,
+  "data": {},
+  "details": []
+}
+```
+**Data**: Información devuelta por el endpoint. Puede ser un objeto, un array o un valor simple.
+**Details**: Objeto con datos.
+- **Code**: Código para uso interno y manejo en frontend.
+- **Message**: Mensaje descriptivo.
+
+### Error (codigo 4xx - 5xx)
+Se devuelve cuando ocurre un error del cliente o del servidor.
+```json
+{
+  "errors": [
+    {
+        "code": "VALIDATION_ERROR",
+        "message": "Invalid data"
+    }
+  ]
+}
+```
+**Errors**: Lista de errores ocurridos durante la petición.
+Contiene objetos que contienen 2 campos:
+- **Code**: Código del error para uso interno y manejo en frontend.
+- **Message**: Mensaje descriptivo del error.
+
+# Codigos de errores
+Hay un objeto que recauda varios errores para ser usados donde se necesiten y agregarle mas si es necesario.

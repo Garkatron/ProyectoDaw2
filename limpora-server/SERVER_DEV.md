@@ -1,4 +1,3 @@
-
 # Comandos basicos
 
 ```sh
@@ -43,3 +42,26 @@ docker-compose exec limpora-client sh
 # Ver uso de recursos
 docker stats
 ```
+
+
+#### Configuracion firebase
+https://support.google.com/firebase/answer/7015592?authuser=1&hl=es-419#web&zippy=%2Cen-este-art%C3%ADculo
+
+
+#### Instalacion
+https://firebase.google.com/docs/web/setup?authuser=1&hl=es-419
+
+https://firebase.google.com/docs/web/learn-more?authuser=1&hl=es-419#config-object
+
+#### Autenticacion
+https://firebase.google.com/docs/auth/web/password-auth?authuser=1&hl=es-419
+
+
+#### Roles y Permisos Auth firebase
+https://firebase.google.com/docs/auth/admin/custom-claims?hl=es-419
+
+#### Cuentas de servicio (JSON)
+https://console.firebase.google.com/u/1/project/limpora/settings/serviceaccounts/adminsdk?hl=es-419
+
+--------
+
