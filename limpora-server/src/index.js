@@ -35,6 +35,7 @@ import { SLOWDOWN_CONFIG } from './configs/slowdown.js'
 import { asyncHandler } from './helpers/utils.js'
 
 // Routes
+import authRoutes from './routes/auth_routes.js';
 
 // Database
 import { connectWithRetry, pingDB } from './databases/mysql.js'
@@ -91,11 +92,13 @@ app.get(
 // API prefix
 const API_PREFIX = requiredEnv("API_PREFIX");
 const API_VERSION = requiredEnv("API_VERSION");
-const PREFIX = `${API_PREFIX}/${API_VERSION}`
+const PREFIX = `${API_PREFIX}/${API_VERSION}`;
 
-logger.info(`Using prefix: ${PREFIX}`)
+logger.info(`Using prefix: ${PREFIX}`);
 
 // Routes
+app.use(`${PREFIX}/users`, authRoutes);
+
 // ! app.use(`${PREFIX}/users`, userRoutes)
 // ! app.use(`${PREFIX}/questions`, questionRoutes)
 // ! app.use(`${PREFIX}/collections`, collectionRoutes)

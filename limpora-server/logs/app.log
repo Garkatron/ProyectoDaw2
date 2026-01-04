@@ -1,6 +1,0 @@
-{"level":30,"time":1767277702227,"pid":215,"hostname":"de6a1d5b367c","msg":"Using prefix: /api/v1"}
-{"level":30,"time":1767277702257,"pid":215,"hostname":"de6a1d5b367c","msg":"Server running on port 3000"}
-{"level":30,"time":1767277702768,"pid":287,"hostname":"de6a1d5b367c","msg":"Using prefix: /api/v1"}
-{"level":30,"time":1767277702794,"pid":287,"hostname":"de6a1d5b367c","msg":"Server running on port 3000"}
-{"level":30,"time":1767555905945,"pid":2303,"hostname":"79c64f921362","msg":"Using prefix: /api/v1"}
-{"level":30,"time":1767555905971,"pid":2303,"hostname":"79c64f921362","msg":"Server running on port 3000"}
