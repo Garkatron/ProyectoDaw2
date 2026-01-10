@@ -1,5 +1,7 @@
 DROP DATABASE IF EXISTS limpora;
+
 CREATE DATABASE limpora CHARACTER SET utf8mb4;
+
 USE limpora;
 
 -- =========================
@@ -8,10 +10,10 @@ USE limpora;
 CREATE TABLE Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     firebase_uid VARCHAR(128) NOT NULL UNIQUE,
-    name VARCHAR(25),
+    name VARCHAR(50),
+    role ENUM('admin', 'provider', 'user') DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 -- =========================
 -- INSIGNIAS
@@ -49,14 +51,16 @@ CREATE TABLE Appointments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     date_time DATETIME NOT NULL,
     status ENUM('Completed', 'Pending', 'In Process') NOT NULL DEFAULT 'Pending',
-    price DECIMAL(10,2) NOT NULL,
-    total_amount DECIMAL(10,2),
-    app_commission DECIMAL(10,2),
+    price DECIMAL(10, 2) NOT NULL,
+    total_amount DECIMAL(10, 2),
+    app_commission DECIMAL(10, 2),
     payment_method ENUM('Bizum', 'Bank Transfer', 'Paypal') NOT NULL,
     user_id INT NOT NULL,
+    provider_id INT NOT NULL,
     service_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (provider_id) REFERENCES Users(id),
     FOREIGN KEY (service_id) REFERENCES Services(id)
 );
 
@@ -66,7 +70,10 @@ CREATE TABLE Appointments (
 CREATE TABLE Reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT,
-    rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    rating TINYINT NOT NULL CHECK (
+        rating BETWEEN 1
+        AND 5
+    ),
     user_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(id)

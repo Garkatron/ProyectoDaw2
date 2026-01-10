@@ -6,7 +6,7 @@ const logPath = process.env.LOG_FILE_PATH || './logs/app.log'
 const logDir = path.dirname(logPath)
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true })
 
-const logger = pino({
+const Logger = pino({
     level: process.env.LOG_LEVEL || 'info',
     transport: {
         targets: [
@@ -16,4 +16,4 @@ const logger = pino({
     }
 })
 
-export default logger
+export default Logger

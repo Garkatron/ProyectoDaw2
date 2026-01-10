@@ -30,9 +30,6 @@ Prefijo: /api/v1
 ## 2️Ganancias
 
 - **GET /users/{userId}/earnings**Obtiene información sobre las ganancias del usuario.
-- **PUT /users/{userId}/earnings**
-  Añade información sobre las ganancias del usuario.
-
 ---
 
 ## 3️Review / Calificaciones

@@ -1,5 +1,5 @@
 // ! Here go the constants
-
+export const APP_COMISSION = 10; // ? Temp
 const PASSWORD_REGEX = null; // Todo
 
 // ! Error codes
@@ -45,6 +45,10 @@ export const USER_ERRORS = {
   EMAIL_AND_PASSWORD_NEEDED: {
     code: "EMAIL_AND_PASSWORD_NEEDED",
     message: "Email and password are needed"
+  },
+    EMAIL_PASSWORD_USERNAME_NEEDED: {
+    code: "EMAIL_PASSWORD_USERNAME_NEEDED",
+    message: "Email, password and Username are needed"
   },
   USER_NOT_FOUND: {
     code: "USER_NOT_FOUND",

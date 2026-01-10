@@ -1,5 +1,6 @@
 import mysql from "mysql2/promise";
 import { requiredEnv } from '../utils/utils.js';
+import Logger from '../helpers/logger';
 
 
 const DBPool = mysql.createPool({
@@ -18,8 +19,34 @@ export async function pingDB() {
   conn.release();
 }
 
+export async function withdb(doit) {
+  const conn = await connectdb();
+
+  try {
+    return await doit(conn);
+  } catch (err) {
+    throw new Error("withdb failed", { cause: err });
+  } finally {
+    await conn.close?.();
+  }
+}
 
 
+
+
+
+export async function connectdb() {
+  let lastError;
+  try {
+    const conn = await DBPool.getConnection();
+    Logger.error(`MySQL connected`);
+    return conn;
+  } catch (err) {
+    lastError = err;
+    Logger.error(`MySQL connection failed (${i + 1}/${retries}), retrying in ${delay}ms...`);
+    return null;
+  }
+}
 
 export async function connectWithRetry(retries = 5, delay = 3000) {
   let lastError;
@@ -28,7 +55,7 @@ export async function connectWithRetry(retries = 5, delay = 3000) {
     try {
       const conn = await DBPool.getConnection();
       console.log('MySQL connected');
-      return conn; 
+      return conn;
     } catch (err) {
       lastError = err;
       console.log(

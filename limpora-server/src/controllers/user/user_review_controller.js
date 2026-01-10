@@ -1,6 +1,21 @@
+import { withdb } from '../../databases/mysql.js';
 
-export const exampleFunction = (req, res) => {
-  const { param1, param2 } = req.params;
-  const { body1, body2 } = req.body;
+export const getUserReviews = (req, res) => {
+  const { userId } = req.params;
+
+};
+
+export const addUserReview = (req, res) => {
+  const { userId } = req.params;
+
+};
+
+export const updateUserReview = (req, res) => {
+  const { userId } = req.params;
+
+};
+
+export const deleteUserReview = (req, res) => {
+  const { userId } = req.params;
 
 };

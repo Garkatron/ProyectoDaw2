@@ -1,5 +1,13 @@
-export const exampleFunction = (req, res) => {
-  const { param1, param2 } = req.params;
-  const { body1, body2 } = req.body;
+import { withdb } from '../../databases/mysql.js';
+import { q_getEarnings } from '../../databases/queries';
 
+export const getUserEarnings = (req, res) => {
+  const { userId } = req.params;
+  try {
+    const result = withdb(conn => q_getEarnings(conn));
+    res.status(201).json({ success: true, data: result });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error getting earnings' });
+  }
 };

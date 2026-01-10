@@ -1,2 +1,47 @@
 {"level":30,"time":1767555993186,"pid":2412,"hostname":"79c64f921362","msg":"Using prefix: /api/v1"}
 {"level":30,"time":1767555993215,"pid":2412,"hostname":"79c64f921362","msg":"Server running on port 3000"}
+{"level":30,"time":1768070562229,"pid":30,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768070562263,"pid":30,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768071850392,"pid":30,"hostname":"fb7816a887b9","req":{"id":1,"method":"GET","url":"/","query":{},"params":{},"headers":{"host":"localhost:3000","connection":"keep-alive","sec-ch-ua":"\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"","sec-ch-ua-mobile":"?0","sec-ch-ua-platform":"\"Linux\"","upgrade-insecure-requests":"1","user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8","sec-gpc":"1","accept-language":"es-ES,es;q=0.7","sec-fetch-site":"none","sec-fetch-mode":"navigate","sec-fetch-user":"?1","sec-fetch-dest":"document","accept-encoding":"gzip, deflate, br, zstd","if-none-match":"W/\"2a-+8rXrbH98YuBuFA2Tel7kbMOkuA\""},"remoteAddress":"::ffff:172.18.0.1","remotePort":60078},"msg":"Route /"}
+{"level":30,"time":1768071850393,"pid":30,"hostname":"fb7816a887b9","req":{"id":1,"method":"GET","url":"/","query":{},"params":{},"headers":{"host":"localhost:3000","connection":"keep-alive","sec-ch-ua":"\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"","sec-ch-ua-mobile":"?0","sec-ch-ua-platform":"\"Linux\"","upgrade-insecure-requests":"1","user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8","sec-gpc":"1","accept-language":"es-ES,es;q=0.7","sec-fetch-site":"none","sec-fetch-mode":"navigate","sec-fetch-user":"?1","sec-fetch-dest":"document","accept-encoding":"gzip, deflate, br, zstd","if-none-match":"W/\"2a-+8rXrbH98YuBuFA2Tel7kbMOkuA\""},"remoteAddress":"::ffff:172.18.0.1","remotePort":60078},"res":{"statusCode":304,"headers":{"access-control-allow-origin":"*","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0","x-ratelimit-limit":"100","x-ratelimit-remaining":"99","date":"Sat, 10 Jan 2026 19:04:10 GMT","x-ratelimit-reset":"1768072151","etag":"W/\"2a-+8rXrbH98YuBuFA2Tel7kbMOkuA\""}},"responseTime":2,"msg":"request completed"}
+{"level":30,"time":1768071850429,"pid":30,"hostname":"fb7816a887b9","req":{"id":2,"method":"GET","url":"/favicon.ico","query":{},"params":{},"headers":{"host":"localhost:3000","connection":"keep-alive","sec-ch-ua-platform":"\"Linux\"","user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","sec-ch-ua":"\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"","sec-ch-ua-mobile":"?0","accept":"image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8","sec-gpc":"1","accept-language":"es-ES,es;q=0.7","sec-fetch-site":"same-origin","sec-fetch-mode":"no-cors","sec-fetch-dest":"image","accept-encoding":"gzip, deflate, br, zstd"},"remoteAddress":"::ffff:172.18.0.1","remotePort":60078},"res":{"statusCode":404,"headers":{"access-control-allow-origin":"*","content-security-policy":"default-src 'none'","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0","x-ratelimit-limit":"100","x-ratelimit-remaining":"98","date":"Sat, 10 Jan 2026 19:04:10 GMT","x-ratelimit-reset":"1768072151","content-type":"text/html; charset=utf-8","content-length":150}},"responseTime":2,"msg":"request completed"}
+{"level":30,"time":1768072044614,"pid":45,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072044642,"pid":45,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072064158,"pid":60,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072064190,"pid":60,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072080680,"pid":75,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072080712,"pid":75,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072088682,"pid":90,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072088710,"pid":90,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072095699,"pid":105,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072095733,"pid":105,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072099230,"pid":120,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072099261,"pid":120,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072104244,"pid":135,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072104275,"pid":135,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072158833,"pid":150,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072158861,"pid":150,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072160315,"pid":165,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072160347,"pid":165,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072180446,"pid":180,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072180479,"pid":180,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072182372,"pid":195,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072182404,"pid":195,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072183878,"pid":210,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072183909,"pid":210,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072192420,"pid":225,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072192451,"pid":225,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072217981,"pid":240,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072218016,"pid":240,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072258530,"pid":255,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072258559,"pid":255,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072403814,"pid":270,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072403842,"pid":270,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072413821,"pid":285,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072413852,"pid":285,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072515515,"pid":300,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072515545,"pid":300,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072523054,"pid":315,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072523085,"pid":315,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}
+{"level":30,"time":1768072551119,"pid":330,"hostname":"fb7816a887b9","msg":"Using prefix: /api/v1"}
+{"level":30,"time":1768072551150,"pid":330,"hostname":"fb7816a887b9","msg":"Server running on port 3000"}

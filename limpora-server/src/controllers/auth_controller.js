@@ -2,22 +2,26 @@ import admin from '../configs/firebase_config.js';
 import axios from 'axios';
 import { requiredEnv } from '../utils/utils.js';
 import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
+import { withdb } from '../databases/mysql.js';
+import { q_addUser } from '../databases/queries.js';
 
-const allowedRoles = ["cliente", "proveedor"];
+const allowedRoles = ["client", "provider"];
 
 
 export async function registerController(req, res) {
     try {
-        const { email, password, role } = req.body;
+        const { name, email, password, role } = req.body;
 
-        if (!email || !password) {
+        if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
                 errors: [
-                    USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED
+                    USER_ERRORS.EMAIL_PASSWORD_USERNAME_NEEDED
                 ]
             });
         }
+
+        // FIREBASE
         const user = await admin.auth().createUser({
             email,
             password,
@@ -28,6 +32,12 @@ export async function registerController(req, res) {
 
 
         await admin.auth().setCustomUserClaims(user.uid, { role });
+
+        // DATABASE
+        const _ = await withdb(conn =>
+            q_addUser(conn, user.uid, name, user.role)
+        );
+        //
 
         res.status(201).json({
             success: true,
