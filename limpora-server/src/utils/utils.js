@@ -1,3 +1,6 @@
+import googleapijson from "../configs/googleapijson.json" with { type: "json" };
+
+
 /**
  * Safely retrieves a required environment variable from process.env.
  *
@@ -13,4 +16,32 @@ export function requiredEnv(name) {
     throw new Error(`Missing environment variable: ${name}`);
   }
   return value;
+}
+
+import { google } from 'googleapis';
+
+const SCOPES = ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile'];
+
+export function getAuthUrl() {
+  const oAuth2Client = new google.auth.OAuth2(
+    requiredEnv('GOOGLE_CLIENT_ID'),
+    requiredEnv('GOOGLE_CLIENT_SECRET'),
+    requiredEnv('GOOGLE_REDIRECT_URI')
+  );
+
+  const authUrl = oAuth2Client.generateAuthUrl({
+    access_type: 'offline',  // permite refresh token
+    scope: SCOPES,
+    prompt: 'consent',       // fuerza que pida permisos siempre
+  });
+
+  return authUrl;
+}
+
+export function newGoogleOauth2() {
+  return new google.auth.OAuth2(
+    requiredEnv('GOOGLE_CLIENT_ID'),
+    requiredEnv('GOOGLE_CLIENT_SECRET'),
+    requiredEnv('GOOGLE_REDIRECT_URI')
+  );
 }

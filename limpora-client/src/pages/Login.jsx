@@ -18,6 +18,10 @@ export function Login() {
 
   const navigate = useNavigate();
 
+  const loginWithGoogle = async () => {
+    window.location.href = "/api/v1/auth/google-url";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -108,6 +112,12 @@ export function Login() {
               className="w-full p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-blue-200/70 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
             >
               {lang("login.submit")}
+            </button>
+            <button
+              onClick={loginWithGoogle}
+              className="w-full p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-blue-200/70 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+            >
+              Google
             </button>
           </form>
 

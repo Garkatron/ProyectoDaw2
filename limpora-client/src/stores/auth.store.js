@@ -9,7 +9,7 @@ export const useAuthStore = create(
             error: null,
 
             login: async (email, password) => {
-                const res = await fetch("/api/v1/users/login", {
+                const res = await fetch("/api/v1/auth/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: 'include',
@@ -33,7 +33,7 @@ export const useAuthStore = create(
             },
 
             register: async (name, email, password, role) => {
-                const res = await fetch("/api/v1/users/register", {
+                const res = await fetch("/api/v1/auth/register", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ name, email, password, role })
@@ -55,7 +55,7 @@ export const useAuthStore = create(
             },
 
             logout: async () => {
-                await fetch("/api/v1/users/logout", { credentials: 'include' })
+                await fetch("/api/v1/auth/logout", { credentials: 'include' })
                 set({
                     user: null,
                     isAuthenticated: false

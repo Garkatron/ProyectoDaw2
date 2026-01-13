@@ -1,9 +1,9 @@
 import admin from '../configs/firebase_config.js';
 import axios from 'axios';
-import { requiredEnv } from '../utils/utils.js';
+import { getAuthUrl, newGoogleOauth2, requiredEnv } from '../utils/utils.js';
 import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
 import { withdb } from '../databases/mysql.js';
-import { q_addUser } from '../databases/queries.js';
+import { q_addUser, q_userExists } from '../databases/queries.js';
 
 const allowedRoles = ["client", "provider"];
 
@@ -124,7 +124,7 @@ export async function loginController(req, res) {
         // TOOD: HTTPS Secure cookie
         res.cookie('session', idToken, {
             httpOnly: true,
-            secure: true,
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'Strict',
             maxAge: 60 * 60 * 1000,
         });
@@ -221,5 +221,94 @@ export async function registerAdmin(req, res) {
         }
 
         res.status(400).json({ success: false, errors: [errorObj] });
+    }
+}
+
+// https://console.cloud.google.com/auth/clients/create?previousPage=%2Fapis%2Fcredentials%3Freferrer%3Dsearch%26hl%3Des%26project%3Dlimpora-484214&hl=es&project=limpora-484214
+export async function googleUrl(req, res) {
+    const url = getAuthUrl();
+    res.redirect(url);
+}
+
+export async function googleCallback(req, res) {
+    let createdUser = null;
+    let isNewUser = false;
+
+    const { code } = req.query;
+
+    if (!code) {
+        return res.redirect(`${requiredEnv("FRONTEND_URL")}/login`);
+    }
+
+    const oAuth2Client = newGoogleOauth2();
+
+    try {
+        const { tokens } = await oAuth2Client.getToken(code);
+        oAuth2Client.setCredentials(tokens);
+
+        const oauth2 = google.oauth2({
+            auth: oAuth2Client,
+            version: 'v2'
+        });
+
+        const { data } = await oauth2.userinfo.get();
+        const { email, name, id: googleId } = data;
+
+        let user;
+        try {
+            user = await admin.auth().getUserByEmail(email);
+        } catch {
+            user = await admin.auth().createUser({
+                email,
+                displayName: name,
+            });
+            let isNewUser = true;
+
+        }
+        createdUser = user;
+
+        await admin.auth().setCustomUserClaims(user.uid, { role: 'client' });
+
+        const customToken = await admin.auth().createCustomToken(user.uid);
+
+        const tokenRes = await axios.post(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${process.env.FIREBASE_API_KEY}`,
+            {
+                token: customToken,
+                returnSecureToken: true,
+            }
+        );
+
+        const result = await withdb(conn =>
+            q_userExists(conn, user.uid, name, "client")
+        );
+        if (!result) {
+            const _ = await withdb(conn =>
+                q_addUser(conn, user.uid, name, "client")
+            );
+        }
+
+        const idToken = tokenRes.data.idToken;
+
+        res.cookie('session', idToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            maxAge: 60 * 60 * 1000,
+        });
+
+        res.redirect(`${requiredEnv("FRONTEND_URL")}/me`);
+
+    } catch (err) {
+        if (isNewUser && createdUser?.uid) {
+            try {
+                await admin.auth().deleteUser(createdUser.uid);
+                console.log('Usuario eliminado de Firebase tras error en DB');
+            } catch (deleteError) {
+                console.error('Error al eliminar usuario:', deleteError);
+            }
+        }
+        console.error(err);
+        res.redirect(`${requiredEnv("FRONTEND_URL")}/login`);
     }
 }

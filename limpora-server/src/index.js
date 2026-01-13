@@ -88,6 +88,7 @@ app.get(
         res.status(200).json({ message: 'My Express + MySQL + JS API!' })
     })
 )
+app.get('/ping', (_, res) => res.send('pong'));
 
 // API prefix
 const API_PREFIX = requiredEnv("API_PREFIX");
@@ -97,7 +98,8 @@ const PREFIX = `${API_PREFIX}/${API_VERSION}`;
 logger.info(`Using prefix: ${PREFIX}`);
 
 // Routes
-app.use(`${PREFIX}/users`, authRoutes);
+app.use(`${PREFIX}/auth`, authRoutes);
+
 
 // ! app.use(`${PREFIX}/users`, userRoutes)
 // ! app.use(`${PREFIX}/questions`, questionRoutes)
