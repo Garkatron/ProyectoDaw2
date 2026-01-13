@@ -5,6 +5,7 @@ import { useAuthStore } from "../stores/auth.store";
 import { useState } from "react";
 import { Modal } from "../components/Modal";
 import { Link, useNavigate } from "react-router-dom";
+import RegisterSchema from "../schemas/RegisterSchema";
 
 export function Rergister({}) {
   const register = useAuthStore((state) => state.register);
@@ -21,22 +22,32 @@ export function Rergister({}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const result = RegisterSchema.safeParse({ name, email, password });
+
+    if (!result.success) {
+      setModalTitle("Validation Error");
+      setModalMessage(result.error.issues[0].message);
+      setModalOpen(true);
+      return;
+    }
+
     try {
       const data = await register(name, email, password, "client");
 
       if (data.success) {
-        setModalTitle("Succefully registered");
-        setModalMessage("¡Redirecting to login!");
+        setModalTitle("Registration Successful");
+        setModalMessage("Redirecting to login...");
         setSuccess(true);
       } else {
         setModalTitle("Error");
-        setModalMessage(data.message || "Error here.");
+        setModalMessage(data.message || "An error occurred.");
       }
 
       setModalOpen(true);
     } catch (err) {
       setModalTitle("Error");
-      setModalMessage(err.message || "Error regitering.");
+      setModalMessage(err.message || "Error registering user.");
       setModalOpen(true);
     }
   };

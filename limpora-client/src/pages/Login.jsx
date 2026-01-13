@@ -3,12 +3,13 @@ import { useAuthStore } from "../stores/auth.store";
 import { useState } from "react";
 import { Modal } from "../components/Modal";
 import { Link, useNavigate } from "react-router-dom";
+import LoginSchema from "../schemas/NewSessionSchema";
 
 export function Login({}) {
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -17,26 +18,35 @@ export function Login({}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const result = LoginSchema.safeParse({ email, password });
+
+    if (!result.success) {
+      setModalTitle("Validation Error");
+      setModalMessage(result.error.issues[0].message);
+      setModalOpen(true);
+      return;
+    }
+
     try {
-      const data = await login(email, password, "client");
+      const data = await login(email, password);
 
       if (data.success) {
-        setModalTitle("Succefully registered");
-        setModalMessage("¡Redirecting to login!");
+        setModalTitle("Loging Successful");
+        setModalMessage("Redirecting to /me...");
         setSuccess(true);
       } else {
         setModalTitle("Error");
-        setModalMessage(data.message || "Error here.");
+        setModalMessage(data.message || "An error occurred.");
       }
 
       setModalOpen(true);
     } catch (err) {
       setModalTitle("Error");
-      setModalMessage(err.message || "Error regitering.");
+      setModalMessage(err.message || "Error loging user.");
       setModalOpen(true);
     }
   };
-
 
   return (
     <div>
