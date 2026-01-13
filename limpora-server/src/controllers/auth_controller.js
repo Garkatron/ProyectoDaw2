@@ -7,17 +7,23 @@ import { q_addUser } from '../databases/queries.js';
 
 const allowedRoles = ["client", "provider"];
 
-
 export async function registerController(req, res) {
+    let createdUser = null;
+
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role = "client" } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
-                errors: [
-                    USER_ERRORS.EMAIL_PASSWORD_USERNAME_NEEDED
-                ]
+                errors: [USER_ERRORS.EMAIL_PASSWORD_USERNAME_NEEDED]
+            });
+        }
+
+        if (!allowedRoles.includes(role)) {
+            return res.status(403).json({
+                success: false,
+                errors: ["Invalid role."]
             });
         }
 
@@ -27,27 +33,36 @@ export async function registerController(req, res) {
             password,
         });
 
-        if (!allowedRoles.includes(role))
-            return res.status(403).json({ message: "Invalid role." });
-
+        createdUser = user;
 
         await admin.auth().setCustomUserClaims(user.uid, { role });
 
-        // DATABASE
         const _ = await withdb(conn =>
-            q_addUser(conn, user.uid, name, user.role)
+            q_addUser(conn, user.uid, name, role)
         );
-        //
 
         res.status(201).json({
             success: true,
             data: {
                 uid: user.uid,
                 email: user.email,
+                role: role
             },
             details: [SUCCESS_MESSAGES.USER_REGISTERED]
         });
+
     } catch (error) {
+        console.error('Error en registro:', error);
+
+        if (createdUser?.uid) {
+            try {
+                await admin.auth().deleteUser(createdUser.uid);
+                console.log('Usuario eliminado de Firebase tras error en DB');
+            } catch (deleteError) {
+                console.error('Error al eliminar usuario:', deleteError);
+            }
+        }
+
         let errorObj = "";
         switch (error.code) {
             case "auth/email-already-in-use":
@@ -62,6 +77,7 @@ export async function registerController(req, res) {
             default:
                 errorObj = error.message;
         }
+
         res.status(400).json({
             success: false,
             errors: [errorObj]

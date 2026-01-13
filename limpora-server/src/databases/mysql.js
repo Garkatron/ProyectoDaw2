@@ -1,6 +1,6 @@
 import mysql from "mysql2/promise";
 import { requiredEnv } from '../utils/utils.js';
-import Logger from '../helpers/logger';
+import Logger from '../helpers/logger.js';
 
 
 const DBPool = mysql.createPool({
@@ -25,6 +25,8 @@ export async function withdb(doit) {
   try {
     return await doit(conn);
   } catch (err) {
+    Logger.error("❌ Error en withdb:", err); 
+    Logger.error("❌ Stack trace:", err.stack); 
     throw new Error("withdb failed", { cause: err });
   } finally {
     await conn.close?.();

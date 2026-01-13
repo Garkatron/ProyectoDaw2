@@ -1,21 +1,43 @@
-import { Link } from "react-router-dom";
 import logo from "../assets/logo-provisional.png";
 import { useEffect } from "react";
 import axios from "axios";
 import { useAuthStore } from "../stores/auth.store";
 import { useState } from "react";
+import { Modal } from "../components/Modal";
+import { Link, useNavigate } from "react-router-dom";
 
 export function Rergister({}) {
-  const login = useAuthStore((state) => state.login);
+  const register = useAuthStore((state) => state.register);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+
+  const [success, setSuccess] = useState(false);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await register(email, password);
+      const data = await register(name, email, password, "client");
+
+      if (data.success) {
+        setModalTitle("Succefully registered");
+        setModalMessage("¡Redirecting to login!");
+        setSuccess(true);
+      } else {
+        setModalTitle("Error");
+        setModalMessage(data.message || "Error here.");
+      }
+
+      setModalOpen(true);
     } catch (err) {
-      console.error(err.message);
+      setModalTitle("Error");
+      setModalMessage(err.message || "Error regitering.");
+      setModalOpen(true);
     }
   };
 
@@ -42,6 +64,10 @@ export function Rergister({}) {
                 required
                 placeholder="Nombre completo"
                 className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400/50 transition duration-150"
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
+                value={name}
               />
             </div>
 
@@ -93,6 +119,17 @@ export function Rergister({}) {
           </form>
         </div>
       </div>
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          if (success) {
+            navigate("/login");
+          }
+        }}
+        title={modalTitle}
+        message={modalMessage}
+      />
     </div>
   );
 }

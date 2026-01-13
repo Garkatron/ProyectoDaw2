@@ -11,7 +11,7 @@ CREATE TABLE Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     firebase_uid VARCHAR(128) NOT NULL UNIQUE,
     name VARCHAR(50),
-    role ENUM('admin', 'provider', 'user') DEFAULT 'user',
+    role ENUM('admin', 'provider', 'client') DEFAULT 'client',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -1,6 +1,8 @@
 
 services:
   limpora-server:
+    networks:
+      - limpora-network
     env_file:
       - .env
     build:
@@ -38,6 +40,8 @@ services:
         interval: 5s
         timeout: 5s
         retries: 10
+    networks:
+      - limpora-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -50,7 +54,13 @@ services:
       PMA_PASSWORD: 123456
     depends_on:
       - mysql
-
+    networks:
+      - limpora-network
 volumes:
   mysql_data:
   node_modules:
+
+networks:
+  limpora-network:
+    name: limpora-network
+    driver: bridge

@@ -7,42 +7,52 @@ export const useAuthStore = create(
             user: null,
             token: null,
             isAuthenticated: false,
-
+            error: null,
 
             login: async (email, password) => {
-                const res = await fetch("/api/v1", {
+                const res = await fetch("/api/v1/users/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password })
                 })
 
-                if (!res.ok) throw new Error("Login failed");
-
                 const data = await res.json();
+
+                if (!res.ok) {
+                    const errorMessage = data.errors?.[0] || "Login failed";
+                    set({ error: errorMessage });
+                    throw new Error(errorMessage);
+                }
 
                 set({
                     user: data.user,
                     token: data.token,
                     isAuthenticated: true
                 });
+
+                return data;
             },
 
-            register: async (name, email, password) => {
-                const res = await fetch("/api/v1/register", {
+            register: async (name, email, password, role) => {
+                const res = await fetch("/api/v1/users/register", {
                     method: "POST",
-                    headers: { "Content-Type": "aplication/json" },
-                    body: JSON.stringify({ name, email, password })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password, role })
                 });
-
-                if (!res.ok) throw new Error('Register failed');
 
                 const data = await res.json();
 
+                if (!res.ok) {
+                    const errorMessage = data.errors?.[0] || "Register failed";
+                    set({ error: errorMessage });
+                    throw new Error(errorMessage);
+                }
+
                 set({
-                    user: data.user,
-                    token: data.token,
-                    isAuthenticated: true
-                })
+                    error: null,
+                });
+
+                return data;
             },
 
             logout: () => {
@@ -51,7 +61,8 @@ export const useAuthStore = create(
                     token: null,
                     isAuthenticated: false
                 });
-            }
+            },
+            clearError: () => set({ error: null })
         }),
         {
             name: 'auth-storage'
