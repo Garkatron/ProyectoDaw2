@@ -20,3 +20,30 @@ userpanel.label.email = Email
 userpanel.label.completed_appointments = Citas Completas
 userpanel.label.total_points = Puntos totales
 userpanel.title.reviews = Reseñas
+
+# Login
+login.title = Iniciar Sesión
+login.email = Correo Electrónico
+login.password = Contraseña
+login.submit = Acceder
+login.register = Registrarse
+login.validation_error = Error de Validación
+login.success_title = Inicio de Sesión Exitoso
+login.success_message = Redirigiendo a /me...
+login.error_title = Error
+login.generic_error = Ocurrió un error
+login.login_error = Error al iniciar sesión
+
+# Register
+register.title = Registro
+register.name = Nombre completo
+register.email = Correo Electrónico
+register.password = Contraseña
+register.submit = Confirmar
+register.cancel = Cancelar
+register.validation_error = Error de Validación
+register.success_title = Registro Exitoso
+register.success_message = Redirigiendo al login...
+register.error_title = Error
+register.generic_error = Ocurrió un error
+register.register_error = Error al registrar usuario

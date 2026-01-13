@@ -9,9 +9,7 @@ import { initLangManager } from "./utils/LangManager.js";
 initLangManager().then(() => {
   createRoot(document.getElementById("root")).render(
     <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <App />
     </BrowserRouter>
   );
 });

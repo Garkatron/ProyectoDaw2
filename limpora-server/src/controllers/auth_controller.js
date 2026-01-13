@@ -111,6 +111,24 @@ export async function loginController(req, res) {
 
         const sessionToken = await admin.auth().createCustomToken(uid);
 
+
+        const tokenResponse = await axios.post(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${requiredEnv("FIREBASE_API_KEY")}`,
+            { token: sessionToken, returnSecureToken: true }
+        );
+
+
+        const idToken = tokenResponse.data.idToken;
+        const refreshToken = tokenResponse.data.refreshToken;
+
+        // TOOD: HTTPS Secure cookie
+        res.cookie('session', idToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'Strict',
+            maxAge: 60 * 60 * 1000,
+        });
+
         req.user = { uid, email };
 
         res.status(200).json({
@@ -118,7 +136,6 @@ export async function loginController(req, res) {
             data: {
                 uid,
                 email,
-                sessionToken,
             },
             details: [SUCCESS_MESSAGES.USER_LOGGED_IN]
         });
@@ -152,21 +169,7 @@ export async function loginController(req, res) {
 
 // Todo: Check logic
 export async function logoutController(req, res) {
-    const { uid } = req.body;
-
-
-    if (!uid) {
-        return res.status(400).json({
-            success: false,
-            errors: [
-                {
-                    code: USER_ERRORS.BAD_REQUEST.code,
-                    message: "User ID is required"
-                }
-            ]
-        });
-    }
-
+    const uid = req.user.uid;
     try {
         await admin.auth().revokeRefreshTokens(uid);
         res.status(200).json({
@@ -180,6 +183,7 @@ export async function logoutController(req, res) {
         });
     }
 }
+
 
 export async function registerAdmin(req, res) {
     const { email, password } = req.body;

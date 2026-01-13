@@ -1,4 +1,3 @@
-import React from 'react';
 import { UserCircleIcon } from '@heroicons/react/24/outline'; // Asegúrate de tener instalados los íconos (ej: npm install @heroicons/react)
 import { Link } from 'react-router-dom';
 import lang from '../utils/LangManager';

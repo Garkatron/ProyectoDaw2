@@ -20,3 +20,33 @@ userpanel.label.email = Email
 userpanel.label.completed_appointments = Completed Appointments
 userpanel.label.total_points = Total Points
 userpanel.title.reviews = Reviews
+
+# Modal
+modal.close = Cerrar
+
+# Login
+login.title = Login
+login.email = Email
+login.password = Password
+login.submit = Sign In
+login.register = Register
+login.validation_error = Validation Error
+login.success_title = Login Successful
+login.success_message = Redirecting to /me...
+login.error_title = Error
+login.generic_error = An error occurred
+login.login_error = Error logging in user
+
+# Register
+register.title = Register
+register.name = Full Name
+register.email = Email
+register.password = Password
+register.submit = Confirm
+register.cancel = Cancel
+register.validation_error = Validation Error
+register.success_title = Registration Successful
+register.success_message = Redirecting to login...
+register.error_title = Error
+register.generic_error = An error occurred
+register.register_error = Error registering user

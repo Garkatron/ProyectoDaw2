@@ -5,7 +5,6 @@ export const useAuthStore = create(
     persist(
         (set) => ({
             user: null,
-            token: null,
             isAuthenticated: false,
             error: null,
 
@@ -13,6 +12,7 @@ export const useAuthStore = create(
                 const res = await fetch("/api/v1/users/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
+                    credentials: 'include',
                     body: JSON.stringify({ email, password })
                 })
 
@@ -26,7 +26,6 @@ export const useAuthStore = create(
 
                 set({
                     user: data.user,
-                    token: data.token,
                     isAuthenticated: true
                 });
 
@@ -55,10 +54,10 @@ export const useAuthStore = create(
                 return data;
             },
 
-            logout: () => {
+            logout: async () => {
+                await fetch("/api/v1/users/logout", { credentials: 'include' })
                 set({
                     user: null,
-                    token: null,
                     isAuthenticated: false
                 });
             },
