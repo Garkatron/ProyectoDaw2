@@ -2,6 +2,13 @@
 export const APP_COMISSION = 10; // ? Temp
 const PASSWORD_REGEX = null; // Todo
 
+export const ROLES = {
+  ADMIN: "admin",
+  CLIENT: "client",
+  PROVIDER: "provider"
+}
+
+
 // ! Error codes
 export const ERROR_CODES = {
 

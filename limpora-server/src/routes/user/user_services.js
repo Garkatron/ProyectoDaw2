@@ -7,6 +7,7 @@ import {
   deleteUserService
 } from "../../controllers/user/user_services_controller.js";
 import { mw_role, mw_session } from '../../middlewares/auth.js';
+import { ROLES } from '../../constants.js';
 
 const userServices = Router();
 
@@ -19,23 +20,23 @@ const userServices = Router();
  * GET /users/{userId}/services
  * Retrieves the list of services offered by a user.
  */
-router.get('/:userId', getUserServices);
+userServices.get('/:userId', getUserServices);
 
 /**
  * GET /users/{userId}/services/{serviceId}
  * Retrieves detailed information about a specific service offered by the user.
  */
-router.get('/:userId/:serviceId', getUserServiceById);
+userServices.get('/:userId/:serviceId', getUserServiceById);
 
 /**
  * POST /users/{userId}/services
  * Adds a service from the global catalog to the user's profile.
  * Requires an active session and "client" role.
  */
-router.post(
+userServices.post(
   '/:userId',
   mw_session,
-  mw_role("client"),
+  mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
   addUserService
 );
 
@@ -45,10 +46,10 @@ router.post(
  * (price, availability, extras, etc.).
  * Requires an active session and "client" role.
  */
-router.patch(
+userServices.patch(
   '/:userId/:serviceId',
   mw_session,
-  mw_role("client"),
+  mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
   updateUserService
 );
 
@@ -57,10 +58,10 @@ router.patch(
  * Removes a service from the user's profile.
  * Requires an active session and "client" role.
  */
-router.delete(
+userServices.delete(
   '/:userId/:serviceId',
   mw_session,
-  mw_role("client"),
+  mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
   deleteUserService
 );
 

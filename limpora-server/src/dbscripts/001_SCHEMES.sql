@@ -67,14 +67,14 @@ CREATE TABLE Appointments (
 -- =========================
 -- RESEÑAS
 -- =========================
+-- =========================
 CREATE TABLE Reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT,
-    rating TINYINT NOT NULL CHECK (
-        rating BETWEEN 1
-        AND 5
-    ),
-    user_id INT NOT NULL,
+    rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    user_id INT NOT NULL,           -- Quien hace la review (cliente)
+    provider_id INT NOT NULL,       -- A quién va dirigida la review
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(id)
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (provider_id) REFERENCES Users(id)
 );

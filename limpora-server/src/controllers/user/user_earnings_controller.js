@@ -1,5 +1,5 @@
 import { withdb } from '../../databases/mysql.js';
-import { q_getEarnings } from '../../databases/queries';
+import { q_getEarnings } from '../../databases/queries.js';
 
 export const getUserEarnings = (req, res) => {
   const { userId } = req.params;

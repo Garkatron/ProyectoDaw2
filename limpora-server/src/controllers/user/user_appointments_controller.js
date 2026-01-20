@@ -1,5 +1,5 @@
-import { q_addAppointmentToUser, q_getAppointmentsByUser } from "../../databases/queries";
-import { APP_COMISSION } from '../../constants';
+import { q_addAppointmentToUser, q_getAppointmentsByUser } from "../../databases/queries.js";
+import { APP_COMISSION } from '../../constants.js';
 import { withdb } from '../../databases/mysql.js';
 
 export const getUserAppointments = async (req, res) => {

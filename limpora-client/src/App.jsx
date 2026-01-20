@@ -16,7 +16,6 @@ import BookingConfirmation from "./pages/BookingConfirmation";
 import { initLangManager } from "./utils/LangManager";
 
 function App() {
-
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -24,7 +23,8 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       <Route element={<PrivateRoute />}>
-        <Route path="/me" element={<UserPanel />} />
+        <Route path="/panel/:username" element={<UserPanel />} />
+
         <Route path="/currency" element={<Currency />} />
         <Route path="/userfinder" element={<UserFinder />} />
         <Route path="/booking" element={<BookingConfirmation />} />

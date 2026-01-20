@@ -1,11 +1,11 @@
-import { withdb } from '../../databases/mysql.js';
-import { q_getServices, q_getAvailableServices, q_getServiceById, q_addService, q_deleteService } from '../databases/queries.js';
+import { withdb } from '../databases/mysql.js';
+import { q_getServices, q_getServiceById, q_addService, q_deleteService } from '../databases/queries.js';
 
 export const getAllServices = async (req, res) => {
   try {
     // DATABASE
     const result = await withdb(conn =>
-      q_getAvailableServices(conn)
+      q_getServices(conn)
     );
     //
     res.status(201).json({ success: true, data: result });
@@ -13,7 +13,6 @@ export const getAllServices = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error getting services' });
   }
 };
-
 
 export const getServiceById = async (req, res) => {
   const { serviceId } = req.params;

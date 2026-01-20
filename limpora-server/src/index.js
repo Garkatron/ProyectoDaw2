@@ -38,8 +38,10 @@ import { asyncHandler } from './helpers/utils.js'
 import authRoutes from './routes/auth_routes.js';
 
 // Database
-import { connectWithRetry, pingDB } from './databases/mysql.js'
-import { requiredEnv } from './utils/utils.js'
+import { connectWithRetry} from './databases/mysql.js';
+import { requiredEnv } from './utils/utils.js';
+import userIndexRouter from './routes/user/user_index.js';
+import servicesRouter from './routes/services.js';
 
 // Load environment
 dotenv.config({ path: '.env' })
@@ -99,6 +101,9 @@ logger.info(`Using prefix: ${PREFIX}`);
 
 // Routes
 app.use(`${PREFIX}/auth`, authRoutes);
+app.use(`${PREFIX}/user`, userIndexRouter);
+
+app.use(`${PREFIX}/services`, servicesRouter);
 
 
 // ! app.use(`${PREFIX}/users`, userRoutes)

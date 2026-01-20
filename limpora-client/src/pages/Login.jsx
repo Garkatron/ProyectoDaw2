@@ -137,7 +137,7 @@ export function Login() {
         onClose={() => {
           setModalOpen(false);
           if (success) {
-            navigate("/me");
+            navigate("/panel/me");
           }
         }}
         title={modalTitle}
