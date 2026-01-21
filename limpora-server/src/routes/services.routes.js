@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createService, deleteService, getAllServices, getServiceById } from '../controllers/services_controller.js';
+import { createService, deleteService, getAllServices, getServiceById } from '../controllers/services.controller.js';
 import { mw_role, mw_session } from '../middlewares/auth.js';
 
 const servicesRouter = Router();

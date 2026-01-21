@@ -1,8 +1,8 @@
-import  { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import logo from '../assets/logo-provisional.png'
-import lang from '../utils/LangManager';
+import { useState } from 'react';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import logo from '../../assets/logo-provisional.png'
+import lang from '../../utils/LangManager';
 
 
 const topUsersData = [
@@ -98,7 +98,7 @@ const UserDetailPanel = ({ user }) => {
 };
 
 
-export function TopUsers({ }) {
+export default function TopUsers({ }) {
     const [selectedUser, setSelectedUser] = useState(topUsersData[0]);
     const listUsers = topUsersData.slice(3);
 

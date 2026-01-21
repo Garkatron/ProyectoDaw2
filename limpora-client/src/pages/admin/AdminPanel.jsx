@@ -32,6 +32,7 @@ export default function AdminPanel() {
   });
 
   const [adminFormData, setAdminFormData] = useState({
+    name: "",
     email: "",
     password: "",
   });
@@ -130,7 +131,7 @@ export default function AdminPanel() {
         `Admin ${adminFormData.email} registrado exitosamente`,
       );
       setShowRegisterAdminModal(false);
-      setAdminFormData({ email: "", password: "" });
+      setAdminFormData({ name: "", email: "", password: "" });
     } catch (err) {
       console.error("Error registering admin:", err);
       showAlert(
@@ -144,7 +145,6 @@ export default function AdminPanel() {
     if (!window.confirm(`¿Estás seguro de eliminar a ${user.name}?`)) return;
 
     try {
-      
       await deleteUser(user.firebase_uid);
       showAlert("success", `Usuario ${user.name} eliminado exitosamente`);
       fetchUsers();
@@ -376,7 +376,19 @@ export default function AdminPanel() {
               ⚠️ Los administradores tienen acceso completo al sistema.
             </p>
           </div>
-
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name
+            </label>
+            <input
+              type="Name"
+              value={adminFormData.name}
+              onChange={(e) =>
+                setAdminFormData({ ...adminFormData, name: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email

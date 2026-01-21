@@ -36,13 +36,14 @@ import { SLOWDOWN_CONFIG } from './configs/slowdown.js'
 import { asyncHandler } from './helpers/utils.js'
 
 // Routes
-import authRoutes from './routes/auth_routes.js';
+import authRoutes from './routes/auth.routes.js';
+import userIndexRouter from './routes/user/user_index.routes.js';
+import servicesRouter from './routes/services.routes.js';
 
 // Database
 import { connectWithRetry} from './databases/mysql.js';
 import { requiredEnv } from './utils/utils.js';
-import userIndexRouter from './routes/user/user_index.js';
-import servicesRouter from './routes/services.js';
+
 
 // Load environment
 dotenv.config({ path: '.env' })

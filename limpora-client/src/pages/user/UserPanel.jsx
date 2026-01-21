@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import Base from "../layouts/Base";
+import Base from "../../layouts/Base";
 import { TrophyIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
-import lang from "../utils/LangManager";
-import { useAuthStore } from "../stores/auth.store";
+import lang from "../../utils/LangManager";
+import { useAuthStore } from "../../stores/auth.store";
 
 const InfoCard = ({ label, value }) => (
   <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-300/20">
@@ -44,7 +43,7 @@ const MetricPill = ({ icon: Icon, label, value, color }) => (
   </div>
 );
 
-export function UserPanel() {
+export default function UserPanel() {
   const { username } = useParams();
   const currentUser = useAuthStore((state) => state.user);
   const [targetUser, setTargetUser] = useState(null);

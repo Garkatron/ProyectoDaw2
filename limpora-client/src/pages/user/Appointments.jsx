@@ -1,6 +1,6 @@
-import BookingCard from "../components/BookingCard";
-import Calendar from "../components/Calendar";
-import Base from "../layouts/Base";
+import BookingCard from "../../components/BookingCard";
+import Calendar from "../../components/Calendar";
+import Base from "../../layouts/Base";
 
 export default function Appointments() {
     return (

@@ -6,7 +6,7 @@ import { withdb } from '../databases/mysql.js';
 import { q_addUser, q_deleteUserByUid, q_getUserByUid, q_userExists } from '../databases/queries.js';
 import { google } from 'googleapis';
 
-const allowedRoles = ["client", "provider"];
+const allowedRoles = ["client", "provider", "admin"];
 
 export async function registerController(req, res) {
     let createdUser = null;
@@ -38,11 +38,25 @@ export async function loginController(req, res) {
         if (!email || !password) return res.status(400).json({ success: false, errors: [USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED] });
         const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`, { email, password, returnSecureToken: true });
         const { localId: uid } = response.data;
-        const sessionToken = await admin.auth().createCustomToken(uid);
+
+
+        let userRecord = await withdb(conn => q_getUserByUid(conn, uid));
+        let role;
+
+        if (userRecord) {
+            role = userRecord.role;
+        } else {
+            const firebaseUser = await admin.auth().getUser(uid);
+            role = firebaseUser.customClaims?.role || "client";
+
+            const name = firebaseUser.displayName || "Unknown";
+            await withdb(conn => q_addUser(conn, uid, name, role));
+        }
+
+        const sessionToken = await admin.auth().createCustomToken(uid, { role });
         const tokenResponse = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${requiredEnv("FIREBASE_API_KEY")}`, { token: sessionToken, returnSecureToken: true });
         const idToken = tokenResponse.data.idToken;
         res.cookie('session', idToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict', maxAge: 60 * 60 * 1000 });
-        let userRecord = await withdb(conn => q_getUserByUid(conn, uid));
         if (!userRecord) {
             const firebaseUser = await admin.auth().getUser(uid);
             const name = firebaseUser.displayName || "Unknown";
@@ -113,11 +127,12 @@ export async function logoutController(req, res) {
 }
 
 export async function registerAdmin(req, res) {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ errors: [ERROR_CODES.BAD_REQUEST] });
+    const { name, email, password } = req.body;
+    if (!name, !email || !password) return res.status(400).json({ errors: [ERROR_CODES.BAD_REQUEST] });
     try {
-        const user = await admin.auth().createUser({ email, password });
+        const user = await admin.auth().createUser({ email, password, displayName: name });
         await admin.auth().setCustomUserClaims(user.uid, { role: "admin" });
+        await withdb(conn => q_addUser(conn, user.uid, name, "admin"));
         res.status(201).json({ success: true, data: { uid: user.uid, email: user.email, role: "admin" }, details: [SUCCESS_MESSAGES.USER_REGISTERED] });
     } catch (error) {
         let errorObj;
@@ -150,7 +165,7 @@ export async function googleCallback(req, res) {
         catch { user = await admin.auth().createUser({ email, displayName: name }); isNewUser = true; }
         createdUser = user;
         await admin.auth().setCustomUserClaims(user.uid, { role: 'client' });
-        const customToken = await admin.auth().createCustomToken(user.uid);
+        const customToken = await admin.auth().createCustomToken(user.uid, { role: 'client' });
         const tokenRes = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${process.env.FIREBASE_API_KEY}`, { token: customToken, returnSecureToken: true });
         const exists = await withdb(conn => q_userExists(conn, user.uid));
         if (!exists) await withdb(conn => q_addUser(conn, user.uid, name, "client"));

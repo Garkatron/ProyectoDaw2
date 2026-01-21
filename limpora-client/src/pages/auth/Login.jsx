@@ -1,12 +1,12 @@
-import logo from "../assets/logo-provisional.png";
-import { useAuthStore } from "../stores/auth.store";
+import logo from "../../assets/logo-provisional.png";
+import { useAuthStore } from "../../stores/auth.store";
 import { useState } from "react";
-import { Modal } from "../components/Modal";
+import { Modal } from "../../components/Modal";
 import { Link, useNavigate } from "react-router-dom";
-import LoginSchema from "../schemas/NewSessionSchema";
-import lang from "../utils/LangManager";
+import LoginSchema from "../../schemas/NewSessionSchema";
+import lang from "../../utils/LangManager";
 
-export function Login() {
+export default function Login() {
   const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { addUserAppointment, getUserAppointments } from '../../controllers/user/user_appointments_controller.js';
+import { addUserAppointment, getUserAppointments } from '../../controllers/user/user_appointments.controller.js';
 import { mw_session } from '../../middlewares/auth.js';
 
 const userAppointmentsRouter = Router();

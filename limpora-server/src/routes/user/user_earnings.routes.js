@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getUserEarnings } from '../../controllers/user/user_earnings_controller.js';
+import { getUserEarnings } from '../../controllers/user/user_earnings.controller.js';
 import { mw_role, mw_session } from '../../middlewares/auth.js';
 import { ROLES } from '../../constants.js';
 

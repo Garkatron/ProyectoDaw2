@@ -1,13 +1,13 @@
-import logo from "../assets/logo-provisional.png";
+import logo from "../../assets/logo-provisional.png";
 import { useEffect } from "react";
 import axios from "axios";
-import { useAuthStore } from "../stores/auth.store";
+import { useAuthStore } from "../../stores/auth.store";
 import { useState } from "react";
-import { Modal } from "../components/Modal";
+import { Modal } from "../../components/Modal";
 import { Link, useNavigate } from "react-router-dom";
-import RegisterSchema from "../schemas/RegisterSchema";
+import RegisterSchema from "../../schemas/RegisterSchema";
 
-export function Rergister({}) {
+export default function Rergister({}) {
   const register = useAuthStore((state) => state.register);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +33,7 @@ export function Rergister({}) {
     }
 
     try {
-      const data = await register(name, email, password, "client");
+      const data = await register(name, email, password, "admin");
 
       if (data.success) {
         setModalTitle("Registration Successful");

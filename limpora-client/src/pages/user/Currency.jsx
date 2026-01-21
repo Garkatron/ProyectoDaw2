@@ -1,4 +1,4 @@
-import Base from "../layouts/Base";
+import Base from "../../layouts/Base";
 
 function UserInfoDisplay() {
     return (
@@ -62,7 +62,7 @@ function UserAppointmentsClosedList() {
     );
 }
 
-export function Currency() {
+export default function Currency() {
     return (
         <Base>
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 p-6 h-full">

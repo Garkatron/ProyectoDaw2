@@ -53,6 +53,7 @@ export function mw_permissions(requiredPermissions = []) {
 export function mw_role(requiredRoles = []) {
     return (req, res, next) => {
         const userRole = req.user?.role;
+        console.log("User role:", req.user);
 
         if (!requiredRoles.includes(userRole)) {
             return res.status(403).json({

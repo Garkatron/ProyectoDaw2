@@ -2,7 +2,7 @@ import UserInfoSidePanel from '../../components/UserInfoSidePanel';
 import Finder from './../../components/Finder';
 import { UserCard } from './../../components/UserCard';
 
-export function AdminUsersView() {
+export default function AdminUsersView() {
     const placeholder = [{ name: "Alice" }, { name: "Bob" }, { name: "Charlie" }];
 
     return (

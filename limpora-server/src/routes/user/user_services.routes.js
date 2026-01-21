@@ -5,7 +5,7 @@ import {
   addUserService,
   updateUserService,
   deleteUserService
-} from "../../controllers/user/user_services_controller.js";
+} from "../../controllers/user/user_services.controller.js";
 import { mw_role, mw_session } from '../../middlewares/auth.js';
 import { ROLES } from '../../constants.js';
 

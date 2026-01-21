@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
-import { Home } from "./pages/Home";
-import { TopUsers } from "./pages/TopUsers";
-import { UserPanel } from "./pages/UserPanel";
-import { Currency } from "./pages/Currency";
-import { Login } from "./pages/Login";
-import { Rergister } from "./pages/Register";
-import { Reviews } from "./pages/Reviews";
-import { AdminUsersView } from "./pages/admin/AdminUsersView";
-import { Routes, Route } from "react-router-dom";
-import { PrivateRoute } from "./components/PrivateRoute";
-import Appointments from "./pages/Appointments";
-import { UserFinder } from "./pages/UserFinder";
-import BookingConfirmation from "./pages/BookingConfirmation";
-import AdminPanel from "./pages/admin/AdminPanel";
+
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/main/Home';
+import PrivateRoute from './components/PrivateRoute';
+import UserPanel from './pages/user/UserPanel';
+import Rergister from './pages/auth/Register';
+import Login from './pages/auth/Login';
+import Appointments from './pages/user/Appointments';
+import TopUsers from './pages/main/TopUsers';
+import Reviews from './pages/main/Reviews';
+import AdminPanel from './pages/admin/AdminPanel';
+import AdminUsersView from './pages/admin/AdminUsersView';
+import BookingConfirmation from './pages/user/BookingConfirmation';
+import Currency from './pages/user/Currency';
+import UserFinder from './pages/main/UserFinder';
 
 function App() {
   return (

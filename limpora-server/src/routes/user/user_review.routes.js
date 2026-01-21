@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { mw_role, mw_session } from '../../middlewares/auth.js';
-import { addReview, getAllReviews, getAverageRating, getReviewsByProvider, getReviewsByUser, getReviewsByUsername } from '../../controllers/user/user_review_controller.js';
+import { addReview, getAllReviews, getAverageRating, getReviewsByProvider, getReviewsByUser, getReviewsByUsername } from '../../controllers/user/user_review.controller.js';
 import { ROLES } from '../../constants.js';
 
 const userReviewRouter = Router();

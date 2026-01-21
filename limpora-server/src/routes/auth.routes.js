@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deleteUserController, googleCallback, googleUrl, loginController, logoutController, meController, registerAdmin, registerController } from '../controllers/auth_controller.js';
+import { deleteUserController, googleCallback, googleUrl, loginController, logoutController, meController, registerAdmin, registerController } from '../controllers/auth.controller.js';
 import { mw_role, mw_session } from '../middlewares/auth.js';
 import { ROLES } from '../constants.js';
 

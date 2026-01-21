@@ -1,9 +1,9 @@
 import React from 'react';
-import Base from '../layouts/Base';
-import Navbar from '../components/Navbar';
-import News from '../components/News';
-import logo from '../assets/logo-provisional.png'
-import lang from '../utils/LangManager';
+import Base from '../../layouts/Base';
+import Navbar from '../../components/Navbar';
+import News from '../../components/News';
+import logo from '../../assets/logo-provisional.png'
+import lang from '../../utils/LangManager';
 
 const AboutSection = () => (
     <div className="bg-white p-8 rounded-lg shadow-md border border-gray-300/20 h-full flex items-center justify-center min-h-[400px]">
@@ -11,7 +11,7 @@ const AboutSection = () => (
     </div>
 );
 
-export function Home({ }) {
+export default function Home({ }) {
     return (
         <div>
             <div className="max-w-6xl mx-auto flex flex-col h-[calc(100vh-2rem)] space-y-8 p-4 sm:p-8">
