@@ -6,14 +6,13 @@ import { Currency } from "./pages/Currency";
 import { Login } from "./pages/Login";
 import { Rergister } from "./pages/Register";
 import { Reviews } from "./pages/Reviews";
-import { AdminPanel } from "./pages/admin/AdminPanel";
 import { AdminUsersView } from "./pages/admin/AdminUsersView";
 import { Routes, Route } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute";
 import Appointments from "./pages/Appointments";
 import { UserFinder } from "./pages/UserFinder";
 import BookingConfirmation from "./pages/BookingConfirmation";
-import { initLangManager } from "./utils/LangManager";
+import AdminPanel from "./pages/admin/AdminPanel";
 
 function App() {
   return (
@@ -31,8 +30,8 @@ function App() {
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/top" element={<TopUsers />} />
         <Route path="/reviews" element={<Reviews />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/admin/users" element={<AdminUsersView />} />
+        <Route path="/panel/admin" element={<AdminPanel />} />
+        <Route path="/panel/admin/users" element={<AdminUsersView />} />
       </Route>
     </Routes>
   );

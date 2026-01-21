@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { loginService, registerService } from '../services/auth.service';
+import axios from 'axios';
 
 export const useAuthStore = create(
     persist(
@@ -10,61 +12,46 @@ export const useAuthStore = create(
 
             fetchUser: async () => {
                 try {
-                    const res = await axios.get('/api/v1/user/me');
-                    set({ user: res.data.data });
+                    const res = await axios.get('/api/v1/user/me', { withCredentials: true });
+                    if (res.data?.data) {
+                        set({ user: res.data.data, isAuthenticated: true });
+                    } else {
+                        set({ user: null, isAuthenticated: false });
+                    }
                 } catch {
-                    set({ user: null });
+                    set({ user: null, isAuthenticated: false });
                 }
             },
+
             login: async (email, password) => {
-                const res = await fetch("/api/v1/auth/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: 'include',
-                    body: JSON.stringify({ email, password })
-                })
+                try {
+                    const response = await loginService(email, password);
 
-                const result = await res.json();
+                    if (response.success) {
+                        set({ user: response.data, isAuthenticated: true });
+                    }
 
-                if (!res.ok) {
-                    const errorMessage = data.errors?.[0] || "Login failed";
-                    set({ error: errorMessage });
-                    throw new Error(errorMessage);
+                    return response;
+                } catch (error) {
+                    return {
+                        success: false,
+                        message:
+                            error.response?.data?.errors?.[0] ||
+                            error.message ||
+                            "Error al iniciar sesión"
+                    };
                 }
-
-                set({
-                    user: {
-                        uid: result.data.uid,
-                        email: result.data.email,
-                        name: result.data.name,
-                        role: result.data.role
-                    },
-                    isAuthenticated: true
-                });
-
-                return result;
             },
 
             register: async (name, email, password, role) => {
-                const res = await fetch("/api/v1/auth/register", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ name, email, password, role })
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    const errorMessage = data.errors?.[0] || "Register failed";
-                    set({ error: errorMessage });
-                    throw new Error(errorMessage);
+                try {
+                    const data = await registerService(name, email, password, role);
+                    set({ error: null });
+                    return data;
+                } catch (error) {
+                    set({ error: error.message });
+                    throw error;
                 }
-
-                set({
-                    error: null,
-                });
-
-                return data;
             },
 
             logout: async () => {
@@ -74,7 +61,9 @@ export const useAuthStore = create(
                     isAuthenticated: false
                 });
             },
-            clearError: () => set({ error: null })
+            clearError: () => set({ error: null }),
+           
+
         }),
         {
             name: 'auth-storage'

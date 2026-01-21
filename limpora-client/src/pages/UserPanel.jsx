@@ -54,7 +54,6 @@ export function UserPanel() {
 
   useEffect(() => {
     const fetchData = async () => {
-      
       if (!username || username === "undefined") {
         setError("Invalid username.");
         setLoading(false);
@@ -65,66 +64,47 @@ export function UserPanel() {
       setError(null);
 
       try {
-        let userEndpoint;
-        let reviewsEndpoint;
         const isSelf = username === "me";
-
         let effectiveUser = currentUser;
 
         if (isSelf) {
-          // Si currentUser no está cargado, intentar fetch desde backend
-          if (!currentUser) {
+          if (!effectiveUser) {
             try {
-              const res = await axios.get("/api/v1/user/me", {
-                withCredentials: true,
-              });
-              effectiveUser = res.data.data;
-              // Actualizar store
+              effectiveUser = await getCurrentUser();
               useAuthStore
                 .getState()
                 .set({ user: effectiveUser, isAuthenticated: true });
             } catch {
               setError("No current user found.");
-              setLoading(false);
               return;
             }
           }
 
           if (effectiveUser.role === "admin") {
             setError("Admins cannot access the panel.");
-            setLoading(false);
             return;
           }
-
-          userEndpoint = `/api/v1/user/uid/${effectiveUser.uid}`;
-          reviewsEndpoint = `/api/v1/user/reviews/name/${effectiveUser.name}`;
-        } else {
-          userEndpoint = `/api/v1/user/name/${username}`;
-          reviewsEndpoint = `/api/v1/user/reviews/name/${username}`;
         }
 
-        const userResponse = await axios.get(userEndpoint, {
-          withCredentials: true,
-        });
-        const fetchedUser = userResponse.data.data;
+        const fetchedUser = isSelf
+          ? await getUserByUid(effectiveUser.uid)
+          : await getUserByName(username);
 
         if (fetchedUser.role === "admin") {
           setError("Admin profiles are not visible.");
-          setLoading(false);
           return;
         }
 
         setTargetUser(fetchedUser);
 
-        const reviewsResponse = await axios.get(reviewsEndpoint, {
-          withCredentials: true,
-        });
-        const reviewsData = reviewsResponse.data.data.map((r) => ({
-          id: r.id,
-          reviewer: r.reviewer,
-          rating: r.rating,
-          text: r.text,
-        }));
+        const reviewsData = (await getReviewsByUsername(fetchedUser.name)).map(
+          (r) => ({
+            id: r.id,
+            reviewer: r.reviewer,
+            rating: r.rating,
+            text: r.text,
+          }),
+        );
 
         setUserReviews(reviewsData);
       } catch (err) {

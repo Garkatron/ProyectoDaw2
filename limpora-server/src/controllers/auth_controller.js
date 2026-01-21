@@ -3,7 +3,7 @@ import axios from 'axios';
 import { getAuthUrl, newGoogleOauth2, requiredEnv } from '../utils/utils.js';
 import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
 import { withdb } from '../databases/mysql.js';
-import { q_addUser, q_getUserByUid, q_userExists } from '../databases/queries.js';
+import { q_addUser, q_deleteUserByUid, q_getUserByUid, q_userExists } from '../databases/queries.js';
 import { google } from 'googleapis';
 
 const allowedRoles = ["client", "provider"];
@@ -63,6 +63,44 @@ export async function loginController(req, res) {
         res.status(400).json({ success: false, errors: [errorObj] });
     }
 }
+
+export async function deleteUserController(req, res) {
+    try {
+        const { uid } = req.params;
+
+        if (!uid) {
+            return res.status(400).json({
+                success: false,
+                errors: [USER_ERRORS.USER_NOT_FOUND]
+            });
+        }
+
+        const user = await withdb(conn => q_getUserByUid(conn, uid));
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                errors: [USER_ERRORS.USER_NOT_FOUND]
+            });
+        }
+
+        await admin.auth().deleteUser(uid);
+
+        await withdb(conn => q_deleteUserByUid(conn, uid));
+
+        res.status(200).json({
+            success: true,
+            details: ["Deleted user."]
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            errors: [ERROR_CODES.INTERNAL_ERROR]
+        });
+    }
+}
+
 
 export async function logoutController(req, res) {
     const uid = req.user.uid;

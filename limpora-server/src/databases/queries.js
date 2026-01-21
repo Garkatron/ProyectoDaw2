@@ -50,6 +50,39 @@ export async function q_userExists(conn, firebase_uid) {
     return rows.length > 0 ? rows[0] : null;
 }
 
+export async function q_deleteUserById(conn, id) {
+    const [result] = await conn.query(
+        `DELETE FROM Users WHERE id = ?`,
+        [id]
+    );
+    return result.affectedRows > 0;
+}
+
+export async function q_deleteUserByUid(conn, uid) {
+    const [result] = await conn.query(
+        `DELETE FROM Users WHERE firebase_uid = ?`,
+        [uid]
+    );
+    return result.affectedRows > 0;
+}
+
+export async function q_deleteUserByName(conn, name) {
+    const [result] = await conn.query(
+        `DELETE FROM Users WHERE name = ?`,
+        [name]
+    );
+    return result.affectedRows > 0;
+}
+
+export async function q_softDeleteUserById(conn, id) {
+    const [result] = await conn.query(
+        `UPDATE Users SET deleted_at = NOW() WHERE id = ?`,
+        [id]
+    );
+    return result.affectedRows > 0;
+}
+
+
 // APPOINTMENTS
 
 export async function q_getAppointmentsByUser(conn, userId) {

@@ -15,6 +15,7 @@ export function Login() {
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
   const [success, setSuccess] = useState(false);
+  const [isAdmin, setAdmin] = useState(false);
 
   const navigate = useNavigate();
 
@@ -35,15 +36,19 @@ export function Login() {
     }
 
     try {
-      const data = await login(email, password);
+      const response = await login(email, password);
 
-      if (data.success) {
+      if (response.success) {
         setModalTitle(lang("login.success_title"));
         setModalMessage(lang("login.success_message"));
         setSuccess(true);
+        console.log(response);
+        if (response.data.role === "admin") {
+          setAdmin(true);
+        }
       } else {
         setModalTitle(lang("login.error_title"));
-        setModalMessage(data.message || lang("login.generic_error"));
+        setModalMessage(response.message || lang("login.generic_error"));
       }
 
       setModalOpen(true);
@@ -137,7 +142,11 @@ export function Login() {
         onClose={() => {
           setModalOpen(false);
           if (success) {
-            navigate("/panel/me");
+            if (isAdmin) {
+              navigate("/panel/admin");
+            } else {
+              navigate("/panel/me");
+            }
           }
         }}
         title={modalTitle}

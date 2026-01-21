@@ -1,0 +1,53 @@
+import { Link } from 'react-router-dom';
+
+export function old_AdminPanel() {
+  return (
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 p-8">
+      <section class="grid grid-cols-3 grid-rows-3 gap-6 w-full max-w-4xl">
+
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+
+
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+
+
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+        <Link to="/admin/users" class="bg-white border border-gray-300/20 shadow-sm rounded-lg p-8 flex flex-col items-center gap-3 text-gray-800 hover:bg-gray-100 transition-colors">
+          <span class="text-4xl">👥</span>
+          <span class="text-sm font-medium text-gray-700">Usuarios</span>
+        </Link>
+
+      </section>
+    </div>
+  );
+}

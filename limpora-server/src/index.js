@@ -11,6 +11,7 @@ import express from 'express'
 import { fileURLToPath } from 'url'
 import path from 'path'
 import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser';
 
 // Security
 import helmet from 'helmet'
@@ -56,6 +57,7 @@ const app = express()
 // Basic
 app.set('port', PORT)
 app.use(express.json())
+app.use(cookieParser());
 
 // Security
 app.use(cors(CORS_CONFIG))

@@ -4,25 +4,26 @@ import admin from "../configs/firebase_config.js";
  * If valid, attaches the user object to `req.user`.
  */
 export async function mw_session(req, res, next) {
-    const header = req.headers["authorization"];
-    const token = header?.split(" ")[1];
-
-    if (!token) {
-        return res.status(401).json({ success: false, message: "Token expected" });
-    }
-
     try {
+        const token = req.cookies.session || req.headers["authorization"]?.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ success: false, message: "Token expected" });
+        }
+
         const claims = await admin.auth().verifyIdToken(token);
         req.user = {
             uid: claims.uid,
             email: claims.email,
-            permissions: claims.permissions || [] 
+            permissions: claims.permissions || []
         };
         next();
     } catch (err) {
-        return res.status(401).json({ error: `Prohibited access: ${err.message}` });
+        console.error("Auth middleware error:", err);
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
+
+
 /**
  * Middleware to check if the authenticated user has the required permissions.
  * Returns 403 if the user lacks any of the specified permissions.
