@@ -9,7 +9,6 @@ import Appointments from './pages/user/Appointments';
 import TopUsers from './pages/main/TopUsers';
 import Reviews from './pages/main/Reviews';
 import AdminPanel from './pages/admin/AdminPanel';
-import AdminUsersView from './pages/admin/AdminUsersView';
 import BookingConfirmation from './pages/user/BookingConfirmation';
 import Currency from './pages/user/Currency';
 import UserFinder from './pages/main/UserFinder';
@@ -31,7 +30,6 @@ function App() {
         <Route path="/top" element={<TopUsers />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/panel/admin" element={<AdminPanel />} />
-        <Route path="/panel/admin/users" element={<AdminUsersView />} />
       </Route>
     </Routes>
   );

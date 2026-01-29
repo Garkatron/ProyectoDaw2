@@ -27,7 +27,7 @@ const Navbar = () => {
       </div>
       
       <Link 
-        to="/me"
+        to="/panel/me"
         className="p-2 rounded-full transition-colors hover:bg-gray-100/50 cursor-pointer flex-shrink-0"
       >
         <UserCircleIcon className="h-8 w-8 text-gray-600" />

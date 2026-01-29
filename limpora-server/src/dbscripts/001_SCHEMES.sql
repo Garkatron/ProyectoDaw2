@@ -36,11 +36,7 @@ CREATE TABLE UserBadges (
 -- =========================
 CREATE TABLE Services (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name ENUM(
-        'Internal Cleaning',
-        'External Cleaning',
-        'Pools'
-    ) NOT NULL,
+    name VARCHAR(50) NOT NULL,
     duration TIME NOT NULL
 );
 
