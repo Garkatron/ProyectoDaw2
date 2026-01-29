@@ -33,7 +33,7 @@ export default function Rergister({}) {
     }
 
     try {
-      const data = await register(name, email, password, "admin");
+      const data = await register(result.data.name, result.data.email, result.data.password, "admin");
 
       if (data.success) {
         setModalTitle("Registration Successful");

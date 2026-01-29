@@ -36,7 +36,7 @@ export default function Login() {
     }
 
     try {
-      const response = await login(email, password);
+      const response = await login(result.data.email, result.data.password);
 
       if (response.success) {
         setModalTitle(lang("login.success_title"));
@@ -119,6 +119,7 @@ export default function Login() {
               {lang("login.submit")}
             </button>
             <button
+              type="button"
               onClick={loginWithGoogle}
               className="w-full p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-blue-200/70 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
             >

@@ -4,6 +4,8 @@ import Base from "../../layouts/Base";
 import { TrophyIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
 import lang from "../../utils/LangManager";
 import { useAuthStore } from "../../stores/auth.store";
+import { getUserByUid } from "../../services/user.service";
+import { getReviewsByUsername } from '../../services/reviews.service';
 
 const InfoCard = ({ label, value }) => (
   <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-300/20">

@@ -53,8 +53,8 @@ export default function AdminPanel() {
       });
       const allUsers = response.data.data || [];
       const nonAdminUsers = allUsers.filter((u) => u.role !== "admin");
-      setUsers(nonAdminUsers);
-      setFilteredUsers(nonAdminUsers);
+      setUsers(allUsers);
+      setFilteredUsers(allUsers);
     } catch (err) {
       console.error("Error fetching users:", err);
       showAlert("error", "Error al cargar usuarios");
@@ -120,6 +120,7 @@ export default function AdminPanel() {
         {
           email: adminFormData.email,
           password: adminFormData.password,
+          name: adminFormData.name,
         },
         {
           withCredentials: true,
