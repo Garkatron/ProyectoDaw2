@@ -8,6 +8,8 @@ import {
 } from "../../controllers/user/user_services.controller.js";
 import { mw_role, mw_session } from '../../middlewares/auth.js';
 import { ROLES } from '../../constants.js';
+import { body, param } from 'express-validator';
+import { handleValidationErrors } from './../../utils/sanitization';
 
 const userServices = Router();
 
@@ -20,13 +22,24 @@ const userServices = Router();
  * GET /users/{userId}/services
  * Retrieves the list of services offered by a user.
  */
-userServices.get('/:userId', getUserServices);
+userServices.get(
+  '/:userId', 
+  param("userId").trim().escape().isNumeric(),
+  handleValidationErrors,
+  getUserServices
+);
 
 /**
  * GET /users/{userId}/services/{serviceId}
  * Retrieves detailed information about a specific service offered by the user.
  */
-userServices.get('/:userId/:serviceId', getUserServiceById);
+userServices.get(
+  '/:userId/:serviceId', 
+  param("userId").trim().escape().isNumeric(),
+  param("serviceId").trim().escape().isNumeric(),
+  handleValidationErrors,
+  getUserServiceById
+);
 
 /**
  * POST /users/{userId}/services
@@ -35,6 +48,10 @@ userServices.get('/:userId/:serviceId', getUserServiceById);
  */
 userServices.post(
   '/:userId',
+
+  param("userId").trim().escape().isNumeric(),
+  handleValidationErrors,
+
   mw_session,
   mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
   addUserService
@@ -50,6 +67,12 @@ userServices.patch(
   '/:userId/:serviceId',
   mw_session,
   mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
+
+
+  param("userId").trim().escape().isNumeric(),
+  param("serviceId").trim().escape().isNumeric(),
+  handleValidationErrors,
+
   updateUserService
 );
 
@@ -62,6 +85,11 @@ userServices.delete(
   '/:userId/:serviceId',
   mw_session,
   mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
+  
+  param("userId").trim().escape().isNumeric(),
+  param("serviceId").trim().escape().isNumeric(),
+  handleValidationErrors,
+  
   deleteUserService
 );
 

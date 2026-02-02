@@ -4,7 +4,7 @@ import { q_getEarnings } from '../../databases/queries.js';
 export const getUserEarnings = (req, res) => {
   const { userId } = req.params;
   try {
-    const result = withdb(conn => q_getEarnings(conn));
+    const result = withdb(conn => q_getEarnings(conn, userId));
     res.status(201).json({ success: true, data: result });
 
   } catch (error) {
