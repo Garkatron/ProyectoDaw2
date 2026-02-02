@@ -2,7 +2,7 @@ import React from 'react';
 import Base from '../../layouts/Base';
 import Navbar from '../../components/Navbar';
 import News from '../../components/News';
-import logo from '../../assets/logo-provisional.png'
+import logo from '../../assets/logo.svg'
 import lang from '../../utils/LangManager';
 
 const AboutSection = () => (
