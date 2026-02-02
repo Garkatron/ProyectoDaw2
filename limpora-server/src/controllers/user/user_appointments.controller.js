@@ -29,7 +29,7 @@ export const addUserAppointment = async (req, res) => {
         conn,
         d,
         price,
-        APP_COMMISSION,
+        APP_COMISSION,
         totalAmount,
         paymentMethod,
         clientId,

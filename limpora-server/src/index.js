@@ -108,11 +108,6 @@ app.use(`${PREFIX}/user`, userIndexRouter);
 
 app.use(`${PREFIX}/services`, servicesRouter);
 
-
-// ! app.use(`${PREFIX}/users`, userRoutes)
-// ! app.use(`${PREFIX}/questions`, questionRoutes)
-// ! app.use(`${PREFIX}/collections`, collectionRoutes)
-
 // Swagger API Docs
 const swaggerSpec = swaggerJSDoc(SWAGGER_CONFIG)
 app.use(

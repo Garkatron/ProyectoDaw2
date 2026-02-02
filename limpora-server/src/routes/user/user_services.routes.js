@@ -13,15 +13,7 @@ import { handleValidationErrors } from './../../utils/sanitization';
 
 const userServices = Router();
 
-/**
- * User Services (Freelancer / Provider)
- * Base path: /api/v1/users/{userId}/services
- */
 
-/**
- * GET /users/{userId}/services
- * Retrieves the list of services offered by a user.
- */
 userServices.get(
   '/:userId', 
   param("userId").trim().escape().isNumeric(),
@@ -29,10 +21,7 @@ userServices.get(
   getUserServices
 );
 
-/**
- * GET /users/{userId}/services/{serviceId}
- * Retrieves detailed information about a specific service offered by the user.
- */
+
 userServices.get(
   '/:userId/:serviceId', 
   param("userId").trim().escape().isNumeric(),
@@ -41,11 +30,8 @@ userServices.get(
   getUserServiceById
 );
 
-/**
- * POST /users/{userId}/services
- * Adds a service from the global catalog to the user's profile.
- * Requires an active session and "client" role.
- */
+
+
 userServices.post(
   '/:userId',
 
@@ -57,12 +43,6 @@ userServices.post(
   addUserService
 );
 
-/**
- * PATCH /users/{userId}/services/{serviceId}
- * Updates user-specific service data
- * (price, availability, extras, etc.).
- * Requires an active session and "client" role.
- */
 userServices.patch(
   '/:userId/:serviceId',
   mw_session,

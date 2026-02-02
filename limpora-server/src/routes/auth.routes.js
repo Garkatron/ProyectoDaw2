@@ -46,8 +46,6 @@ authRoutes.get('/google-url', googleUrl);
 
 authRoutes.get('/callback', googleCallback);
 
-
-
 authRoutes.post(
     '/reg_admin', 
     mw_session, 
