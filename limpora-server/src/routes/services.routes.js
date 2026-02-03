@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { createService, deleteService, getAllServices, getServiceById } from '../controllers/services.controller.js';
 import { mw_role, mw_session } from '../middlewares/auth.js';
 import { body, param } from 'express-validator';
-import { handleValidationErrors } from './../../utils/sanitization';
+import { handleValidationErrors } from '../utils/sanitization.js';
 
 const servicesRouter = Router();
 

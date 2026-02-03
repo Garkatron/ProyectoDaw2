@@ -86,7 +86,7 @@ export async function loginController(req, res) {
 
         res.status(200).json({
             success: true,
-            data: { uid, email, name: userRecord.name, role: userRecord.role },
+            data: { uid, email, name: userRecord.name, role: userRecord.role, id: userRecord.id },
             details: [SUCCESS_MESSAGES.USER_LOGGED_IN]
         });
 

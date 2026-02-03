@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { addUserAppointment, getUserAppointments } from '../../controllers/user/user_appointments.controller.js';
 import { mw_session } from '../../middlewares/auth.js';
 import { body, param } from 'express-validator';
-import { handleValidationErrors } from './../../utils/sanitization';
+import { handleValidationErrors } from '../../utils/sanitization.js';
 
 
 const userAppointmentsRouter = Router();

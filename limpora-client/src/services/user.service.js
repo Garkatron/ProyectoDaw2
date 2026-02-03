@@ -13,8 +13,9 @@ export const registerAdmin = (data) =>
   API.post("/auth/reg_admin", data, { withCredentials: true });
 
 
+// { uid, email, name: userRecord.name, role: userRecord.role },
 export const getCurrentUser = async () => {
-  const { data } = await API.get("/user/me");
+  const { data } = await API.get("/auth/me");
   return data.data;
 };
 

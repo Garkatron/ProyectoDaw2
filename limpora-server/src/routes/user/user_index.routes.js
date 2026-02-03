@@ -5,7 +5,7 @@ import userAppointmentsRouter from './user_appointments.routes.js';
 import userReviewRouter from './user_review.routes.js';
 import { getUserById, getUserByName, getUserByUid, getUsers } from '../../controllers/user.controller.js';
 import { body, param } from 'express-validator';
-import { handleValidationErrors } from './../../utils/sanitization';
+import { handleValidationErrors } from '../../utils/sanitization.js';
 
 const userIndexRouter = Router();
 

@@ -3,7 +3,7 @@ import { mw_role, mw_session } from '../../middlewares/auth.js';
 import { addReview, getAllReviews, getAverageRating, getReviewsByProvider, getReviewsByUser, getReviewsByUsername } from '../../controllers/user/user_review.controller.js';
 import { ROLES } from '../../constants.js';
 import { body, param } from 'express-validator';
-import { handleValidationErrors } from './../../utils/sanitization';
+import { handleValidationErrors } from '../../utils/sanitization.js';
 
 const userReviewRouter = Router();
 

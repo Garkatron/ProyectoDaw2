@@ -221,3 +221,103 @@ export async function q_getAverageRating(conn, providerId) {
     );
     return rows[0] || { provider_id: providerId, average_rating: 0, total_reviews: 0 };
 }
+
+export async function q_getUserServices(conn, userId) {
+    const [rows] = await conn.query(
+        `SELECT 
+            us.user_id,
+            us.service_id,
+            us.price,
+            us.is_active,
+            us.created_at,
+            us.updated_at,
+            s.name AS service_name,
+            s.duration AS service_duration
+         FROM UserServices us
+         INNER JOIN Services s ON us.service_id = s.id
+         WHERE us.user_id = ?
+         ORDER BY us.created_at DESC`,
+        [userId]
+    );
+    return rows;
+}
+
+
+export async function q_getUserServiceById(conn, userId, serviceId) {
+    const [rows] = await conn.query(
+        `SELECT 
+            us.user_id,
+            us.service_id,
+            us.price,
+            us.is_active,
+            us.created_at,
+            us.updated_at,
+            s.name AS service_name,
+            s.duration AS service_duration
+         FROM UserServices us
+         INNER JOIN Services s ON us.service_id = s.id
+         WHERE us.user_id = ? AND us.service_id = ?`,
+        [userId, serviceId]
+    );
+    return rows[0] || null;
+}
+
+
+export async function q_addUserService(conn, userId, serviceId, price, isActive = true) {
+    const [result] = await conn.query(
+        `INSERT INTO UserServices (user_id, service_id, price, is_active)
+         VALUES (?, ?, ?, ?)`,
+        [userId, serviceId, price, isActive]
+    );
+    return result;
+}
+
+
+export async function q_updateUserService(conn, userId, serviceId, data) {
+    const updates = [];
+    const values = [];
+
+    if (data.price !== undefined) {
+        updates.push('price = ?');
+        values.push(data.price);
+    }
+
+    if (data.is_active !== undefined) {
+        updates.push('is_active = ?');
+        values.push(data.is_active);
+    }
+
+    if (updates.length === 0) {
+        throw new Error('No fields to update');
+    }
+
+    values.push(userId, serviceId);
+
+    const [result] = await conn.query(
+        `UPDATE UserServices 
+         SET ${updates.join(', ')}
+         WHERE user_id = ? AND service_id = ?`,
+        values
+    );
+
+    return result;
+}
+ 
+export async function q_deleteUserService(conn, userId, serviceId) {
+    const [result] = await conn.query(
+        `DELETE FROM UserServices 
+         WHERE user_id = ? AND service_id = ?`,
+        [userId, serviceId]
+    );
+    return result;
+}
+
+
+export async function q_userServiceExists(conn, userId, serviceId) {
+    const [rows] = await conn.query(
+        `SELECT 1 FROM UserServices 
+         WHERE user_id = ? AND service_id = ?`,
+        [userId, serviceId]
+    );
+    return rows.length > 0;
+}

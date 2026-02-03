@@ -1,8 +1,8 @@
-import { body, param } from 'express-validator';
+import { validationResult } from 'express-validator'
 
 
-export const handleValidationErrors = (req, res, next) => {
-    const errors = validationResult(req)
+export function handleValidationErrors (req, res, next) {
+    const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         res.status(400).json({
@@ -14,7 +14,7 @@ export const handleValidationErrors = (req, res, next) => {
                 value: err.type === 'field' ? err.value : undefined
             }))
         })
-        return
+        return;
     }
 
     next()

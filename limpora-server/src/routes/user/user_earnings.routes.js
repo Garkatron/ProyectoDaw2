@@ -3,7 +3,7 @@ import { getUserEarnings } from '../../controllers/user/user_earnings.controller
 import { mw_role, mw_session } from '../../middlewares/auth.js';
 import { ROLES } from '../../constants.js';
 import { body, param } from 'express-validator';
-import { handleValidationErrors } from './../../utils/sanitization';
+import { handleValidationErrors } from '../../utils/sanitization.js';
 
 const userEarningsRouter = Router();
 

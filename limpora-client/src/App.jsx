@@ -28,7 +28,6 @@ function App() {
         <Route path="/booking" element={<BookingConfirmation />} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/top" element={<TopUsers />} />
-        <Route path="/reviews" element={<Reviews />} />
         <Route path="/panel/admin" element={<AdminPanel />} />
       </Route>
     </Routes>

@@ -9,7 +9,7 @@ import {
 import { mw_role, mw_session } from '../../middlewares/auth.js';
 import { ROLES } from '../../constants.js';
 import { body, param } from 'express-validator';
-import { handleValidationErrors } from './../../utils/sanitization';
+import { handleValidationErrors } from '../../utils/sanitization.js';
 
 const userServices = Router();
 
@@ -31,15 +31,15 @@ userServices.get(
 );
 
 
-
 userServices.post(
   '/:userId',
+
+  mw_session,
+  mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
 
   param("userId").trim().escape().isNumeric(),
   handleValidationErrors,
 
-  mw_session,
-  mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
   addUserService
 );
 
