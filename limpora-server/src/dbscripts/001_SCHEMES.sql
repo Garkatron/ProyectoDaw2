@@ -101,4 +101,24 @@ BEGIN
     END IF;
 END//
 
+
+CREATE TABLE EmailVerificationCodes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    code VARCHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (code),
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_email_verification_code
+ON EmailVerificationCodes (code);
+
+CREATE INDEX idx_email_verification_user
+ON EmailVerificationCodes (user_id);
+
+
 DELIMITER ;

@@ -103,7 +103,10 @@ export const SUCCESS_MESSAGES = {
     code: "USER_REGISTERED",
     message: "User registered successfully"
   },
-
+  EMAIL_CONFMIRMED: {
+    code: "EMAIL_CONFMIRMED",
+    message: "Email verifycated successfully"
+  },
   USER_LOGGED_IN: {
     code: "USER_LOGGED_IN",
     message: "User logged in successfully"

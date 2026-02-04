@@ -1,4 +1,6 @@
+import { bcrypt } from 'bcrypt';
 // USER
+
 export async function q_getUsers(conn) {
     const [rows] = await conn.query("SELECT * FROM Users;");
     return rows;
@@ -119,7 +121,7 @@ export async function q_addAppointmentToUser(
 // EARNIGS
 
 export const q_getEarnings = async (conn, userId) => {
-  const [rows] = conn.query(`
+    const [rows] = conn.query(`
     SELECT 
       COUNT(CASE WHEN status = 'Completed' THEN 1 END) as closed_appointments,
       COUNT(CASE WHEN status = 'Cancelled' THEN 1 END) as cancelled_appointments,
@@ -128,12 +130,12 @@ export const q_getEarnings = async (conn, userId) => {
     FROM Appointments
     WHERE provider_id = ?
   `, [userId]);
-  
-  return rows[0];
+
+    return rows[0];
 };
 
 export const q_getClosedAppointments = async (conn, userId) => {
-  const [rows] = conn.execute(`
+    const [rows] = conn.execute(`
     SELECT 
       a.id,
       a.date_time,
@@ -145,8 +147,8 @@ export const q_getClosedAppointments = async (conn, userId) => {
     WHERE a.provider_id = ?
     ORDER BY a.date_time DESC
   `, [userId]);
-  
-  return rows;
+
+    return rows;
 };
 
 // SERVICES
@@ -318,7 +320,7 @@ export async function q_updateUserService(conn, userId, serviceId, data) {
 
     return result;
 }
- 
+
 export async function q_deleteUserService(conn, userId, serviceId) {
     const [result] = await conn.query(
         `DELETE FROM UserServices 
@@ -338,7 +340,7 @@ export async function q_userServiceExists(conn, userId, serviceId) {
     return rows.length > 0;
 }
 export const q_getTopUsers = async (conn, limit = 10) => {
-  const [rows] = await conn.query(`
+    const [rows] = await conn.query(`
     SELECT 
       u.id,
       u.name,
@@ -355,12 +357,12 @@ export const q_getTopUsers = async (conn, limit = 10) => {
     ORDER BY u.total_points DESC
     LIMIT ?
   `, [limit]);
-  
-  return rows;
+
+    return rows;
 };
 
 export const q_getUserRankingDetails = async (conn, userId) => {
-  const [rows] = await conn.query(`
+    const [rows] = await conn.query(`
     SELECT 
       u.id,
       u.name,
@@ -380,6 +382,51 @@ export const q_getUserRankingDetails = async (conn, userId) => {
     WHERE u.id = ?
     GROUP BY u.id
   `, [userId]);
-  
-  return rows[0];
+
+    return rows[0];
 };
+
+export async function q_addEmailVerificationCode(conn, userId, code) {
+  const hashedCode = await bcrypt.hash(code, 10);
+
+  const [result] = await conn.query(
+    `INSERT INTO EmailVerificationCodes (
+      user_id,
+      code,
+      expires_at
+    ) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE));`,
+    [userId, hashedCode]
+  );
+
+  return result.affectedRows === 1;
+}
+
+export async function q_markEmailVerificationCodeUsed(conn, codeId) {
+  const [result] = await conn.query(
+    `UPDATE EmailVerificationCodes
+     SET used = true
+     WHERE id = ?;`,
+    [codeId]
+  );
+  return result.affectedRows === 1;
+}
+
+
+export async function q_verifyEmailCode(conn, inputCode) {
+  const [rows] = await conn.query(
+    `SELECT id, user_id, code
+     FROM EmailVerificationCodes
+     WHERE used = false
+       AND expires_at > NOW();`
+  );
+
+  if (rows.length === 0) return null;
+
+  const valid = rows.find(r => bcrypt.compareSync(inputCode, r.code));
+
+  if (!valid) return null;
+
+  await q_markEmailVerificationCodeUsed(conn, valid.id);
+
+  return valid.user_id;
+}

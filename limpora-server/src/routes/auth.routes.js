@@ -1,11 +1,29 @@
 import { Router } from 'express';
-import { deleteUserController, googleCallback, googleUrl, loginController, logoutController, meController, registerAdmin, registerController } from '../controllers/auth.controller.js';
+import { deleteUserController, emailVerifycationController, googleCallback, googleUrl, loginController, logoutController, meController, registerAdmin, registerController, sendVerificationEmailController } from '../controllers/auth.controller.js';
 import { mw_role, mw_session } from '../middlewares/auth.js';
 import { ROLES } from '../constants.js';
 import { body, param } from 'express-validator';
 import { handleValidationErrors } from '../utils/sanitization.js';
 
 const authRoutes = Router();
+
+// Verify Email Code
+authRoutes.post(
+    'vec',
+    body("code").trim().escape().isString(),
+    handleValidationErrors,
+    emailVerifycationController
+);
+
+// Send Email Verifycation Code
+authRoutes.post(
+    'sevcode',
+    body("email").trim().escape().isString(),
+    body("id").trim().escape().isNumeric(),
+    handleValidationErrors,
+    sendVerificationEmailController
+);
+
 
 authRoutes.post(
     '/register',

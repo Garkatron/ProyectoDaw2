@@ -3,10 +3,62 @@ import axios from 'axios';
 import { requiredEnv, newGoogleOauth2, getAuthUrl } from '../utils/utils.js';
 import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
 import { withdb } from '../databases/mysql.js';
-import { q_addUser, q_deleteUserByUid, q_getUserByUid, q_userExists } from '../databases/queries.js';
+import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserByUid, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
 import { google } from 'googleapis';
+import sendVerifycationEmail, { generateVerificationCode } from "../helpers/email_verifycation.js";
 
 const allowedRoles = ["client", "provider", "admin"];
+
+
+export async function emailVerificationController(req, res) {
+  const { code } = req.body;
+
+  try {
+    const userId = await withdb(conn => q_verifyEmailCode(conn, code));
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        errors: ["Código inválido o expirado"]
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      data: { userId },
+      details: [SUCCESS_MESSAGES.EMAIL_CONFMIRMED]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, errors: [err.message] });
+  }
+}
+
+
+export async function sendVerificationEmailController(req, res) {
+  const { userId, email } = req.body;
+
+  try {
+    const { code, hashedCode } = await generateVerificationCode();
+
+    const result = await withdb(conn =>
+      q_addEmailVerificationCode(conn, userId, hashedCode)
+    );
+
+    const emailData = await sendVerifycationEmail(email, code);
+
+    res.status(201).json({
+      success: true,
+      data: { emailId: emailData[0].id },
+      details: ["Email enviado con éxito"]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ success: false, errors: [err.message] });
+  }
+}
+
+
 
 // =========================
 // REGISTER
