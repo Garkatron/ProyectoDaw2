@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deleteUserController, emailVerifycationController, googleCallback, googleUrl, loginController, logoutController, meController, registerAdmin, registerController, sendVerificationEmailController } from '../controllers/auth.controller.js';
+import { deleteUserController, emailVerificationController, googleCallback, googleUrl, loginController, logoutController, meController, registerAdmin, registerController, sendVerificationEmailController } from '../controllers/auth.controller.js';
 import { mw_role, mw_session } from '../middlewares/auth.js';
 import { ROLES } from '../constants.js';
 import { body, param } from 'express-validator';
@@ -12,7 +12,7 @@ authRoutes.post(
     'vec',
     body("code").trim().escape().isString(),
     handleValidationErrors,
-    emailVerifycationController
+    emailVerificationController
 );
 
 // Send Email Verifycation Code

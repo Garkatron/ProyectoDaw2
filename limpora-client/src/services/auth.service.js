@@ -19,6 +19,10 @@ export const registerService = async (name, email, password, role) => {
       role
     });
 
+    if (!name || !email || !password) {
+      throw new Error("All fields required: Name, Email, Password, Role");
+    }
+
     return data;
   } catch (error) {
     const errorMessage =

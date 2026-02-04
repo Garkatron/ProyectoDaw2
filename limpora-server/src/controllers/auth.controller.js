@@ -5,57 +5,57 @@ import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
 import { withdb } from '../databases/mysql.js';
 import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserByUid, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
 import { google } from 'googleapis';
-import sendVerifycationEmail, { generateVerificationCode } from "../helpers/email_verifycation.js";
+import sendVerificationEmail, { generateVerificationCode } from "../helpers/email_verification.js";
 
 const allowedRoles = ["client", "provider", "admin"];
 
 
 export async function emailVerificationController(req, res) {
-  const { code } = req.body;
+    const { code } = req.body;
 
-  try {
-    const userId = await withdb(conn => q_verifyEmailCode(conn, code));
+    try {
+        const userId = await withdb(conn => q_verifyEmailCode(conn, code));
 
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        errors: ["Código inválido o expirado"]
-      });
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                errors: ["Código inválido o expirado"]
+            });
+        }
+
+        res.status(201).json({
+            success: true,
+            data: { userId },
+            details: [SUCCESS_MESSAGES.EMAIL_CONFMIRMED]
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, errors: [err.message] });
     }
-
-    res.status(201).json({
-      success: true,
-      data: { userId },
-      details: [SUCCESS_MESSAGES.EMAIL_CONFMIRMED]
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, errors: [err.message] });
-  }
 }
 
 
 export async function sendVerificationEmailController(req, res) {
-  const { id, email } = req.body;
+    const { id, email } = req.body;
 
-  try {
-    const { code, hashedCode } = await generateVerificationCode();
+    try {
+        const { code, hashedCode } = await generateVerificationCode();
 
-    const result = await withdb(conn =>
-      q_addEmailVerificationCode(conn, id, hashedCode)
-    );
+        const result = await withdb(conn =>
+            q_addEmailVerificationCode(conn, id, hashedCode)
+        );
 
-    const emailData = await sendVerifycationEmail(email, code);
+        const emailData = await sendVerificationEmail(email, code);
 
-    res.status(201).json({
-      success: true,
-      data: { emailId: emailData[0].id },
-      details: ["Email enviado con éxito"]
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ success: false, errors: [err.message] });
-  }
+        res.status(201).json({
+            success: true,
+            data: { emailId: emailData[0].id },
+            details: ["Email enviado con éxito"]
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ success: false, errors: [err.message] });
+    }
 }
 
 
@@ -79,9 +79,16 @@ export async function registerController(req, res) {
 
         await withdb(conn => q_addUser(conn, firebaseUser.uid, name, role));
 
+        let userRecord = await withdb(conn => q_getUserByUid(conn, firebaseUser.uid));
+        if (!userRecord) {
+            const role = firebaseUser.customClaims?.role || "client";
+            const name = firebaseUser.displayName || "Unknown";
+            userRecord = { id: userRecord.id, uid: firebaseUser.uid, name, role };
+        }
+
         res.status(201).json({
             success: true,
-            data: { uid: firebaseUser.uid, email: firebaseUser.email, role },
+            data: { id: userRecord.id, uid: firebaseUser.uid, email: firebaseUser.email, role },
             details: [SUCCESS_MESSAGES.USER_REGISTERED]
         });
     } catch (err) {

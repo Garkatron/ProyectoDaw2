@@ -1,9 +1,9 @@
 import { Resend } from 'resend';
-import { requiredEnv } from './../utils/utils';
+import { requiredEnv } from './../utils/utils.js';
 import bcrypt from "bcrypt";
 const resend = new Resend(requiredEnv("RESEND_KEY"));
 
-export default async function sendVerifycationEmail(emailto, code) {
+export default async function sendVerificationEmail(emailto, code) {
 
   const { data } = await resend.emails.send({
     from: requiredEnv("RESEND_EMAIL_FROM"),

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { sendVerifycationCode, sendVerifycationEmail } from "../../services/code.service";
+import { sendVerifycationCode, sendVerifycationEmail } from "../../services/email.service";
 import { Modal } from "../../components/Modal";
 import logo from "../../assets/logo-provisional.png";
 import { useAuthStore } from "../../stores/auth.store";

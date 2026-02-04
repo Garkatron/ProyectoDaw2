@@ -1,4 +1,4 @@
-import { bcrypt } from 'bcrypt';
+import bcrypt from 'bcrypt';
 // USER
 
 export async function q_getUsers(conn) {
