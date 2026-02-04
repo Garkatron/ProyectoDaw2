@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Base from "../../layouts/Base";
-import { TrophyIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { TrophyIcon, CalendarDaysIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 import lang from "../../utils/LangManager";
 import { useAuthStore } from "../../stores/auth.store";
 import { getUserByUid } from "../../services/user.service";
@@ -47,11 +47,18 @@ const MetricPill = ({ icon: Icon, label, value, color }) => (
 
 export default function UserPanel() {
   const { username } = useParams();
+  const navigate = useNavigate();
   const currentUser = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const [targetUser, setTargetUser] = useState(null);
   const [userReviews, setUserReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,12 +152,11 @@ export default function UserPanel() {
     <Base>
       <div className="max-w-6xl mx-auto space-y-8 p-4 sm:p-8">
         <main className="bg-white rounded-lg shadow-xl border border-gray-300/20">
-          {/* Header y Avatar */}
           <div className="relative">
             <div
               className="h-60 w-full bg-cover bg-center rounded-t-lg"
               style={{
-                backgroundImage: `ur[](https://media.istockphoto.com/id/1360927961/es/foto/fondo-abstracto-con-entrelazamiento-de-l%C3%ADneas-y-puntos-de-colores-estructura-de-conexi%C3%B3n-de.jpg?s=612x612&w=0&k=20&c=fQMuV5lCMxs3u3FZV2Vzhm--XxJGI5uUjMDj5o1SpG8=)`,
+                backgroundImage: `url(https://media.istockphoto.com/id/1360927961/es/foto/fondo-abstracto-con-entrelazamiento-de-l%C3%ADneas-y-puntos-de-colores-estructura-de-conexi%C3%B3n-de.jpg?s=612x612&w=0&k=20&c=fQMuV5lCMxs3u3FZV2Vzhm--XxJGI5uUjMDj5o1SpG8=)`,
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-t-lg"></div>
@@ -160,9 +166,19 @@ export default function UserPanel() {
                 {targetUser.name[0].toUpperCase()}
               </div>
             </div>
+            {isSelf && (
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 px-4 py-2 bg-white/90 hover:bg-white text-gray-700 rounded-lg shadow-md transition-all duration-200 border border-gray-300/20"
+                >
+                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                  <span className="text-sm font-medium">Logout</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Info del usuario */}
           <div className="p-8 pt-16 space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-6 border-b border-gray-100">
               <div className="lg:col-span-1 flex flex-col justify-start pt-4">
@@ -188,7 +204,6 @@ export default function UserPanel() {
               </div>
             </div>
 
-            {/* Métricas */}
             <div className="flex space-x-6 items-center border-b border-gray-100 pb-6">
               <MetricPill
                 icon={CalendarDaysIcon}
@@ -204,7 +219,6 @@ export default function UserPanel() {
               />
             </div>
 
-            {/* Reviews */}
             <div className="space-y-4">
               <h2 className="text-2xl font-light text-gray-800 pb-2 border-b border-gray-100">
                 {lang("userpanel.title.reviews")}

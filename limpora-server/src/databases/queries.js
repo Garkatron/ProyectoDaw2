@@ -118,20 +118,36 @@ export async function q_addAppointmentToUser(
 
 // EARNIGS
 
-export async function q_getEarnings(conn, providerId) {
-    const [rows] = await conn.query(
-        `SELECT provider_id,
-                SUM(total_amount) AS total_received,
-                SUM(app_commission) AS total_commission,
-                SUM(total_amount - app_commission) AS provider_earning
-         FROM Appointments
-         WHERE provider_id = ?
-           AND status = 'Completed'
-         GROUP BY provider_id;`,
-        [providerId]
-    );
-    return rows[0] || { provider_id: providerId, total_received: 0, total_commission: 0, provider_earning: 0 };
-}
+export const q_getEarnings = async (conn, userId) => {
+  const [rows] = conn.query(`
+    SELECT 
+      COUNT(CASE WHEN status = 'Completed' THEN 1 END) as closed_appointments,
+      COUNT(CASE WHEN status = 'Cancelled' THEN 1 END) as cancelled_appointments,
+      COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_amount END), 0) as total_money,
+      COALESCE(SUM(CASE WHEN status IN ('Pending', 'In Process') THEN total_amount END), 0) as retained_money
+    FROM Appointments
+    WHERE provider_id = ?
+  `, [userId]);
+  
+  return rows[0];
+};
+
+export const q_getClosedAppointments = async (conn, userId) => {
+  const [rows] = conn.execute(`
+    SELECT 
+      a.id,
+      a.date_time,
+      a.total_amount,
+      a.status,
+      u.name as requester_name
+    FROM Appointments a
+    JOIN Users u ON a.user_id = u.id
+    WHERE a.provider_id = ?
+    ORDER BY a.date_time DESC
+  `, [userId]);
+  
+  return rows;
+};
 
 // SERVICES
 
@@ -321,3 +337,49 @@ export async function q_userServiceExists(conn, userId, serviceId) {
     );
     return rows.length > 0;
 }
+export const q_getTopUsers = async (conn, limit = 10) => {
+  const [rows] = await conn.query(`
+    SELECT 
+      u.id,
+      u.name,
+      u.total_points,
+      u.completed_appointments,
+      u.cancelled_appointments,
+      u.member_since,
+      COALESCE(AVG(r.rating), 0) as avg_rating,
+      COUNT(DISTINCT r.id) as total_reviews
+    FROM Users u
+    LEFT JOIN Reviews r ON u.id = r.provider_id
+    WHERE u.role = 'provider'
+    GROUP BY u.id
+    ORDER BY u.total_points DESC
+    LIMIT ?
+  `, [limit]);
+  
+  return rows;
+};
+
+export const q_getUserRankingDetails = async (conn, userId) => {
+  const [rows] = await conn.query(`
+    SELECT 
+      u.id,
+      u.name,
+      u.total_points,
+      u.completed_appointments,
+      u.cancelled_appointments,
+      u.member_since,
+      COALESCE(AVG(r.rating), 0) as avg_rating,
+      COUNT(DISTINCT r.id) as total_reviews,
+      (
+        SELECT COUNT(*) + 1
+        FROM Users u2
+        WHERE u2.total_points > u.total_points AND u2.role = 'provider'
+      ) as ranking
+    FROM Users u
+    LEFT JOIN Reviews r ON u.id = r.provider_id
+    WHERE u.id = ?
+    GROUP BY u.id
+  `, [userId]);
+  
+  return rows[0];
+};

@@ -12,6 +12,10 @@ CREATE TABLE Users (
     firebase_uid VARCHAR(128) NOT NULL UNIQUE,
     name VARCHAR(50),
     role ENUM('admin', 'provider', 'client') DEFAULT 'client',
+    total_points INT DEFAULT 0,
+    completed_appointments INT DEFAULT 0,
+    cancelled_appointments INT DEFAULT 0,
+    member_since TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -46,7 +50,7 @@ CREATE TABLE Services (
 CREATE TABLE Appointments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     date_time DATETIME NOT NULL,
-    status ENUM('Completed', 'Pending', 'In Process') NOT NULL DEFAULT 'Pending',
+    status ENUM('Completed', 'Pending', 'In Process', 'Cancelled') NOT NULL DEFAULT 'Pending',
     price DECIMAL(10, 2) NOT NULL,
     total_amount DECIMAL(10, 2),
     app_commission DECIMAL(10, 2),
@@ -63,14 +67,38 @@ CREATE TABLE Appointments (
 -- =========================
 -- RESEÑAS
 -- =========================
--- =========================
 CREATE TABLE Reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT,
     rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    user_id INT NOT NULL,           -- Quien hace la review (cliente)
-    provider_id INT NOT NULL,       -- A quién va dirigida la review
+    user_id INT NOT NULL,
+    provider_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (provider_id) REFERENCES Users(id)
 );
+
+-- =========================
+-- TRIGGERS
+-- =========================
+DELIMITER //
+
+CREATE TRIGGER update_user_points_on_appointment
+AFTER UPDATE ON Appointments
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'Completed' AND OLD.status != 'Completed' THEN
+        UPDATE Users 
+        SET total_points = total_points + 100,
+            completed_appointments = completed_appointments + 1
+        WHERE id = NEW.provider_id;
+    END IF;
+    
+    IF NEW.status = 'Cancelled' AND OLD.status != 'Cancelled' THEN
+        UPDATE Users 
+        SET cancelled_appointments = cancelled_appointments + 1
+        WHERE id = NEW.provider_id;
+    END IF;
+END//
+
+DELIMITER ;

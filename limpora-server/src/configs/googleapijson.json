@@ -7,7 +7,8 @@
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
         "client_secret": "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",
         "redirect_uris": [
-            "http://localhost:3000"
+            "http://localhost:3001",
+            "https://matias.informaticamajada.es/"
         ]
     }
 }

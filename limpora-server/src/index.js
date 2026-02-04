@@ -43,12 +43,13 @@ import servicesRouter from './routes/services.routes.js';
 // Database
 import { connectWithRetry} from './databases/mysql.js';
 import { requiredEnv } from './utils/utils.js';
+import rankingRouter from './routes/ranking.routes.js'
 
 
 // Load environment
 dotenv.config({ path: '.env' })
 
-const PORT = Number(process.env.PORT) || 3000
+const PORT = Number(process.env.PORT) || 3001
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -105,6 +106,7 @@ logger.info(`Using prefix: ${PREFIX}`);
 // Routes
 app.use(`${PREFIX}/auth`, authRoutes);
 app.use(`${PREFIX}/user`, userIndexRouter);
+app.use(`${PREFIX}/ranking`, rankingRouter);
 
 app.use(`${PREFIX}/services`, servicesRouter);
 
