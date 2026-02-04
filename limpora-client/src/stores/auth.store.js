@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { loginService, registerService } from '../services/auth.service';
+import { sendVerifycationCode, sendVerifycationEmail } from './../services/email.service';
 
 export const useAuthStore = create(
   persist(
@@ -52,13 +53,15 @@ export const useAuthStore = create(
       // =========================
       // REGISTER
       // =========================
-      register: async (name, email, password, role = "client") => {
+        register: async (name, email, password, role = "client") => {
         set({ error: null });
         try {
           const response = await registerService(name, email, password, role);
 
           if (response.success) {
-            set({ error: null });
+            set({ user: response.data, isAuthenticated: true, error: null });
+
+            await sendVerifycationEmail(response.data.id, response.data.email);
           }
 
           return response;
@@ -71,6 +74,7 @@ export const useAuthStore = create(
           return { success: false, message };
         }
       },
+
 
       // =========================
       // LOGOUT

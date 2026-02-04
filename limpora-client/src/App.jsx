@@ -12,6 +12,7 @@ import AdminPanel from './pages/admin/AdminPanel';
 import BookingConfirmation from './pages/user/BookingConfirmation';
 import Currency from './pages/user/Currency';
 import UserFinder from './pages/main/UserFinder';
+import EmailCode from './pages/auth/EmailCode';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/register" element={<Rergister />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/emailcode" element={<EmailCode />} />
 
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />

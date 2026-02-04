@@ -36,13 +36,13 @@ export async function emailVerificationController(req, res) {
 
 
 export async function sendVerificationEmailController(req, res) {
-  const { userId, email } = req.body;
+  const { id, email } = req.body;
 
   try {
     const { code, hashedCode } = await generateVerificationCode();
 
     const result = await withdb(conn =>
-      q_addEmailVerificationCode(conn, userId, hashedCode)
+      q_addEmailVerificationCode(conn, id, hashedCode)
     );
 
     const emailData = await sendVerifycationEmail(email, code);
