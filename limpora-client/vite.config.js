@@ -9,6 +9,7 @@ export default defineConfig({
     usePolling: true
   },
   server: {
+    allowedHosts: ["matias.informaticamajada.es", "www.limpora.xyz"],
     host: true,
     port: 5173,
     proxy: {
