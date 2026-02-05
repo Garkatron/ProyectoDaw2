@@ -51,9 +51,9 @@ CREATE TABLE Appointments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     date_time DATETIME NOT NULL,
     status ENUM('Completed', 'Pending', 'In Process', 'Cancelled') NOT NULL DEFAULT 'Pending',
-    price DECIMAL(10, 2) NOT NULL,
-    total_amount DECIMAL(10, 2),
-    app_commission DECIMAL(10, 2),
+    price DECIMAL(10,2) NOT NULL,
+    total_amount DECIMAL(10,2),
+    app_commission DECIMAL(10,2),
     payment_method ENUM('Bizum', 'Bank Transfer', 'Paypal') NOT NULL,
     user_id INT NOT NULL,
     provider_id INT NOT NULL,
@@ -79,29 +79,29 @@ CREATE TABLE Reviews (
 );
 
 -- =========================
--- TRIGGERS
+-- TRIGGER
 -- =========================
-DELIMITER //
-
 CREATE TRIGGER update_user_points_on_appointment
 AFTER UPDATE ON Appointments
 FOR EACH ROW
 BEGIN
     IF NEW.status = 'Completed' AND OLD.status != 'Completed' THEN
-        UPDATE Users 
+        UPDATE Users
         SET total_points = total_points + 100,
             completed_appointments = completed_appointments + 1
         WHERE id = NEW.provider_id;
     END IF;
-    
+
     IF NEW.status = 'Cancelled' AND OLD.status != 'Cancelled' THEN
-        UPDATE Users 
+        UPDATE Users
         SET cancelled_appointments = cancelled_appointments + 1
         WHERE id = NEW.provider_id;
     END IF;
-END//
+END;
 
-
+-- =========================
+-- EMAIL VERIFICATION
+-- =========================
 CREATE TABLE EmailVerificationCodes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -109,7 +109,6 @@ CREATE TABLE EmailVerificationCodes (
     expires_at DATETIME NOT NULL,
     used BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     UNIQUE (code),
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
@@ -119,6 +118,3 @@ ON EmailVerificationCodes (code);
 
 CREATE INDEX idx_email_verification_user
 ON EmailVerificationCodes (user_id);
-
-
-DELIMITER ;
