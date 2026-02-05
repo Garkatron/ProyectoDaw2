@@ -1,4 +1,4 @@
-import { validationResult } from 'express-validator'
+import { validationResult } from 'express-validator';
 
 
 export function handleValidationErrors (req, res, next) {
@@ -13,9 +13,9 @@ export function handleValidationErrors (req, res, next) {
                 message: err.msg,
                 value: err.type === 'field' ? err.value : undefined
             }))
-        })
+        });
         return;
     }
 
-    next()
+    next();
 }

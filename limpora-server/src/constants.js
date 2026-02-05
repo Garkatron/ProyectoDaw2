@@ -6,7 +6,7 @@ export const ROLES = {
   ADMIN: "admin",
   CLIENT: "client",
   PROVIDER: "provider"
-}
+};
 
 
 // ! Error codes

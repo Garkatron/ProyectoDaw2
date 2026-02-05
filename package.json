@@ -1,0 +1,22 @@
+{
+  "type": "module",
+    "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write ."
+    },
+    "devDependencies": {
+        "@typescript-eslint/visitor-keys": "^8.54.0",
+        "eslint": "^9.39.2",
+        "eslint-config-airbnb": "^19.0.4",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-import": "^2.32.0",
+        "eslint-plugin-jsx-a11y": "^6.10.2",
+        "eslint-plugin-prettier": "^5.5.5",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "eslint-plugin-react-refresh": "^0.4.24",
+        "prettier": "^3.8.1",
+        "eslint-plugin-vitest": "^0.5.4"
+    }
+}

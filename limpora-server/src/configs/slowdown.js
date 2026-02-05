@@ -5,4 +5,4 @@ export const SLOWDOWN_CONFIG = {
     delayMs: () => 500,
     maxDelayMs: 3000,
     skipSuccessfulRequests: false
-}
+};

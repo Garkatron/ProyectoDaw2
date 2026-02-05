@@ -5,6 +5,6 @@ const CORS_CONFIG = {
     credentials: true,
     optionsSuccessStatus: 204
     // headers: 'Content-Type, Authorization, Content-Length, X-Requested-With',
-}
+};
 
-export default { CORS_CONFIG }
+export default { CORS_CONFIG };

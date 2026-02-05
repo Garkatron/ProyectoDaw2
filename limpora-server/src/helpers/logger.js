@@ -1,10 +1,10 @@
-import pino from 'pino'
-import fs from 'fs'
-import path from 'path'
+import pino from 'pino';
+import fs from 'fs';
+import path from 'path';
 
-const logPath = process.env.LOG_FILE_PATH || './logs/app.log'
-const logDir = path.dirname(logPath)
-if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true })
+const logPath = process.env.LOG_FILE_PATH || './logs/app.log';
+const logDir = path.dirname(logPath);
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
 
 const Logger = pino({
     level: process.env.LOG_LEVEL || 'info',
@@ -14,6 +14,6 @@ const Logger = pino({
             { target: 'pino/file', options: { destination: logPath } }
         ]
     }
-})
+});
 
-export default Logger
+export default Logger;

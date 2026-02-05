@@ -39,7 +39,7 @@ export class LangManager {
     }
 }
 
-let manager = new LangManager();
+const manager = new LangManager();
 export async function initLangManager() {
     await manager.init();
 }

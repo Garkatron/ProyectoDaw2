@@ -43,6 +43,6 @@ userEarningsRouter.get(
     "/", 
     param("userId").trim().escape().isNumeric(),
     handleValidationErrors,
-    getUserEarnings)
+    getUserEarnings);
 
 export default userEarningsRouter;
