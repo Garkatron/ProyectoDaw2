@@ -81,6 +81,8 @@ CREATE TABLE Reviews (
 -- =========================
 -- TRIGGER
 -- =========================
+DELIMITER $$
+
 CREATE TRIGGER update_user_points_on_appointment
 AFTER UPDATE ON Appointments
 FOR EACH ROW
@@ -98,6 +100,7 @@ BEGIN
         WHERE id = NEW.provider_id;
     END IF;
 END;
+DELIMITER ;
 
 -- =========================
 -- EMAIL VERIFICATION
