@@ -9,7 +9,7 @@ const authRoutes = Router();
 
 // Verify Email Code
 authRoutes.post(
-    'vec',
+    '/vec',
     body("code").trim().escape().isString(),
     handleValidationErrors,
     emailVerificationController
@@ -17,7 +17,7 @@ authRoutes.post(
 
 // Send Email Verifycation Code
 authRoutes.post(
-    'sevcode',
+    '/sevcode',
     body("email").trim().escape().isString(),
     body("id").trim().escape().isNumeric(),
     handleValidationErrors,
