@@ -429,3 +429,25 @@ export async function q_verifyEmailCode(conn, inputCode) {
 
   return valid.user_id;
 }
+
+export async function q_isEmailVerified(conn, userId) {
+  const [rows] = await conn.query(
+    `SELECT email_verified
+     FROM Users
+     WHERE id = ?`,
+    [userId]
+  );
+
+  return rows.length > 0 ? rows[0].email_verified === 1 : false;
+}
+
+export async function q_markUserEmailVerified(conn, userId) {
+  const [result] = await conn.query(
+    `UPDATE Users
+     SET email_verified = true
+     WHERE id = ?`,
+    [userId]
+  );
+
+  return result.affectedRows === 1;
+}

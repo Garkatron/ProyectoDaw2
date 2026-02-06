@@ -87,6 +87,7 @@ CREATE TABLE EmailVerificationCodes (
     code VARCHAR(64) NOT NULL,
     expires_at DATETIME NOT NULL,
     used BOOLEAN DEFAULT FALSE,
+    email_verified  BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (code),
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE

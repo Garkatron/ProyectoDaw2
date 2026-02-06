@@ -3,7 +3,7 @@ import axios from 'axios';
 import { requiredEnv, newGoogleOauth2, getAuthUrl } from '../utils/utils.js';
 import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
 import { withdb } from '../databases/mysql.js';
-import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserByUid, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
+import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserByUid, q_isEmailVerified, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
 import { google } from 'googleapis';
 import sendVerificationEmail, { generateVerificationCode } from "../helpers/email_verification.js";
 
@@ -49,7 +49,7 @@ export async function sendVerificationEmailController(req, res) {
 
         res.status(201).json({
             success: true,
-            data: { emailId: emailData[0].id },
+            data: { emailId: emailData },
             details: ["Email enviado con éxito"]
         });
     } catch (err) {
@@ -108,33 +108,46 @@ export async function registerController(req, res) {
 // =========================
 export async function loginController(req, res) {
     const { email, password } = req.body;
+
     if (!email || !password) {
-        return res.status(400).json({ success: false, errors: [USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED] });
+        return res.status(400).json({
+            success: false,
+            errors: [USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED]
+        });
     }
 
     try {
-        // Autenticación con Firebase REST
-        const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`, {
-            email,
-            password,
-            returnSecureToken: true
-        });
+        const response = await axios.post(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`,
+            { email, password, returnSecureToken: true }
+        );
 
         const { localId: uid, idToken } = response.data;
 
-        // Revisar o crear usuario en SQL
-        let userRecord = await withdb(conn => q_getUserByUid(conn, uid));
+        const userRecord = await withdb(conn =>
+            q_getUserByUid(conn, uid)
+        );
+
         if (!userRecord) {
-            const firebaseUser = await admin.auth().getUser(uid);
-            const role = firebaseUser.customClaims?.role || "client";
-            const name = firebaseUser.displayName || "Unknown";
-            await withdb(conn => q_addUser(conn, uid, name, role));
-            userRecord = { uid, name, role };
+            return res.status(403).json({
+                success: false,
+                errors: [USER_ERRORS.USER_NOT_REGISTERED]
+            });
         }
 
-        // Crear SESSION COOKIE real (en vez de usar ID token directo)
-        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 días
-        const sessionCookie = await admin.auth().createSessionCookie(idToken, { expiresIn });
+        if (!userRecord.email_verified) {
+            await sendVerificationEmailController(userRecord.id, email);
+
+            return res.status(403).json({
+                success: false,
+                errors: [USER_ERRORS.EMAIL_NOT_VERIFIED],
+                details: ["Te hemos enviado un correo de verificación"]
+            });
+        }
+
+        const expiresIn = 60 * 60 * 24 * 5 * 1000;
+        const sessionCookie = await admin.auth()
+            .createSessionCookie(idToken, { expiresIn });
 
         res.cookie('session', sessionCookie, {
             httpOnly: true,
@@ -145,22 +158,41 @@ export async function loginController(req, res) {
 
         res.status(200).json({
             success: true,
-            data: { uid, email, name: userRecord.name, role: userRecord.role, id: userRecord.id },
+            data: {
+                uid,
+                email,
+                name: userRecord.name,
+                role: userRecord.role,
+                id: userRecord.id
+            },
             details: [SUCCESS_MESSAGES.USER_LOGGED_IN]
         });
 
     } catch (err) {
         const firebaseCode = err.response?.data?.error?.message;
+
         let errorObj;
         switch (firebaseCode) {
-            case "EMAIL_NOT_FOUND": errorObj = USER_ERRORS.USER_NOT_FOUND; break;
-            case "INVALID_PASSWORD": errorObj = USER_ERRORS.INCORRECT_PASSWORD; break;
-            case "USER_DISABLED": errorObj = USER_ERRORS.ACCOUNT_LOCKED; break;
-            default: errorObj = USER_ERRORS.INTERNAL_ERROR; break;
+            case "EMAIL_NOT_FOUND":
+                errorObj = USER_ERRORS.USER_NOT_FOUND;
+                break;
+            case "INVALID_PASSWORD":
+                errorObj = USER_ERRORS.INCORRECT_PASSWORD;
+                break;
+            case "USER_DISABLED":
+                errorObj = USER_ERRORS.ACCOUNT_LOCKED;
+                break;
+            default:
+                errorObj = USER_ERRORS.INTERNAL_ERROR;
         }
-        res.status(400).json({ success: false, errors: [errorObj] });
+
+        res.status(400).json({
+            success: false,
+            errors: [errorObj]
+        });
     }
 }
+
 
 
 // =========================
