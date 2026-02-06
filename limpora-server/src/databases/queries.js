@@ -386,8 +386,7 @@ export const q_getUserRankingDetails = async (conn, userId) => {
     return rows[0];
 };
 
-export async function q_addEmailVerificationCode(conn, userId, code) {
-  const hashedCode = await bcrypt.hash(code, 10);
+export async function q_addEmailVerificationCode(conn, userId, hashedCode) {
 
   const [result] = await conn.query(
     `INSERT INTO EmailVerificationCodes (
