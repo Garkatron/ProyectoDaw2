@@ -106,92 +106,75 @@ export async function registerController(req, res) {
 // =========================
 // LOGIN
 // =========================
-export async function loginController(req, res) {
-    const { email, password } = req.body;
+export const loginController = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({
-            success: false,
-            errors: [USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED]
-        });
-    }
+  if (!email || !password) {
+    throw new AppError(
+      "Email and password required",
+      400,
+      [USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED]
+    );
+  }
 
-    try {
-        const response = await axios.post(
-            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`,
-            { email, password, returnSecureToken: true }
-        );
+  let firebaseResponse;
+  try {
+    firebaseResponse = await axios.post(
+      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`,
+      { email, password, returnSecureToken: true }
+    );
+  } catch (err) {
+    throw mapFirebaseError(err);
+  }
 
-        const { localId: uid, idToken } = response.data;
+  const { localId: uid, idToken } = firebaseResponse.data;
 
-        const userRecord = await withdb(conn =>
-            q_getUserByUid(conn, uid)
-        );
+  const userRecord = await withdb(conn =>
+    q_getUserByUid(conn, uid)
+  );
 
-        if (!userRecord) {
-            return res.status(403).json({
-                success: false,
-                errors: [USER_ERRORS.USER_NOT_REGISTERED]
-            });
-        }
+  if (!userRecord) {
+    throw new AppError(
+      "User not registered",
+      403,
+      [USER_ERRORS.USER_NOT_REGISTERED]
+    );
+  }
 
-        if (!userRecord.email_verified) {
-            await sendVerificationEmailController(userRecord.id, email);
+  if (!userRecord.email_verified) {
+    await sendVerificationEmailController(userRecord.id, email);
 
-            return res.status(403).json({
-                success: false,
-                errors: [USER_ERRORS.EMAIL_NOT_VERIFIED],
-                details: ["Te hemos enviado un correo de verificación"]
-            });
-        }
+    throw new AppError(
+      "Email not verified",
+      403,
+      [USER_ERRORS.EMAIL_NOT_VERIFIED]
+    );
+  }
 
-        const expiresIn = 60 * 60 * 24 * 5 * 1000;
-        const sessionCookie = await admin.auth()
-            .createSessionCookie(idToken, { expiresIn });
+  const expiresIn = 60 * 60 * 24 * 5 * 1000;
+  const sessionCookie = await admin.auth()
+    .createSessionCookie(idToken, { expiresIn });
 
-        res.cookie('session', sessionCookie, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Strict',
-            maxAge: expiresIn
-        });
+  res.cookie('session', sessionCookie, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+    maxAge: expiresIn
+  });
 
-        res.status(200).json({
-            success: true,
-            data: {
-                uid,
-                email,
-                name: userRecord.name,
-                role: userRecord.role,
-                id: userRecord.id
-            },
-            details: [SUCCESS_MESSAGES.USER_LOGGED_IN]
-        });
+  res.json({
+    success: true,
+    data: {
+      uid,
+      email,
+      name: userRecord.name,
+      role: userRecord.role,
+      id: userRecord.id
+    },
+    details: [SUCCESS_MESSAGES.USER_LOGGED_IN]
+  });
+});
 
-    } catch (err) {
-        const firebaseCode = err.response?.data?.error?.message;
-
-        let errorObj;
-        switch (firebaseCode) {
-            case "EMAIL_NOT_FOUND":
-                errorObj = USER_ERRORS.USER_NOT_FOUND;
-                break;
-            case "INVALID_PASSWORD":
-                errorObj = USER_ERRORS.INCORRECT_PASSWORD;
-                break;
-            case "USER_DISABLED":
-                errorObj = USER_ERRORS.ACCOUNT_LOCKED;
-                break;
-            default:
-                errorObj = USER_ERRORS.INTERNAL_ERROR;
-        }
-
-        res.status(400).json({
-            success: false,
-            errors: [errorObj]
-        });
-    }
-}
 
 
 
