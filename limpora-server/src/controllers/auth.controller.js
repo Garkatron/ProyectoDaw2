@@ -12,7 +12,8 @@ const allowedRoles = ["client", "provider", "admin"];
 
 export async function emailVerificationController(req, res) {
     const { code } = req.body;
-
+    console.log(req.body);
+    
     try {
         const userId = await withdb(conn => q_verifyEmailCode(conn, code));
 
@@ -49,7 +50,7 @@ export async function sendVerificationEmailController(req, res) {
 
         res.status(201).json({
             success: true,
-            data: { emailId: emailData[0].id },
+            data: { emaildata: emailData },
             details: ["Email enviado con éxito"]
         });
     } catch (err) {
@@ -94,11 +95,12 @@ export async function registerController(req, res) {
     } catch (err) {
         let errorObj;
         switch (err.code) {
+            case "auth/email-already-exists": errorObj = USER_ERRORS.EMAIL_ALREADY_USED; break;
             case "auth/email-already-in-use": errorObj = USER_ERRORS.EMAIL_ALREADY_USED; break;
             case "auth/invalid-email": errorObj = USER_ERRORS.INVALID_EMAIL; break;
             case "auth/weak-password": errorObj = USER_ERRORS.WEAK_PASSWORD; break;
-            default: errorObj = ERROR_CODES.INTERNAL_ERROR; break;
-        }
+            default: errorObj = ERROR_CODES.INTERNAL_ERROR; console.log(err); break
+        }        
         res.status(400).json({ success: false, errors: [errorObj] });
     }
 }

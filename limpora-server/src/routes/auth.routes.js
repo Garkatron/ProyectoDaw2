@@ -9,7 +9,7 @@ const authRoutes = Router();
 
 // Verify Email Code
 authRoutes.post(
-    'vec',
+    '/vec',
     body("code").trim().escape().isString(),
     handleValidationErrors,
     emailVerificationController
@@ -17,7 +17,7 @@ authRoutes.post(
 
 // Send Email Verifycation Code
 authRoutes.post(
-    'sevcode',
+    '/sevcode',
     body("email").trim().escape().isString(),
     body("id").trim().escape().isNumeric(),
     handleValidationErrors,
@@ -28,10 +28,10 @@ authRoutes.post(
 authRoutes.post(
     '/register',
 
-    body("name").trim().escape().isString(),
-    body("email").trim().escape().isString(),
-    body("password").trim().escape().isString(),
-    body("role").trim().escape().isString(),
+    body("name").trim().notEmpty().isString(),
+    body("email").trim().normalizeEmail().isEmail(),
+    body("password").notEmpty().isString().isLength({ min: 6 }),
+    body("role").optional().trim().isString().isIn(['client', 'admin', 'photographer']),
     handleValidationErrors,
 
     registerController

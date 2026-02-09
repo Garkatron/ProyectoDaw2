@@ -53,25 +53,28 @@ export const useAuthStore = create(
       // =========================
       // REGISTER
       // =========================
-        register: async (name, email, password, role = "client") => {
+      register: async (name, email, password, role = "client") => {
         set({ error: null });
         try {
           const response = await registerService(name, email, password, role);
 
           if (response.success) {
             set({ user: response.data, isAuthenticated: true, error: null });
-
             await sendVerifycationEmail(response.data.id, response.data.email);
+          } else {
+            const errorMessage = response.errors?.[0]?.message || "Error al registrarse";
+            set({ error: errorMessage });
           }
 
           return response;
         } catch (error) {
-          const message =
-            error.response?.data?.errors?.[0] ||
+          const errorMessage =
+            error.response?.data?.errors?.[0]?.message || 
             error.message ||
             "Error al registrarse";
-          set({ error: message });
-          return { success: false, message };
+
+          set({ error: errorMessage });
+          return { success: false, errors: error.response?.data?.errors };
         }
       },
 
