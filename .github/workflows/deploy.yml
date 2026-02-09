@@ -60,7 +60,7 @@ jobs:
             DB_CONNECTION_LIMIT=${{ vars.DB_CONNECTION_LIMIT }}
 
             LOG_LEVEL=info
-            LOG_FILE_PATH=./
+            LOG_FILE_PATH=./logs/app.log
 
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
