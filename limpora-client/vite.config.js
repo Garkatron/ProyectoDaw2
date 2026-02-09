@@ -32,11 +32,11 @@ export default defineConfig({
         },
       },
     },
-    preview: {
-      allowedHosts: ["matias.informaticamajada.es", "www.limpora.xyz"],
-    },
-  },
 
+  },
+  preview: {
+    allowedHosts: ["matias.informaticamajada.es", "www.limpora.xyz"],
+  },
   hmr: {
     host: 'localhost',
   }
