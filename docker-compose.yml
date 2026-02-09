@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   limpora-client:
     build:
@@ -9,17 +11,15 @@ services:
       - ./limpora-client:/app
       - /app/node_modules
     environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=500
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "500"
     stdin_open: true
     tty: true
     networks:
       - limpora-network
 
   limpora-server:
-    env_file:
-      - ./limpora-server/.env
     build:
       context: ./limpora-server
       dockerfile: Dockerfile.dev
@@ -28,10 +28,33 @@ services:
     volumes:
       - ./limpora-server:/app:Z
       - node_modules:/app/node_modules
+    env_file:
+      - ./limpora-server/.env
     environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=500
+      NODE_ENV: development
+      API_PREFIX: ${API_PREFIX}
+      API_VERSION: ${API_VERSION}
+      PORT: ${PORT}
+
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PASS: ${DB_PASS}
+      DB_CONNECTION_LIMIT: ${DB_CONNECTION_LIMIT}
+
+      LOG_LEVEL: info
+      LOG_FILE_PATH: ./
+
+      FIREBASE_API_KEY: ${FIREBASE_API_KEY}
+
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+
+      RESEND_KEY: ${RESEND_KEY}
+      RESEND_EMAIL_FROM: ${RESEND_EMAIL_FROM}
+
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "500"
     depends_on:
       mysql:
         condition: service_healthy
@@ -44,8 +67,8 @@ services:
     image: mysql:8
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: limpora
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
       - "3306:3306"
     volumes:
