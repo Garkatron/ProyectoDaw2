@@ -49,6 +49,10 @@ export const ERROR_CODES = {
 };
 
 export const USER_ERRORS = {
+  EMAIL_NOT_VERIFIED: {
+    code: "EMAIL_NOT_VERIFIED",
+    message: "Email not verified."
+  },
   EMAIL_AND_PASSWORD_NEEDED: {
     code: "EMAIL_AND_PASSWORD_NEEDED",
     message: "Email and password are needed"

@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+import { errorHandler } from "./middlewares/error_handler.js";
 
 // Security
 import helmet from 'helmet';
@@ -60,6 +61,7 @@ const app = express();
 app.set('port', PORT);
 app.use(express.json());
 app.use(cookieParser());
+app.use(errorHandler);
 
 // Security
 app.use(cors(CORS_CONFIG));

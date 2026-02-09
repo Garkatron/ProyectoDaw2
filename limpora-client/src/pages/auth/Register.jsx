@@ -113,6 +113,8 @@ export default function Rergister({}) {
             </div>
 
             <div className="flex justify-between pt-2 space-x-4">
+
+              
               <button
                 type="submit"
                 className="w-1/2 p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-gray-200/70 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
@@ -144,3 +146,6 @@ export default function Rergister({}) {
     </div>
   );
 }
+
+// https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/
+// https://developers.cloudflare.com/turnstile/get-started/server-side-validation/

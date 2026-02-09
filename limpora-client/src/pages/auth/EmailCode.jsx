@@ -112,7 +112,7 @@ export default function EmailCode() {
         isOpen={modalOpen}
         onClose={() => {
           setModalOpen(false);
-          if (success) navigate("/panel/me");
+          if (success) navigate("/login");
         }}
         title={modalTitle}
         message={modalMessage}

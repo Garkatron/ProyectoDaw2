@@ -79,27 +79,6 @@ CREATE TABLE Reviews (
 );
 
 -- =========================
--- TRIGGER
--- =========================
-CREATE TRIGGER update_user_points_on_appointment
-AFTER UPDATE ON Appointments
-FOR EACH ROW
-BEGIN
-    IF NEW.status = 'Completed' AND OLD.status != 'Completed' THEN
-        UPDATE Users
-        SET total_points = total_points + 100,
-            completed_appointments = completed_appointments + 1
-        WHERE id = NEW.provider_id;
-    END IF;
-
-    IF NEW.status = 'Cancelled' AND OLD.status != 'Cancelled' THEN
-        UPDATE Users
-        SET cancelled_appointments = cancelled_appointments + 1
-        WHERE id = NEW.provider_id;
-    END IF;
-END;
-
--- =========================
 -- EMAIL VERIFICATION
 -- =========================
 CREATE TABLE EmailVerificationCodes (
@@ -108,6 +87,7 @@ CREATE TABLE EmailVerificationCodes (
     code VARCHAR(64) NOT NULL,
     expires_at DATETIME NOT NULL,
     used BOOLEAN DEFAULT FALSE,
+    email_verified  BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (code),
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
