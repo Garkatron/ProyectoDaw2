@@ -54,6 +54,7 @@ jobs:
             PORT=${{ vars.PORT }}
 
             DB_NAME=${{ vars.DB_NAME }}
+            DB_USER=${{ secrets.DB_USER }}
             DB_HOST=mysql
             DB_PASS=${{ secrets.DB_PASS }}
             DB_CONNECTION_LIMIT=${{ vars.DB_CONNECTION_LIMIT }}
