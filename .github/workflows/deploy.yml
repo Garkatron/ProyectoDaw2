@@ -43,7 +43,8 @@ jobs:
           envs: API_PREFIX,API_VERSION,PORT,DB_NAME,DB_PASS,DB_CONNECTION_LIMIT,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REDIRECT_URI,FIREBASE_API_KEY,RESEND_KEY,RESEND_EMAIL_FROM
           script: |
             cd /var/www/html/ProyectoDaw2
-            
+            rm -f docker-compose.override.yml
+
             # Create .env file for limpora-server
             cat > limpora-server/.env <<'EOF'
             NODE_ENV=production
