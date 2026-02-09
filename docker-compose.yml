@@ -6,12 +6,11 @@ services:
       context: ./limpora-client
       dockerfile: Dockerfile.prod
     ports:
-      - "5173:5173"
-    environment:
-      NODE_ENV: production
+      - "127.0.0.1:3002:3000"
     restart: unless-stopped
     networks:
       - limpora-network
+
 
   limpora-server:
     build:
