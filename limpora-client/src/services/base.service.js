@@ -7,6 +7,6 @@ const API_URL =
     : "/api/v1"; 
 
 export const API = axios.create({
-  baseURL: API_URL,
+  baseURL: "http://limpora-server:3000/api/v1",
   withCredentials: true
 });
