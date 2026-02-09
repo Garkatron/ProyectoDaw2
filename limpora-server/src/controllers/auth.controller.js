@@ -6,6 +6,7 @@ import { withdb } from '../databases/mysql.js';
 import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserByUid, q_isEmailVerified, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
 import { google } from 'googleapis';
 import sendVerificationEmail, { generateVerificationCode } from "../helpers/email_verification.js";
+import { asyncHandler } from '../helpers/utils.js';
 
 const allowedRoles = ["client", "provider", "admin"];
 
