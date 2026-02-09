@@ -9,4 +9,6 @@ COPY . .
 
 EXPOSE 3001
 
+RUN rm package-lock.json
+
 CMD ["npm", "start"]
