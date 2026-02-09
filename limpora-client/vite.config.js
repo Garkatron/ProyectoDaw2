@@ -35,7 +35,7 @@ export default defineConfig({
 
   },
   preview: {
-    allowedHosts: ["matias.informaticamajada.es", "www.limpora.xyz"],
+    allowedHosts: true,
     host: true,
     port: 5173,
     proxy: {
