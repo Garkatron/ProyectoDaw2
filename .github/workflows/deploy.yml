@@ -43,57 +43,72 @@ jobs:
           envs: API_PREFIX,API_VERSION,PORT,DB_NAME,DB_PASS,DB_CONNECTION_LIMIT,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REDIRECT_URI,FIREBASE_API_KEY,RESEND_KEY,RESEND_EMAIL_FROM
           script: |
             cd /var/www/html/ProyectoDaw2
+            
+            # Remove override file if exists
             rm -f docker-compose.override.yml
-
-            # Create .env file for limpora-server
-            cat > limpora-server/.env <<'EOF'
+            
+            # Create .env file for limpora-server (WITHOUT quotes in EOF)
+            cat > limpora-server/.env <<EOF
             NODE_ENV=production
-            API_PREFIX=${API_PREFIX}
-            API_VERSION=${API_VERSION}
-            PORT=${PORT}
+            API_PREFIX=$API_PREFIX
+            API_VERSION=$API_VERSION
+            PORT=$PORT
 
-            DB_NAME=${DB_NAME}
+            DB_NAME=$DB_NAME
             DB_HOST=mysql
-            DB_PASS=${DB_PASS}
-            DB_CONNECTION_LIMIT=${DB_CONNECTION_LIMIT}
+            DB_PASS=$DB_PASS
+            DB_CONNECTION_LIMIT=$DB_CONNECTION_LIMIT
 
             LOG_LEVEL=info
             LOG_FILE_PATH=./
 
-            GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-            GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-            GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+            GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+            GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+            GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI
             
-            FIREBASE_API_KEY=${FIREBASE_API_KEY}
+            FIREBASE_API_KEY=$FIREBASE_API_KEY
 
-            RESEND_KEY=${RESEND_KEY}
-            RESEND_EMAIL_FROM=${RESEND_EMAIL_FROM}
+            RESEND_KEY=$RESEND_KEY
+            RESEND_EMAIL_FROM=$RESEND_EMAIL_FROM
             EOF
 
-            # Create .env file for docker-compose (variables for mysql)
-            cat > .env <<'EOF'
-            DB_PASS=${DB_PASS}
-            DB_NAME=${DB_NAME}
+            # Create .env file in root for docker-compose (WITHOUT quotes in EOF)
+            cat > .env <<EOF
+            DB_PASS=$DB_PASS
+            DB_NAME=$DB_NAME
             EOF
+
+            # Verify .env files were created
+            echo "=== Checking .env files ==="
+            ls -la .env limpora-server/.env
+            
+            echo "=== limpora-server/.env (first 5 lines) ==="
+            head -n 5 limpora-server/.env
+            
+            echo "=== root .env ==="
+            cat .env
 
             # Stop existing containers
             docker compose down
 
-            # Remove old images to force rebuild
+            # Remove old images and build
             docker compose build --no-cache
 
             # Start containers
             docker compose up -d
 
-            # Wait for services to be healthy
-            sleep 10
+            # Wait for services
+            sleep 15
 
             # Show status
             echo "=== Container Status ==="
             docker compose ps
             
-            echo "=== Server Logs (last 50 lines) ==="
-            docker compose logs --tail=50 limpora-server
+            echo "=== Server Logs (last 100 lines) ==="
+            docker compose logs --tail=100 limpora-server
+            
+            echo "=== MySQL Logs ==="
+            docker compose logs --tail=50 mysql
         env:
           API_PREFIX: ${{ vars.API_PREFIX }}
           API_VERSION: ${{ vars.API_VERSION }}
