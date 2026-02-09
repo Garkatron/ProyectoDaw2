@@ -4,7 +4,7 @@ services:
   limpora-client:
     build:
       context: ./limpora-client
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "5173:5173"
     volumes:
@@ -22,7 +22,7 @@ services:
   limpora-server:
     build:
       context: ./limpora-server
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "3001:3000"
     volumes:
