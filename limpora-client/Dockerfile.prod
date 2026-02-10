@@ -1,18 +1,30 @@
-FROM oven/bun:1-alpine AS build
+# ---------- BUILD ----------
+FROM node:20-alpine AS build
+
 WORKDIR /app
 
+# Copiar manifests
 COPY package*.json ./
-COPY bun.lockb* ./
-RUN bun install
 
+# Instalar dependencias (NO npm ci)
+RUN npm install
+
+# Copiar código
 COPY . .
-RUN bun run build
 
-FROM oven/bun:1-alpine
+# Build
+RUN npm run build
+
+
+# ---------- RUNTIME ----------
+FROM node:20-alpine
+
 WORKDIR /app
 
-RUN bun install -g serve
+# Instalar serve global
+RUN npm install -g serve
 
+# Copiar build
 COPY --from=build /app/dist ./dist
 
 EXPOSE 3000

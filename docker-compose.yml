@@ -46,6 +46,7 @@ services:
 
 volumes:
   mysql_data:
+  node_modules:
 
 networks:
   limpora-network:
