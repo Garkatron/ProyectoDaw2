@@ -8,7 +8,7 @@ export async function q_getUsers(conn) {
 
 export async function q_getUserById(conn, id) {
     const [rows] = await conn.query(
-        `SELECT id, firebase_uid, name, role
+        `SELECT id, firebase_uid, name, email_verified, role, total_points
          FROM Users
          WHERE id = ?`,
         [id]
@@ -18,7 +18,7 @@ export async function q_getUserById(conn, id) {
 
 export async function q_getUserByName(conn, name) {
     const [rows] = await conn.query(
-        `SELECT id, firebase_uid, name, role
+        `SELECT id, firebase_uid, name, email_verified, role, total_points
          FROM Users
          WHERE name = ?`,
         [name]
@@ -28,7 +28,7 @@ export async function q_getUserByName(conn, name) {
 
 export async function q_getUserByUid(conn, uid) {
     const [rows] = await conn.query(
-        `SELECT id, firebase_uid, name, role
+        `SELECT id, firebase_uid, name, email_verified, role, total_points
          FROM Users
          WHERE firebase_uid = ?`,
         [uid]
@@ -42,7 +42,6 @@ export async function q_addUser(conn, firebase_uid, name, role) {
         [firebase_uid, name, role]
     );
 }
-
 
 export async function q_userExists(conn, firebase_uid) {
     const [rows] = await conn.query(
@@ -387,13 +386,12 @@ export const q_getUserRankingDetails = async (conn, userId) => {
 };
 
 export async function q_addEmailVerificationCode(conn, userId, hashedCode) {
-
   const [result] = await conn.query(
     `INSERT INTO EmailVerificationCodes (
       user_id,
       code,
       expires_at
-    ) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE));`,
+    ) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))`,
     [userId, hashedCode]
   );
 
@@ -403,31 +401,44 @@ export async function q_addEmailVerificationCode(conn, userId, hashedCode) {
 export async function q_markEmailVerificationCodeUsed(conn, codeId) {
   const [result] = await conn.query(
     `UPDATE EmailVerificationCodes
-     SET used = true
-     WHERE id = ?;`,
+     SET used = TRUE
+     WHERE id = ?`,
     [codeId]
   );
+  
   return result.affectedRows === 1;
 }
-
 
 export async function q_verifyEmailCode(conn, inputCode) {
   const [rows] = await conn.query(
     `SELECT id, user_id, code
      FROM EmailVerificationCodes
-     WHERE used = false
-       AND expires_at > NOW();`
+     WHERE used = FALSE
+       AND expires_at > NOW()`
   );
 
-  if (rows.length === 0) return null;
+  if (rows.length === 0) {
+    console.log('[q_verifyEmailCode] No valid codes found');
+    return null;
+  }
 
-  const valid = rows.find(r => bcrypt.compareSync(inputCode, r.code));
+  console.log('[q_verifyEmailCode] Found', rows.length, 'valid codes');
 
-  if (!valid) return null;
+  for (const row of rows) {
+    const isMatch = await bcrypt.compare(inputCode, row.code);
+    
+    if (isMatch) {
+      console.log('[q_verifyEmailCode] Code matched for user:', row.user_id);
+      
+      await q_markEmailVerificationCodeUsed(conn, row.id);
+      await q_markUserEmailVerified(conn, row.user_id);
+      
+      return row.user_id;
+    }
+  }
 
-  await q_markEmailVerificationCodeUsed(conn, valid.id);
-
-  return valid.user_id;
+  console.log('[q_verifyEmailCode] No matching code found');
+  return null;
 }
 
 export async function q_isEmailVerified(conn, userId) {
@@ -438,16 +449,69 @@ export async function q_isEmailVerified(conn, userId) {
     [userId]
   );
 
-  return rows.length > 0 ? rows[0].email_verified === 1 : false;
+  if (rows.length === 0) {
+    console.log('[q_isEmailVerified] User not found:', userId);
+    return false;
+  }
+
+  return rows[0].email_verified === 1;
 }
 
 export async function q_markUserEmailVerified(conn, userId) {
   const [result] = await conn.query(
     `UPDATE Users
-     SET email_verified = true
+     SET email_verified = TRUE
      WHERE id = ?`,
     [userId]
   );
 
-  return result.affectedRows === 1;
+  const success = result.affectedRows === 1;
+  
+  if (success) {
+    console.log('[q_markUserEmailVerified] Email verified for user:', userId);
+  } else {
+    console.warn('[q_markUserEmailVerified] Failed to verify email for user:', userId);
+  }
+
+  return success;
+}
+
+export async function q_getActiveVerificationCode(conn, userId) {
+  const [rows] = await conn.query(
+    `SELECT id, code, expires_at, created_at
+     FROM EmailVerificationCodes
+     WHERE user_id = ?
+       AND used = FALSE
+       AND expires_at > NOW()
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [userId]
+  );
+
+  return rows.length > 0 ? rows[0] : null;
+}
+
+export async function q_invalidateOldVerificationCodes(conn, userId) {
+  const [result] = await conn.query(
+    `UPDATE EmailVerificationCodes
+     SET used = TRUE
+     WHERE user_id = ?
+       AND used = FALSE`,
+    [userId]
+  );
+
+  console.log('[q_invalidateOldVerificationCodes] Invalidated', result.affectedRows, 'codes for user:', userId);
+  
+  return result.affectedRows;
+}
+
+export async function q_cleanupExpiredCodes(conn) {
+  const [result] = await conn.query(
+    `DELETE FROM EmailVerificationCodes
+     WHERE expires_at < DATE_SUB(NOW(), INTERVAL 7 DAY)`
+  );
+
+  console.log('[q_cleanupExpiredCodes] Deleted', result.affectedRows, 'expired codes');
+  
+  return result.affectedRows;
 }

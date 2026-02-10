@@ -7,17 +7,18 @@ USE limpora;
 -- =========================
 -- USUARIOS (PERFIL)
 -- =========================
-CREATE TABLE Users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    firebase_uid VARCHAR(128) NOT NULL UNIQUE,
-    name VARCHAR(50),
-    role ENUM('admin', 'provider', 'client') DEFAULT 'client',
-    total_points INT DEFAULT 0,
-    completed_appointments INT DEFAULT 0,
-    cancelled_appointments INT DEFAULT 0,
-    member_since TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TABLE Users ( 
+    id INT AUTO_INCREMENT PRIMARY KEY, 
+    firebase_uid VARCHAR(128) NOT NULL UNIQUE, 
+    name VARCHAR(50), 
+    email_verified BOOLEAN DEFAULT FALSE,
+    role ENUM('admin', 'provider', 'client') DEFAULT 'client', 
+    total_points INT DEFAULT 0, 
+    completed_appointments INT DEFAULT 0, 
+    cancelled_appointments INT DEFAULT 0, 
+    member_since TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+); 
 
 -- =========================
 -- INSIGNIAS
@@ -84,17 +85,19 @@ CREATE TABLE Reviews (
 CREATE TABLE EmailVerificationCodes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    code VARCHAR(64) NOT NULL,
+    code VARCHAR(60) NOT NULL,
     expires_at DATETIME NOT NULL,
     used BOOLEAN DEFAULT FALSE,
-    email_verified  BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (code),
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_email_verification_code
-ON EmailVerificationCodes (code);
+CREATE INDEX idx_email_verification_code 
+ON EmailVerificationCodes (code); 
+ 
+CREATE INDEX idx_email_verification_user 
+ON EmailVerificationCodes (user_id); 
 
-CREATE INDEX idx_email_verification_user
-ON EmailVerificationCodes (user_id);
+CREATE INDEX idx_email_verification_expires
+ON EmailVerificationCodes (expires_at);

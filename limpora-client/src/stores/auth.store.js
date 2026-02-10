@@ -10,107 +10,161 @@ export const useAuthStore = create(
       user: null,
       isAuthenticated: false,
       error: null,
+      errorDetails: null, 
 
-      // =========================
-      // Sincronizar sesión actual
-      // =========================
       fetchUser: async () => {
         try {
           const res = await axios.get('/api/v1/auth/me', { withCredentials: true });
+          console.log('[fetchUser] Response:', res.data);
+          
           if (res.data?.data) {
             set({ user: res.data.data, isAuthenticated: true, error: null });
           } else {
             set({ user: null, isAuthenticated: false });
           }
         } catch (err) {
+          console.error('[fetchUser] Error:', err.response?.data || err.message);
           set({ user: null, isAuthenticated: false });
         }
       },
 
-      // =========================
-      // LOGIN EMAIL/PASSWORD
-      // =========================
       login: async (email, password) => {
-        set({ error: null });
+        set({ error: null, errorDetails: null });
+        
+        console.log('[login] Attempting login with:', { email, password: '***' });
+        
         try {
           const response = await loginService(email, password);
+          console.log('[login] Service response:', response);
 
           if (response.success) {
+            console.log('[login] Login successful, user:', response.data);
             set({ user: response.data, isAuthenticated: true });
+          } else {
+            console.warn('[login] Login failed:', response);
+            const errorMessage = response.errors?.[0]?.message || 
+                               response.message || 
+                               "Error desconocido";
+            set({ 
+              error: errorMessage,
+              errorDetails: response.errors || response
+            });
           }
 
           return response;
         } catch (error) {
-          const message =
-            error.response?.data?.errors?.[0] ||
+          console.error('[login] Exception caught:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+            headers: error.response?.headers,
+            fullError: error
+          });
+
+          const errorData = error.response?.data;
+          const errorMessage = 
+            errorData?.errors?.[0]?.message ||
+            errorData?.message ||
             error.message ||
             "Error al iniciar sesión";
-          set({ error: message });
-          return { success: false, message };
+
+          set({ 
+            error: errorMessage,
+            errorDetails: errorData || { message: error.message }
+          });
+          
+          return { 
+            success: false, 
+            message: errorMessage,
+            errors: errorData?.errors,
+            _debug: {
+              status: error.response?.status,
+              data: errorData
+            }
+          };
         }
       },
 
-      // =========================
-      // REGISTER
-      // =========================
       register: async (name, email, password, role = "client") => {
-        set({ error: null });
+        set({ error: null, errorDetails: null });
+        
+        console.log('[register] Attempting registration:', { name, email, role, password: '***' });
+        
         try {
           const response = await registerService(name, email, password, role);
+          console.log('[register] Service response:', response);
 
           if (response.success) {
+            console.log('[register] Registration successful');
             set({ user: response.data, isAuthenticated: true, error: null });
             await sendVerifycationEmail(response.data.id, response.data.email);
           } else {
             const errorMessage = response.errors?.[0]?.message || "Error al registrarse";
-            set({ error: errorMessage });
+            console.warn('[register] Registration failed:', errorMessage, response.errors);
+            set({ 
+              error: errorMessage,
+              errorDetails: response.errors || response
+            });
           }
 
           return response;
         } catch (error) {
+          console.error('[register] Exception caught:', {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+            fullError: error
+          });
+
+          const errorData = error.response?.data;
           const errorMessage =
-            error.response?.data?.errors?.[0]?.message || 
+            errorData?.errors?.[0]?.message || 
             error.message ||
             "Error al registrarse";
 
-          set({ error: errorMessage });
-          return { success: false, errors: error.response?.data?.errors };
+          set({ 
+            error: errorMessage,
+            errorDetails: errorData || { message: error.message }
+          });
+          
+          return { 
+            success: false, 
+            errors: errorData?.errors,
+            message: errorMessage
+          };
         }
       },
 
-
-      // =========================
-      // LOGOUT
-      // =========================
       logout: async () => {
         set({ error: null });
+        console.log('[logout] Logging out...');
+        
         try {
           await fetch('/api/v1/auth/logout', { credentials: 'include' });
+          console.log('[logout] Logout successful');
           set({ user: null, isAuthenticated: false });
         } catch (err) {
-          console.error("Logout failed", err);
+          console.error('[logout] Error:', err);
           set({ error: "Error al cerrar sesión" });
         }
       },
 
-      // =========================
-      // LOGIN GOOGLE (redirección)
-      // =========================
       loginWithGoogle: () => {
+        console.log('[loginWithGoogle] Redirecting to Google auth...');
         window.location.href = '/api/v1/auth/google-url';
       },
 
-      // =========================
-      // BORRAR ERRORES
-      // =========================
-      clearError: () => set({ error: null }),
+      clearError: () => {
+        console.log('[clearError] Clearing errors');
+        set({ error: null, errorDetails: null });
+      },
     }),
     {
-      name: 'auth-storage', // nombre de localStorage
+      name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
-      }), // solo persistir estado crítico
+      }),
     }
   )
 );

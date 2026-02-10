@@ -53,7 +53,6 @@ authRoutes.post(
 
     body("email").trim().escape().isString(),
     body("password").trim().escape().isString(),
-    handleValidationErrors,
 
     loginController
 );

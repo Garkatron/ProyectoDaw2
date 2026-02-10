@@ -3,9 +3,9 @@ import axios from 'axios';
 import { requiredEnv, newGoogleOauth2, getAuthUrl } from '../utils/utils.js';
 import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
 import { withdb } from '../databases/mysql.js';
-import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserByUid, q_isEmailVerified, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
+import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserById, q_getUserByUid, q_isEmailVerified, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
 import { google } from 'googleapis';
-import sendVerificationEmail, { generateVerificationCode } from "../helpers/email_verification.js";
+import sendEmail, { generateVerificationCode } from "../helpers/email_verification.js";
 import { asyncHandler } from '../helpers/utils.js';
 
 const allowedRoles = ["client", "provider", "admin"];
@@ -37,28 +37,60 @@ export async function emailVerificationController(req, res) {
 }
 
 
-export async function sendVerificationEmailController(req, res) {
-    const { id, email } = req.body;
-
+async function sendVerifycationCode(userId, email) {
     try {
-        const { code, hashedCode } = await generateVerificationCode();
-
-        const result = await withdb(conn =>
-            q_addEmailVerificationCode(conn, id, hashedCode)
+        const verificationToken = await generateVerificationCode();
+        
+        await withdb(conn => 
+            q_addEmailVerificationCode(conn, userId, verificationToken.hashedCode)
         );
 
-        const emailData = await sendVerificationEmail(email, code);
+        
+        const emailData = await sendEmail(email, verificationToken.code);
 
-        res.status(201).json({
-            success: true,
-            data: { emailId: emailData },
-            details: ["Email enviado con éxito"]
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(400).json({ success: false, errors: [err.message] });
+
+        return { success: true };
+    } catch (error) {
+        console.error('[sendVerificationEmail] Error:', error);
+        throw error;
     }
 }
+
+export async function sendVerificationEmailController(req, res) {
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({
+            success: false,
+            errors: [{ code: "MISSING_ID", message: "ID es requerido" }]
+        });
+    }
+
+    try {
+        const user = await withdb(conn => q_getUserById(conn, id));
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                errors: [USER_ERRORS.USER_NOT_FOUND]
+            });
+        }
+
+        await sendVerifycationCode(id, user.email);
+
+        res.status(200).json({
+            success: true,
+            message: "Email de verificación enviado"
+        });
+    } catch (error) {
+        console.error('[sendVerificationEmailController] Error:', error);
+        res.status(500).json({
+            success: false,
+            errors: [{ code: "INTERNAL_ERROR", message: "Error al enviar email" }]
+        });
+    }
+}
+
 
 
 
@@ -88,6 +120,9 @@ export async function registerController(req, res) {
             userRecord = { id: userRecord.id, uid: firebaseUser.uid, name, role };
         }
 
+        await sendVerifycationCode(userRecord.id, firebaseUser.email);
+
+
         res.status(201).json({
             success: true,
             data: { id: userRecord.id, uid: firebaseUser.uid, email: firebaseUser.email, role },
@@ -109,77 +144,128 @@ export async function registerController(req, res) {
 // =========================
 // LOGIN
 // =========================
-export const loginController = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+export async function loginController(req, res) {
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw new AppError(
-      "Email and password required",
-      400,
-      [USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED]
-    );
-  }
+    console.log('[loginController] Request body:', { 
+        email, 
+        password: password ? '***' : undefined,
+        hasEmail: !!email,
+        hasPassword: !!password
+    });
 
-  let firebaseResponse;
-  try {
-    firebaseResponse = await axios.post(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`,
-      { email, password, returnSecureToken: true }
-    );
-  } catch (err) {
-    throw mapFirebaseError(err);
-  }
+    if (!email || !password) {
+        console.log('[loginController] Missing credentials');
+        return res.status(400).json({
+            success: false,
+            errors: [USER_ERRORS.EMAIL_AND_PASSWORD_NEEDED]
+        });
+    }
 
-  const { localId: uid, idToken } = firebaseResponse.data;
+    try {
+        console.log('[loginController] Calling Firebase auth...');
+        
+        const response = await axios.post(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`,
+            { email, password, returnSecureToken: true }
+        );
 
-  const userRecord = await withdb(conn =>
-    q_getUserByUid(conn, uid)
-  );
+        console.log('[loginController] Firebase auth successful, uid:', response.data.localId);
 
-  if (!userRecord) {
-    throw new AppError(
-      "User not registered",
-      403,
-      [USER_ERRORS.USER_NOT_REGISTERED]
-    );
-  }
+        const { localId: uid, idToken } = response.data;
 
-  if (!userRecord.email_verified) {
-    await sendVerificationEmailController(userRecord.id, email);
+        const userRecord = await withdb(conn =>
+            q_getUserByUid(conn, uid)
+        );
 
-    throw new AppError(
-      "Email not verified",
-      403,
-      [USER_ERRORS.EMAIL_NOT_VERIFIED]
-    );
-  }
+        if (!userRecord) {
+            console.log('[loginController] User not found in DB, uid:', uid);
+            return res.status(403).json({
+                success: false,
+                errors: [USER_ERRORS.USER_NOT_REGISTERED]
+            });
+        }
 
-  const expiresIn = 60 * 60 * 24 * 5 * 1000;
-  const sessionCookie = await admin.auth()
-    .createSessionCookie(idToken, { expiresIn });
+        if (!userRecord.email_verified) {
+            console.log('[loginController] Email not verified:', email);
+            await sendEmail(userRecord.id, email);
 
-  res.cookie('session', sessionCookie, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
-    maxAge: expiresIn
-  });
+            return res.status(403).json({
+                success: false,
+                errors: [USER_ERRORS.EMAIL_NOT_VERIFIED],
+                details: ["Te hemos enviado un correo de verificación"]
+            });
+        }
 
-  res.json({
-    success: true,
-    data: {
-      uid,
-      email,
-      name: userRecord.name,
-      role: userRecord.role,
-      id: userRecord.id
-    },
-    details: [SUCCESS_MESSAGES.USER_LOGGED_IN]
-  });
-});
+        const expiresIn = 60 * 60 * 24 * 5 * 1000;
+        const sessionCookie = await admin.auth()
+            .createSessionCookie(idToken, { expiresIn });
 
+        res.cookie('session', sessionCookie, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            maxAge: expiresIn
+        });
 
+        console.log('[loginController] Login successful:', { uid, email });
 
+        res.status(200).json({
+            success: true,
+            data: {
+                uid,
+                email,
+                name: userRecord.name,
+                role: userRecord.role,
+                id: userRecord.id
+            },
+            details: [SUCCESS_MESSAGES.USER_LOGGED_IN]
+        });
+
+    } catch (err) {
+        console.error('[loginController] Error caught:', {
+            message: err.message,
+            firebaseError: err.response?.data,
+            stack: err.stack
+        });
+
+        const firebaseCode = err.response?.data?.error?.message;
+        console.log('[loginController] Firebase error code:', firebaseCode);
+
+        let errorObj;
+        switch (firebaseCode) {
+            case "EMAIL_NOT_FOUND":
+                errorObj = USER_ERRORS.USER_NOT_FOUND;
+                break;
+            case "INVALID_PASSWORD":
+                errorObj = USER_ERRORS.INCORRECT_PASSWORD;
+                break;
+            case "USER_DISABLED":
+                errorObj = USER_ERRORS.ACCOUNT_LOCKED;
+                break;
+            case "INVALID_LOGIN_CREDENTIALS":
+                errorObj = USER_ERRORS.INVALID_CREDENTIALS || {
+                    code: "INVALID_CREDENTIALS",
+                    message: "Email o contraseña incorrectos"
+                };
+                break;
+            default:
+                errorObj = {
+                    code: "INTERNAL_ERROR",
+                    message: "Error interno del servidor",
+                    details: firebaseCode || err.message
+                };
+                console.error('[loginController] Unhandled error code:', firebaseCode);
+        }
+
+        console.log('[loginController] Returning error:', errorObj);
+
+        res.status(400).json({
+            success: false,
+            errors: [errorObj]
+        });
+    }
+}
 
 // =========================
 // GOOGLE OAUTH

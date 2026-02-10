@@ -25,16 +25,17 @@ export async function withdb(doit) {
   try {
     return await doit(conn);
   } catch (err) {
-    Logger.error("❌ Error en withdb:", err); 
-    Logger.error("❌ Stack trace:", err.stack); 
-    throw new Error("withdb failed", { cause: err });
+    Logger.error("❌ Error en withdb:");
+    Logger.error("❌ Message:", err.message);
+    Logger.error("❌ Code:", err.code);
+    Logger.error("❌ SQL:", err.sql);
+    Logger.error("❌ Stack:", err.stack);
+    Logger.error("❌ Full error:", err);
+    throw err; 
   } finally {
     await conn.close?.();
   }
 }
-
-
-
 
 
 export async function connectdb() {
