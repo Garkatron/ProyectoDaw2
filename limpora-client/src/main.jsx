@@ -6,6 +6,11 @@ import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { initLangManager } from "./utils/LangManager.js";
 
+if (import.meta.env.DEV) {
+  const { mocksWorker } = await import('./mocks/browser');
+  await mocksWorker.start();
+}
+
 initLangManager().then(() => {
   createRoot(document.getElementById("root")).render(
     <BrowserRouter>

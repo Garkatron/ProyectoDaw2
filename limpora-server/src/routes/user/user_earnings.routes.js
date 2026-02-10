@@ -18,7 +18,7 @@ userEarningsRouter.use(mw_session, mw_role([ROLES.ADMIN, ROLES.PROVIDER]));
  *     tags:
  *       - User Earnings
  *     parameters:
- *       - in: query
+ *       - in: param
  *         name: userId
  *         required: true
  *         schema:

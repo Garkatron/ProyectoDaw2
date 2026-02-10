@@ -106,7 +106,7 @@ userAppointmentsRouter.post(
     body("serviceId").trim().isNumeric(),
     body("providerId").trim().isNumeric(),
     body("price").trim(),
-    body("pricepaymentMethod").trim(),
+    body("paymentMethod").trim(),
     body("totalAmount").trim().isNumeric(),
     handleValidationErrors,
     addUserAppointment
