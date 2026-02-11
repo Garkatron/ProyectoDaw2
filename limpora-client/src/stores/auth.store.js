@@ -10,13 +10,13 @@ export const useAuthStore = create(
       user: null,
       isAuthenticated: false,
       error: null,
-      errorDetails: null, 
+      errorDetails: null,
 
       fetchUser: async () => {
         try {
           const res = await axios.get('/api/v1/auth/me', { withCredentials: true });
           console.log('[fetchUser] Response:', res.data);
-          
+
           if (res.data?.data) {
             set({ user: res.data.data, isAuthenticated: true, error: null });
           } else {
@@ -30,9 +30,9 @@ export const useAuthStore = create(
 
       login: async (email, password) => {
         set({ error: null, errorDetails: null });
-        
+
         console.log('[login] Attempting login with:', { email, password: '***' });
-        
+
         try {
           const response = await loginService(email, password);
           console.log('[login] Service response:', response);
@@ -42,10 +42,10 @@ export const useAuthStore = create(
             set({ user: response.data, isAuthenticated: true });
           } else {
             console.warn('[login] Login failed:', response);
-            const errorMessage = response.errors?.[0]?.message || 
-                               response.message || 
-                               "Error desconocido";
-            set({ 
+            const errorMessage = response.errors?.[0]?.message ||
+              response.message ||
+              "Error desconocido";
+            set({
               error: errorMessage,
               errorDetails: response.errors || response
             });
@@ -62,19 +62,19 @@ export const useAuthStore = create(
           });
 
           const errorData = error.response?.data;
-          const errorMessage = 
+          const errorMessage =
             errorData?.errors?.[0]?.message ||
             errorData?.message ||
             error.message ||
             "Error al iniciar sesión";
 
-          set({ 
+          set({
             error: errorMessage,
             errorDetails: errorData || { message: error.message }
           });
-          
-          return { 
-            success: false, 
+
+          return {
+            success: false,
             message: errorMessage,
             errors: errorData?.errors,
             _debug: {
@@ -87,21 +87,22 @@ export const useAuthStore = create(
 
       register: async (name, email, password, role = "client") => {
         set({ error: null, errorDetails: null });
-        
+
         console.log('[register] Attempting registration:', { name, email, role, password: '***' });
-        
+
         try {
           const response = await registerService(name, email, password, role);
           console.log('[register] Service response:', response);
 
           if (response.success) {
-            console.log('[register] Registration successful');
+            console.log('[register] Registration successful - verification email already sent by backend');
             set({ user: response.data, isAuthenticated: true, error: null });
-            await sendVerifycationEmail(response.data.id, response.data.email);
+            // REMOVE THIS LINE - backend already sends verification
+            // await sendVerifycationEmail(response.data.id, response.data.email);
           } else {
             const errorMessage = response.errors?.[0]?.message || "Error al registrarse";
             console.warn('[register] Registration failed:', errorMessage, response.errors);
-            set({ 
+            set({
               error: errorMessage,
               errorDetails: response.errors || response
             });
@@ -118,17 +119,17 @@ export const useAuthStore = create(
 
           const errorData = error.response?.data;
           const errorMessage =
-            errorData?.errors?.[0]?.message || 
+            errorData?.errors?.[0]?.message ||
             error.message ||
             "Error al registrarse";
 
-          set({ 
+          set({
             error: errorMessage,
             errorDetails: errorData || { message: error.message }
           });
-          
-          return { 
-            success: false, 
+
+          return {
+            success: false,
             errors: errorData?.errors,
             message: errorMessage
           };
@@ -138,7 +139,7 @@ export const useAuthStore = create(
       logout: async () => {
         set({ error: null });
         console.log('[logout] Logging out...');
-        
+
         try {
           await fetch('/api/v1/auth/logout', { credentials: 'include' });
           console.log('[logout] Logout successful');
