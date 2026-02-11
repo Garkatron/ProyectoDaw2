@@ -20,6 +20,10 @@ jobs:
           script: |
             cd /var/www/html/ProyectoDaw2
             
+            # Clean
+            git reset --hard
+            git clean -fdx
+
             # Pull latest changes
             git pull origin develop
             
