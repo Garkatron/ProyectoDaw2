@@ -11,27 +11,18 @@ export const loginService = async (email, password) => {
 };
 
 export const registerService = async (name, email, password, role) => {
-  try {
-    const { data } = await API.post("/auth/register", {
-      name,
-      email,
-      password,
-      role
-    });
-
-    if (!name || !email || !password) {
-      throw new Error("All fields required: Name, Email, Password, Role");
-    }
-
-    return data;
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.errors?.[0] ||
-      error.message ||
-      "Register failed";
-
-    throw new Error(errorMessage);
+  if (!name || !email || !password) {
+    throw new Error("All fields required: Name, Email, Password, Role");
   }
+
+  const { data } = await API.post("/auth/register", {
+    name,
+    email,
+    password,
+    role
+  }, { withCredentials: true });
+
+  return data;
 };
 
 export const getGoogleLoginUrl = () => {

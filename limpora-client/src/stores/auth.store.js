@@ -46,6 +46,7 @@ export const useAuthStore = create(
               response.message ||
               "Error desconocido";
             set({
+              isAuthenticated: true,
               error: errorMessage,
               errorDetails: response.errors || response
             });
@@ -96,9 +97,8 @@ export const useAuthStore = create(
 
           if (response.success) {
             console.log('[register] Registration successful - verification email already sent by backend');
-            set({ user: response.data, isAuthenticated: true, error: null });
-            // REMOVE THIS LINE - backend already sends verification
-            // await sendVerifycationEmail(response.data.id, response.data.email);
+            set({ user: response.data, isAuthenticated: false, error: null });
+
           } else {
             const errorMessage = response.errors?.[0]?.message || "Error al registrarse";
             console.warn('[register] Registration failed:', errorMessage, response.errors);
