@@ -64,6 +64,7 @@ app.use(cookieParser());
 app.use(errorHandler);
 
 // Security
+app.set('trust proxy', 1);
 app.use(cors(CORS_CONFIG));
 app.use(helmet());
 app.use(helmet.frameguard({ action: 'sameorigin' }));
