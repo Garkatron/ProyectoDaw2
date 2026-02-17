@@ -9,8 +9,7 @@ import sendEmail, { generateVerificationCode } from "../helpers/email_verificati
 import { asyncHandler } from '../helpers/utils.js';
 
 const allowedRoles = ["client", "provider", "admin"];
-
-
+const DISABLE_EMAIL_VERIFICATION = true; 
 export async function emailVerificationController(req, res) {
     const { code } = req.body;
     console.log(req.body);
@@ -111,7 +110,7 @@ export async function registerController(req, res) {
         const firebaseUser = await admin.auth().createUser({ email, password, displayName: name });
         await admin.auth().setCustomUserClaims(firebaseUser.uid, { role });
 
-        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, role));
+        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, role, DISABLE_EMAIL_VERIFICATION));
 
         let userRecord = await withdb(conn => q_getUserByUid(conn, firebaseUser.uid));
         if (!userRecord) {
@@ -186,7 +185,7 @@ export async function loginController(req, res) {
             });
         }
 
-        if (!userRecord.email_verified) {
+        if (!DISABLE_EMAIL_VERIFICATION && !userRecord.email_verified) {
             console.log('[loginController] Email not verified:', email);
             await sendEmail(userRecord.id, email);
 
@@ -300,7 +299,7 @@ export async function googleCallback(req, res) {
 
         // Revisar o crear en SQL
         const exists = await withdb(conn => q_userExists(conn, firebaseUser.uid));
-        if (!exists) await withdb(conn => q_addUser(conn, firebaseUser.uid, name, 'client'));
+        if (!exists) await withdb(conn => q_addUser(conn, firebaseUser.uid, name, 'client', DISABLE_EMAIL_VERIFICATION));
 
         const userRecord = await withdb(conn => q_getUserByUid(conn, firebaseUser.uid));
         const role = userRecord?.role || firebaseUser.customClaims?.role || "client";
@@ -410,7 +409,7 @@ export async function registerAdmin(req, res) {
         await admin.auth().setCustomUserClaims(firebaseUser.uid, { role: "admin" });
 
         // Guardar en SQL solo datos extendidos
-        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, "admin"));
+        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, "admin", DISABLE_EMAIL_VERIFICATION));
 
         res.status(201).json({
             success: true,

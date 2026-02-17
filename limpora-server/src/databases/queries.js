@@ -36,10 +36,10 @@ export async function q_getUserByUid(conn, uid) {
     return rows.length > 0 ? rows[0] : null;
 }
 
-export async function q_addUser(conn, firebase_uid, name, role) {
+export async function q_addUser(conn, firebase_uid, name, role, verified = false) {
     return await conn.query(
-        "INSERT INTO Users (firebase_uid, name, role) VALUES (?, ?, ?)",
-        [firebase_uid, name, role]
+        "INSERT INTO Users (firebase_uid, name, role, email_verified) VALUES (?, ?, ?, ?)",
+        [firebase_uid, name, role, verified]
     );
 }
 
