@@ -5,20 +5,19 @@ import { http, HttpResponse } from 'msw'
 const users = [
   {
     id: 1,
-    uid: 'uid-1',
-    name: 'Juan Pérez',
-    email: 'juan@test.com',
-    role: 'PROVIDER'
+    uid: 'firebase-mock-uid',
+    name: 'Test User',
+    email: 'test@test.com',
+    role: 'provider',
   },
   {
     id: 2,
     uid: 'uid-2',
     name: 'Ana Gómez',
     email: 'ana@test.com',
-    role: 'CLIENT'
+    role: 'client',
   }
 ]
-
 /* ---------------- HANDLERS ---------------- */
 
 export const userHandlers = [

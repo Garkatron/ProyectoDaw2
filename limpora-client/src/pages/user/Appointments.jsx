@@ -11,7 +11,6 @@ import {
   ArrowPathIcon
 } from "@heroicons/react/24/outline";
 
-// Mapeo de colores por status
 const statusConfig = {
   Completed: {
     bg: "bg-green-50",
