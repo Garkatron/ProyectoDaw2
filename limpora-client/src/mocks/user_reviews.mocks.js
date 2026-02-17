@@ -60,7 +60,7 @@ export const userReviewsHandlers = [
   // -------------------------------------------------
   // GET /user/reviews
   // -------------------------------------------------
-  http.get('/api/user/reviews', () => {
+  http.get('/api/v1/user/reviews', () => {
     return HttpResponse.json(
       {
         success: true,
@@ -74,7 +74,7 @@ export const userReviewsHandlers = [
   // -------------------------------------------------
   // GET /user/reviews/user/:userId
   // -------------------------------------------------
-  http.get('/api/user/reviews/user/:userId', ({ params }) => {
+  http.get('/api/v1/user/reviews/user/:userId', ({ params }) => {
     const userId = Number(params.userId)
 
     if (isNaN(userId)) {
@@ -99,7 +99,7 @@ export const userReviewsHandlers = [
   // -------------------------------------------------
   // GET /user/reviews/provider/:providerId
   // -------------------------------------------------
-  http.get('/api/user/reviews/provider/:providerId', ({ params }) => {
+  http.get('/api/v1/user/reviews/provider/:providerId', ({ params }) => {
     const providerId = Number(params.providerId)
 
     const result = reviews.filter(
@@ -116,7 +116,7 @@ export const userReviewsHandlers = [
   // GET /user/reviews/provider/:providerId/average-rating
   // -------------------------------------------------
   http.get(
-    '/api/user/reviews/provider/:providerId/average-rating',
+    '/api/v1/user/reviews/provider/:providerId/average-rating',
     ({ params }) => {
       const providerId = Number(params.providerId)
 
@@ -140,7 +140,7 @@ export const userReviewsHandlers = [
   // -------------------------------------------------
   // POST /user/reviews
   // -------------------------------------------------
-  http.post('/api/user/reviews', async ({ request }) => {
+  http.post('/api/v1/user/reviews', async ({ request }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },
@@ -185,7 +185,7 @@ export const userReviewsHandlers = [
   // -------------------------------------------------
   // GET /user/reviews/name/:username
   // -------------------------------------------------
-  http.get('/api/user/reviews/name/:username', ({ params }) => {
+  http.get('/api/v1/user/reviews/name/:username', ({ params }) => {
     const username = params.username.toLowerCase()
     const user = usersByName[username]
 

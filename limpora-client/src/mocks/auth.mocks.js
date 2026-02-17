@@ -6,7 +6,7 @@ export const authHandlers = [
   // =========================
   // LOGIN
   // =========================
-  http.post('/api/auth/login', async ({ request }) => {
+  http.post('/api/v1/v1/auth/login', async ({ request }) => {
     const { email, password } = await request.json()
 
     if (email === 'test@test.com' && password === '123456') {
@@ -37,7 +37,7 @@ export const authHandlers = [
   // =========================
   // REGISTER
   // =========================
-  http.post('/api/auth/register', async ({ request }) => {
+  http.post('/api/v1/v1/auth/register', async ({ request }) => {
     const { name, email, password } = await request.json()
 
     if (!name || !email || !password) {
@@ -68,7 +68,7 @@ export const authHandlers = [
   // =========================
   // ME
   // =========================
-  http.get('/api/auth/me', () => {
+  http.get('/api/v1/auth/me', () => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },
@@ -85,7 +85,7 @@ export const authHandlers = [
   // =========================
   // LOGOUT
   // =========================
-  http.post('/api/auth/logout', () => {
+  http.post('/api/v1/auth/logout', () => {
     isAuthenticated = false
 
     return HttpResponse.json({

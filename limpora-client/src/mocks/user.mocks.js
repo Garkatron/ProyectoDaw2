@@ -24,7 +24,7 @@ const users = [
 export const userHandlers = [
 
   /* ===== GET ALL USERS ===== */
-  http.get('/api/user', () => {
+  http.get('/api/v1/user', () => {
     return HttpResponse.json({
       success: true,
       data: users
@@ -32,7 +32,7 @@ export const userHandlers = [
   }),
 
   /* ===== GET USER BY ID ===== */
-  http.get('/api/user/id/:id', ({ params }) => {
+  http.get('/api/v1/user/id/:id', ({ params }) => {
     const { id } = params
 
     if (!id || id === 'undefined') {
@@ -58,7 +58,7 @@ export const userHandlers = [
   }),
 
   /* ===== GET USER BY UID ===== */
-  http.get('/api/user/uid/:uid', ({ params }) => {
+  http.get('/api/v1/user/uid/:uid', ({ params }) => {
     const { uid } = params
 
     if (!uid || uid === 'undefined') {
@@ -84,7 +84,7 @@ export const userHandlers = [
   }),
 
   /* ===== GET USER BY NAME ===== */
-  http.get('/api/user/name/:name', ({ params }) => {
+  http.get('/api/v1/user/name/:name', ({ params }) => {
     const { name } = params
 
     if (!name || name === 'undefined') {

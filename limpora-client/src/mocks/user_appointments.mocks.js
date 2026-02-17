@@ -34,7 +34,7 @@ export const userAppointmentsHandlers = [
   // =========================
   // GET /user/appointments/:userId
   // =========================
-  http.get('/api/user/appointments/:userId', ({ params }) => {
+  http.get('/api/v1/user/appointments/:userId', ({ params }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },
@@ -60,7 +60,7 @@ export const userAppointmentsHandlers = [
   // =========================
   // POST /user/appointments
   // =========================
-  http.post('/api/user/appointments', async ({ request }) => {
+  http.post('/api/v1/user/appointments', async ({ request }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },

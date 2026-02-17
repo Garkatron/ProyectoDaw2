@@ -46,7 +46,7 @@ export const rankingHandlers = [
   // =========================
   // GET TOP USERS
   // =========================
-  http.get('/api/users/top', ({ request }) => {
+  http.get('/api/v1/ranking/top', ({ request }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },
@@ -74,7 +74,7 @@ export const rankingHandlers = [
   // =========================
   // GET USER RANKING
   // =========================
-  http.get('/api/users/:userId/ranking', ({ params }) => {
+  http.get('/api/v1/ranking/user/:userId', ({ params }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },

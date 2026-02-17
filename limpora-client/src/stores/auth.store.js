@@ -46,7 +46,7 @@ export const useAuthStore = create(
               response.message ||
               "Error desconocido";
             set({
-              isAuthenticated: true,
+              isAuthenticated: false,
               error: errorMessage,
               errorDetails: response.errors || response
             });

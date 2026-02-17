@@ -34,7 +34,7 @@ export const userServicesHandlers = [
   // -------------------------------------------------
   // GET /user/services/:userId
   // -------------------------------------------------
-  http.get('/api/user/services/:userId', ({ params }) => {
+  http.get('/api/v1/user/services/:userId', ({ params }) => {
     const userId = Number(params.userId)
 
     if (isNaN(userId)) {
@@ -64,7 +64,7 @@ export const userServicesHandlers = [
   // -------------------------------------------------
   // GET /user/services/:userId/:serviceId
   // -------------------------------------------------
-  http.get('/api/user/services/:userId/:serviceId', ({ params }) => {
+  http.get('/api/v1/user/services/:userId/:serviceId', ({ params }) => {
     const userId = Number(params.userId)
     const serviceId = Number(params.serviceId)
 
@@ -95,7 +95,7 @@ export const userServicesHandlers = [
   // -------------------------------------------------
   // POST /user/services/:userId
   // -------------------------------------------------
-  http.post('/api/user/services/:userId', async ({ params, request }) => {
+  http.post('/api/v1/user/services/:userId', async ({ params, request }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },
@@ -171,7 +171,7 @@ export const userServicesHandlers = [
   // PATCH /user/services/:userId/:serviceId
   // -------------------------------------------------
   http.patch(
-    '/api/user/services/:userId/:serviceId',
+    '/api/v1/user/services/:userId/:serviceId',
     async ({ params, request }) => {
       if (!isAuthenticated) {
         return HttpResponse.json(
@@ -250,7 +250,7 @@ export const userServicesHandlers = [
   // DELETE /user/services/:userId/:serviceId
   // -------------------------------------------------
   http.delete(
-    '/api/user/services/:userId/:serviceId',
+    '/api/v1/user/services/:userId/:serviceId',
     ({ params }) => {
       if (!isAuthenticated) {
         return HttpResponse.json(

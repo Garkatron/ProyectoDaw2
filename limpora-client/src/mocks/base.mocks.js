@@ -7,6 +7,7 @@ export const ROLES = {
   CLIENT: "client",
   PROVIDER: "provider"
 };
+export const MOCK_USER_ROLE = ROLES.PROVIDER;
 
 
 
@@ -15,6 +16,6 @@ export const mockUser = {
   uid: 'firebase-mock-uid',
   email: 'test@test.com',
   name: 'Test User',
-  role: 'client',
+  role: MOCK_USER_ROLE,
   email_verified: true,
 };

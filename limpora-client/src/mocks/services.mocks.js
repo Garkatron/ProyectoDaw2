@@ -16,7 +16,7 @@ export const servicesHandlers = [
   // =========================
   // GET /services
   // =========================
-  http.get('/api/services', () => {
+  http.get('/api/v1/services', () => {
     return HttpResponse.json(
       {
         success: true,
@@ -29,7 +29,7 @@ export const servicesHandlers = [
   // =========================
   // GET /services/:serviceId
   // =========================
-  http.get('/api/services/:serviceId', ({ params }) => {
+  http.get('/api/v1/services/:serviceId', ({ params }) => {
     const { serviceId } = params
 
     const service = services.find(
@@ -55,7 +55,7 @@ export const servicesHandlers = [
   // =========================
   // POST /services (ADMIN)
   // =========================
-  http.post('/api/services', async ({ request }) => {
+  http.post('/api/v1/services', async ({ request }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },
@@ -98,7 +98,7 @@ export const servicesHandlers = [
   // =========================
   // DELETE /services/:serviceId (ADMIN)
   // =========================
-  http.delete('/api/services/:serviceId', ({ params }) => {
+  http.delete('/api/v1/services/:serviceId', ({ params }) => {
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },

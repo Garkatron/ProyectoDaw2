@@ -2,9 +2,8 @@ import { http, HttpResponse } from 'msw'
 import { isAuthenticated, mockUser } from './base.mocks.js'
 import { ROLES } from './base.mocks.js'
 
-// Mock data
 const mockEarningsByUser = {
-  2: {
+  1: {       
     total: 1250,
     month: 420,
     year: 1250,
@@ -12,7 +11,7 @@ const mockEarningsByUser = {
 }
 
 const mockClosedAppointmentsByUser = {
-  2: [
+  1: [          
     {
       id: 10,
       date: '2024-01-10T10:00:00.000Z',
@@ -41,10 +40,7 @@ const hasValidRole = () =>
 
 export const userEarningsHandlers = [
 
-  // =========================
-  // GET /user/earnings?userId=
-  // =========================
-  http.get('/api/user/earnings', ({ request }) => {
+  http.get('/api/v1/user/earnings/:userId', ({ params }) => {  
     if (!isAuthenticated) {
       return HttpResponse.json(
         { success: false, message: 'Not authenticated' },
@@ -59,32 +55,13 @@ export const userEarningsHandlers = [
       )
     }
 
-    const url = new URL(request.url)
-    const userId = url.searchParams.get('userId')
+    const { userId } = params  
 
-    if (!userId) {
-      return HttpResponse.json(
-        { success: false, message: 'userId is required' },
-        { status: 400 }
-      )
-    }
-
-    const earnings = mockEarningsByUser[userId] ?? {
-      total: 0,
-      month: 0,
-      year: 0,
-    }
-
+    const earnings = mockEarningsByUser[userId] ?? { total: 0, month: 0, year: 0 }
     const appointments = mockClosedAppointmentsByUser[userId] ?? []
 
     return HttpResponse.json(
-      {
-        success: true,
-        data: {
-          earnings,
-          appointments,
-        },
-      },
+      { success: true, data: { earnings, appointments } },
       { status: 200 }
     )
   }),

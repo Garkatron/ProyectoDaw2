@@ -6,7 +6,9 @@ COPY package*.json ./
 
 RUN npm install
 
+# RUN npx msw init public/ --save
 COPY . .
+
 
 EXPOSE 5173
 
