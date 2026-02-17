@@ -12,6 +12,7 @@ export default function Rergister({}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("client");
 
   const [success, setSuccess] = useState(false);
 
@@ -33,7 +34,7 @@ export default function Rergister({}) {
     }
 
     try {
-      const data = await register(result.data.name, result.data.email, result.data.password, "admin");;
+      const data = await register(result.data.name, result.data.email, result.data.password, role);
       
       if (data.success) {
         setModalTitle("Registration Successful");
@@ -62,7 +63,6 @@ export default function Rergister({}) {
               alt="Limpora Logo"
               className="w-32 h-32 object-contain flex-shrink-0"
             />
-
             <h1 className="text-2xl font-light text-gray-800">Registro</h1>
           </header>
 
@@ -75,9 +75,7 @@ export default function Rergister({}) {
                 required
                 placeholder="Nombre completo"
                 className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400/50 transition duration-150"
-                onChange={(e) => {
-                  setName(e.target.value);
-                }}
+                onChange={(e) => setName(e.target.value)}
                 value={name}
               />
             </div>
@@ -90,9 +88,7 @@ export default function Rergister({}) {
                 required
                 placeholder="Correo Electrónico"
                 className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400/50 transition duration-150"
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
+                onChange={(e) => setEmail(e.target.value)}
                 value={email}
               />
             </div>
@@ -105,16 +101,25 @@ export default function Rergister({}) {
                 required
                 placeholder="Contraseña"
                 className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400/50 transition duration-150"
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
+                onChange={(e) => setPassword(e.target.value)}
                 value={password}
               />
             </div>
 
-            <div className="flex justify-between pt-2 space-x-4">
+            {/* TODO: quitar selector de rol */}
+            <div>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 focus:outline-none focus:border-blue-400/50 transition duration-150"
+              >
+                <option value="client">Cliente</option>
+                <option value="provider">Proveedor</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
 
-              
+            <div className="flex justify-between pt-2 space-x-4">
               <button
                 type="submit"
                 className="w-1/2 p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-gray-200/70 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
@@ -146,6 +151,3 @@ export default function Rergister({}) {
     </div>
   );
 }
-
-// https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/
-// https://developers.cloudflare.com/turnstile/get-started/server-side-validation/

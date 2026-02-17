@@ -98,6 +98,7 @@ export async function sendVerificationEmailController(req, res) {
 // =========================
 export async function registerController(req, res) {
     const { name, email, password, role = "client" } = req.body;
+    
 
     if (!name || !email || !password) {
         return res.status(400).json({ success: false, errors: [USER_ERRORS.EMAIL_PASSWORD_USERNAME_NEEDED] });

@@ -31,7 +31,7 @@ authRoutes.post(
     body("name").trim().notEmpty().isString(),
     body("email").trim().normalizeEmail().isEmail(),
     body("password").notEmpty().isString().isLength({ min: 6 }),
-    body("role").optional().trim().isString().isIn(['client', 'admin', 'photographer']),
+    body("role").optional().trim().isString().isIn(['client', 'admin', 'provider']),
     handleValidationErrors,
 
     registerController
