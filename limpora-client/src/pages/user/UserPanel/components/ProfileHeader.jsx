@@ -4,16 +4,13 @@ export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
     return (
         <div className="relative">
             <div
-                className="h-60 w-full bg-cover bg-center rounded-t-lg"
-                style={{
-                    backgroundImage: `url(https://media.istockphoto.com/id/1360927961/es/foto/fondo-abstracto-con-entrelazamiento-de-l%C3%ADneas-y-puntos-de-colores-estructura-de-conexi%C3%B3n-de.jpg?s=612x612&w=0&k=20&c=fQMuV5lCMxs3u3FZV2Vzhm--XxJGI5uUjMDj5o1SpG8=)`,
-                }}
+                className="h-56 w-full rounded-t-lg bg-gray-200 flex items-center justify-center text-gray-400 text-lg"
             >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-t-lg" />
+                Fondo de usuario
             </div>
 
-            <div className="absolute left-8 -bottom-12">
-                <div className="w-32 h-32 rounded-full bg-gray-100 border-4 border-white shadow-xl flex items-center justify-center text-5xl font-bold text-gray-700">
+            <div className="absolute left-6 -bottom-10">
+                <div className="w-24 h-24 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-3xl font-bold text-gray-600">
                     {targetUser.name[0].toUpperCase()}
                 </div>
             </div>
@@ -22,10 +19,10 @@ export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
                 <div className="absolute top-4 right-4">
                     <button
                         onClick={onLogout}
-                        className="flex items-center space-x-2 px-4 py-2 bg-white/90 hover:bg-white text-gray-700 rounded-lg shadow-md transition-all duration-200 border border-gray-300/20"
+                        className="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-300 text-sm font-medium transition-colors"
                     >
-                        <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                        <span className="text-sm font-medium">Logout</span>
+                        <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                        <span>Logout</span>
                     </button>
                 </div>
             )}

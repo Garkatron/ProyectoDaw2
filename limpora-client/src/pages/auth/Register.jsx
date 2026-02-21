@@ -1,13 +1,11 @@
 import logo from "../../assets/logo-provisional.png";
-import { useEffect } from "react";
-import axios from "axios";
-import { useAuthStore } from "../../stores/auth.store";
 import { useState } from "react";
+import { useAuthStore } from "../../stores/auth.store";
 import { Modal } from "../../components/Modal";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterSchema from "../../schemas/RegisterSchema";
 
-export default function Rergister({}) {
+export default function Register() {
   const register = useAuthStore((state) => state.register);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +13,6 @@ export default function Rergister({}) {
   const [role, setRole] = useState("client");
 
   const [success, setSuccess] = useState(false);
-
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -23,7 +20,6 @@ export default function Rergister({}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const result = RegisterSchema.safeParse({ name, email, password });
 
     if (!result.success) {
@@ -34,116 +30,106 @@ export default function Rergister({}) {
     }
 
     try {
-      const data = await register(result.data.name, result.data.email, result.data.password, role);
-      
+      const data = await register(
+        result.data.name,
+        result.data.email,
+        result.data.password,
+        role
+      );
+
       if (data.success) {
-        setModalTitle("Registration Successful");
-        setModalMessage("Redirecting to login...");
+        setModalTitle("Registro exitoso");
+        setModalMessage("Redirigiendo a login...");
         setSuccess(true);
       } else {
         setModalTitle("Error");
-        setModalMessage(data.message || "An error occurred.");
+        setModalMessage(data.message || "Ocurrió un error.");
       }
 
       setModalOpen(true);
     } catch (err) {
       setModalTitle("Error");
-      setModalMessage(err.message || "Error registering user.");
+      setModalMessage(err.message || "Error registrando usuario.");
       setModalOpen(true);
     }
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-xl shadow-gray-200 border border-gray-300/20 space-y-6">
-          <header className="flex flex-col items-center">
-            <img
-              src={logo}
-              alt="Limpora Logo"
-              className="w-32 h-32 object-contain flex-shrink-0"
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-gray-50 p-10 rounded-xl border border-gray-200 space-y-8">
+        <header className="flex flex-col items-center space-y-2">
+          <img
+            src={logo}
+            alt="Limpora Logo"
+            className="w-28 h-28 object-contain"
+          />
+          <h1 className="text-3xl font-light text-gray-700">Registro</h1>
+        </header>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <input
+              type="text"
+              required
+              placeholder="Nombre completo"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
             />
-            <h1 className="text-2xl font-light text-gray-800">Registro</h1>
-          </header>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                placeholder="Nombre completo"
-                className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400/50 transition duration-150"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-              />
-            </div>
+            <input
+              type="email"
+              required
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
+            />
 
-            <div>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="Correo Electrónico"
-                className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400/50 transition duration-150"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-              />
-            </div>
+            <input
+              type="password"
+              required
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
+            />
 
-            <div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                placeholder="Contraseña"
-                className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:border-blue-400/50 transition duration-150"
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-              />
-            </div>
+            {/* Selector de rol opcional */}
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
+            >
+              <option value="client">Cliente</option>
+              <option value="provider">Proveedor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
-            {/* TODO: quitar selector de rol */}
-            <div>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full p-4 bg-gray-100/50 border border-gray-300/50 rounded-lg shadow-sm text-gray-800 focus:outline-none focus:border-blue-400/50 transition duration-150"
-              >
-                <option value="client">Cliente</option>
-                <option value="provider">Proveedor</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              type="submit"
+              className="flex-1 p-3 bg-gray-100 text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition"
+            >
+              Confirmar
+            </button>
 
-            <div className="flex justify-between pt-2 space-x-4">
-              <button
-                type="submit"
-                className="w-1/2 p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-gray-200/70 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
-              >
-                Confirmar
-              </button>
-
-              <Link
-                to="/login"
-                className="w-1/2 p-3 text-center bg-gray-50 text-gray-600 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-gray-100/70 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
-              >
-                Cancelar
-              </Link>
-            </div>
-          </form>
-        </div>
+            <Link
+              to="/login"
+              className="flex-1 p-3 text-center bg-gray-50 text-gray-600 font-medium rounded-md border border-gray-300 hover:bg-gray-100 transition"
+            >
+              Cancelar
+            </Link>
+          </div>
+        </form>
       </div>
+
       <Modal
         isOpen={modalOpen}
         onClose={() => {
           setModalOpen(false);
-          if (success) {
-            navigate("/login");
-          }
+          if (success) navigate("/login");
         }}
         title={modalTitle}
         message={modalMessage}

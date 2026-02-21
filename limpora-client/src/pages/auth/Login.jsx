@@ -42,7 +42,6 @@ export default function Login() {
         setModalTitle(lang("login.success_title"));
         setModalMessage(lang("login.success_message"));
         setSuccess(true);
-        console.log(response);
         if (response.data.role === "admin") {
           setAdmin(true);
         }
@@ -60,81 +59,80 @@ export default function Login() {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-xl shadow-gray-200 border border-gray-300/20 space-y-6">
-          <header className="flex flex-col items-center">
-            <img
-              src={logo}
-              alt="Limpora Logo"
-              className="w-32 h-32 object-contain flex-shrink-0"
-            />
-            <h1 className="text-2xl font-light text-gray-800">
-              {lang("login.title")}
-            </h1>
-          </header>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-gray-50 p-10 rounded-xl border border-gray-200 space-y-8">
+        <header className="flex flex-col items-center space-y-2">
+          <img
+            src={logo}
+            alt="Limpora Logo"
+            className="w-28 h-28 object-contain"
+          />
+          <h1 className="text-3xl font-light text-gray-700">{lang("login.title")}</h1>
+        </header>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 {lang("login.email")}
               </label>
               <input
                 id="email"
-                name="email"
                 type="email"
                 required
-                className="w-full p-3 border border-gray-300/50 rounded-md shadow-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400/50 transition duration-150"
-                placeholder="tu.correo@ejemplo.com"
-                onChange={(e) => setEmail(e.target.value)}
                 value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu.correo@ejemplo.com"
+                className="w-full p-4 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
               />
             </div>
 
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-1"
               >
                 {lang("login.password")}
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
                 required
-                className="w-full p-3 border border-gray-300/50 rounded-md shadow-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400/50 transition duration-150"
-                placeholder="••••••••"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full p-4 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
               />
             </div>
+          </div>
 
+          <div className="flex flex-col gap-4">
             <button
               type="submit"
-              className="w-full p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-blue-200/70 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+              className="w-full p-3 bg-gray-100 text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition"
             >
               {lang("login.submit")}
             </button>
             <button
               type="button"
               onClick={loginWithGoogle}
-              className="w-full p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-blue-200/70 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+              className="w-full p-3 bg-gray-100 text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition"
             >
               Google
             </button>
-          </form>
-
-          <div className="text-center">
-            <Link
-              to="/register"
-              className="text-sm text-gray-600 hover:text-blue-800 transition duration-150"
-            >
-              {lang("login.register")}
-            </Link>
           </div>
+        </form>
+
+        <div className="text-center">
+          <Link
+            to="/register"
+            className="text-sm text-gray-600 hover:text-blue-800 transition"
+          >
+            {lang("login.register")}
+          </Link>
         </div>
       </div>
 

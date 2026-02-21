@@ -1,4 +1,3 @@
-
 import { useUserPanel } from './useUserPanel';
 import { useServices } from './useServices';
 import { useReviews } from './useReviews';
@@ -18,7 +17,7 @@ export default function UserPanel() {
         return (
             <Base>
                 <div className="max-w-6xl mx-auto p-8">
-                    <p className="text-gray-500">Cargando...</p>
+                    <p className="text-gray-400">Cargando...</p>
                 </div>
             </Base>
         );
@@ -26,22 +25,22 @@ export default function UserPanel() {
         return (
             <Base>
                 <div className="max-w-6xl mx-auto p-8">
-                    <p className="text-red-500">{error || 'User not found.'}</p>
+                    <p className="text-red-400">{error || 'Usuario no encontrado.'}</p>
                 </div>
             </Base>
         );
 
     return (
         <Base>
-            <div className="max-w-6xl mx-auto space-y-8 p-4 sm:p-8">
-                <main className="bg-white rounded-lg shadow-xl border border-gray-300/20">
+            <div className="max-w-6xl mx-auto space-y-6 p-4 sm:p-8">
+                <main className="bg-gray-50 rounded-lg border border-gray-200">
                     <ProfileHeader
                         targetUser={targetUser}
                         isSelf={isSelf}
                         onLogout={handleLogout}
                     />
 
-                    <div className="p-8 pt-16 space-y-8">
+                    <div className="p-6 space-y-6">
                         <InfoSection targetUser={targetUser} isSelf={isSelf} />
                         <MetricsBar targetUser={targetUser} />
 
