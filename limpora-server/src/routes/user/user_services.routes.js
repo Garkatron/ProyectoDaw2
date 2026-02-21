@@ -38,6 +38,9 @@ userServices.post(
   mw_role([ROLES.ADMIN, ROLES.PROVIDER]),
 
   param("userId").trim().escape().isNumeric(),
+  body("service_id").isNumeric(),
+  body("price").isNumeric(),
+
   handleValidationErrors,
 
   addUserService

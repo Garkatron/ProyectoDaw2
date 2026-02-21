@@ -153,13 +153,13 @@ export const q_getClosedAppointments = async (conn, userId) => {
 // SERVICES
 
 export async function q_getServices(conn) {
-    const [rows] = await conn.query("SELECT name FROM Services;");
+    const [rows] = await conn.query("SELECT id, name FROM Services;");
     return rows || [];
 }
 
 export async function q_getServiceById(conn, serviceId) {
     const [rows] = await conn.query(
-        "SELECT name FROM Services WHERE id = ?;",
+        "SELECT id, name FROM Services WHERE id = ?;",
         [serviceId]
     );
     return rows[0] || null;
@@ -180,60 +180,62 @@ export async function q_deleteService(conn, id) {
 // Reviews
 
 export async function q_getReviews(conn) {
-    const [rows] = await conn.query(
-        `SELECT r.id, r.content, r.rating, r.created_at,
-                u.name AS client_name,
-                p.name AS provider_name
-         FROM Reviews r
-         JOIN Users u ON u.id = r.user_id
-         JOIN Users p ON p.id = r.provider_id
-         ORDER BY r.created_at DESC`
-    );
-    return rows;
+  const [rows] = await conn.query(
+    `SELECT r.id, r.content, r.rating, r.created_at,
+            u.name AS reviewer_name,
+            p.name AS reviewed_name
+     FROM Reviews r
+     JOIN Users u ON u.id = r.reviewer_id
+     JOIN Users p ON p.id = r.reviewed_id
+     ORDER BY r.created_at DESC`
+  );
+  return rows;
 }
 
-export async function q_getReviewsByUser(conn, userId) {
-    const [rows] = await conn.query(
-        `SELECT r.id, r.content, r.rating, r.created_at,
-                p.name AS provider_name
-         FROM Reviews r
-         JOIN Users p ON p.id = r.provider_id
-         WHERE r.user_id = ?
-         ORDER BY r.created_at DESC`,
-        [userId]
-    );
-    return rows;
+export async function q_getReviewsByReviewer(conn, reviewerId) {
+  const [rows] = await conn.query(
+    `SELECT r.id, r.content, r.rating, r.created_at,
+            p.name AS reviewed_name
+     FROM Reviews r
+     JOIN Users p ON p.id = r.reviewed_id
+     WHERE r.reviewer_id = ?
+     ORDER BY r.created_at DESC`,
+    [reviewerId]
+  );
+  return rows;
 }
 
-export async function q_getReviewsByProvider(conn, providerId) {
-    const [rows] = await conn.query(
-        `SELECT r.id, r.content, r.rating, r.created_at,
-                u.name AS client_name
-         FROM Reviews r
-         JOIN Users u ON u.id = r.user_id
-         WHERE r.provider_id = ?
-         ORDER BY r.created_at DESC`,
-        [providerId]
-    );
-    return rows;
+export async function q_getReviewsByReviewed(conn, reviewedId) {
+  const [rows] = await conn.query(
+    `SELECT r.id, r.content, r.rating, r.created_at,
+            u.name AS reviewer_name
+     FROM Reviews r
+     JOIN Users u ON u.id = r.reviewer_id
+     WHERE r.reviewed_id = ?
+     ORDER BY r.created_at DESC`,
+    [reviewedId]
+  );
+  return rows;
 }
 
-export async function q_addReview(conn, content, rating, userId, providerId) {
-    return await conn.query(
-        `INSERT INTO Reviews (content, rating, user_id, provider_id)
-         VALUES (?, ?, ?, ?)`,
-        [content, rating, userId, providerId]
-    );
+
+export async function q_addReview(conn, content, rating, reviewerId, reviewedId) {
+  const [result] = await conn.query(
+    `INSERT INTO Reviews (content, rating, reviewer_id, reviewed_id)
+     VALUES (?, ?, ?, ?)`,
+    [content, rating, reviewerId, reviewedId]
+  );
+  return result;
 }
 
 export async function q_getAverageRating(conn, providerId) {
     const [rows] = await conn.query(
-        `SELECT provider_id, 
+        `SELECT reviewed_id, 
                 AVG(rating) AS average_rating, 
                 COUNT(*) AS total_reviews
          FROM Reviews
-         WHERE provider_id = ?
-         GROUP BY provider_id`,
+         WHERE reviewed_id = ?
+         GROUP BY reviewed_id`,
         [providerId]
     );
     return rows[0] || { provider_id: providerId, average_rating: 0, total_reviews: 0 };

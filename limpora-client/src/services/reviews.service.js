@@ -6,10 +6,14 @@ export const getReviewsByUsername = async (username) => {
   return data.data;
 };
 
-export const addReview = async ({ content, rating, userId, providerId }) => {
-  const res = await axios.post('/api/v1/user/reviews', 
-    { content, rating, userId, providerId }, 
-    { withCredentials: true }
-  );
-  return res.data;
-};
+export const getReviewsByUserId = (userId) =>
+  API.get(`/user/reviews/reviewer/${userId}`).then(r => r.data.data);
+
+export const getReviewsByReviewedId = (userId) =>
+  API.get(`/user/reviews/reviewed/${userId}`).then(r => r.data.data);
+
+export const addReview = (data) =>
+  API.post(`/user/reviews`, data).then(r => r.data);
+
+export const getAverageRating = (userId) =>
+  API.get(`/user/reviews/reviewed/${userId}/average-rating`).then(r => r.data.data);
