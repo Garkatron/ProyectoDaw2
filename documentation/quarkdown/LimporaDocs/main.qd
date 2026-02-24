@@ -1,0 +1,699 @@
+.docname {LimporaDocs}
+.doctype {paged}
+.doclang {Spanish}
+.theme {paperwhite} layout:{latex}
+
+.docauthors
+  - Matias Gulias Carrascal
+    - email: masitacarg@email.com
+    - website: https://github.com/Garkatron
+
+.pagemargin {bottomcenter}
+    .currentpage
+
+.center
+    #! Limpora Docs
+    ###! Limpieza, Seguridad y Claridad
+
+!(100%)[Quarkdown](image/logo.png)
+
+# Sobre el proyecto (Sprint 0)
+
+## Que es?
+
+Limpora es una aplicacion y servicio web que conecta a clientes con autonomos especializados en servicios de limpieza, facilitando el contacto, la contratacion y la gestion de trabajos de forma clara, rapida y segura.
+
+## A quien va dirigido?
+
+Limpora esta dirigido a:
+
+- Autonomos que trabajan en el ambito de la limpieza y desean encontrar nuevos clientes.
+- Personas que
+    - buscan servicios de limpieza puntuales o temporales.
+    - no pueden realizar tareas de limpieza en su hogar.
+    - prefieren delegar las tareas de limpieza por comodidad o falta de tiempo.
+
+## Tipos de servicios
+
+- Limpieza interna del hogar o local
+- Limpieza externa (fachadas, patios, terrazas)
+- Limpieza de piscinas
+- Limpieza de vehiculos
+- Limpieza de objetos o articulos de alto valor
+
+## Modelo de negocio
+
+Limpora basa su modelo de negocio en la intermediacion de servicios de limpieza entre clientes y profesionales. La plataforma aplica una tarifa o comision en el momento en que se concreta una cita o contratacion entre usuarios.
+
+Ademas, la empresa dispone de una red propia de profesionales de limpieza, lo que permite ofrecer servicios directos dentro de la aplicacion. Esto garantiza disponibilidad, calidad controlada y una experiencia uniforme para los clientes.
+
+De esta forma, Limpora combina dos fuentes de ingresos:
+
+- Comisiones por intermediacion entre clientes y autonomos registrados.
+- Ingresos por servicios realizados por profesionales propios de la plataforma.
+
+# Prototipado (Sprint 1)
+!(100%)[PrototipoFrontend](image/uidesing.png)
+
+
+# Organizacion (Sprint 2)
+Se ha optado por distribuir la planificación de los sprints en 8 partes, y para ello se ha decidido repartir las tareas del equipo a través de un tablero que emplea la aplicación Trello.
+!(100%)[Trello](image/trello.png)
+
+# Workflow (Sprint 3)
+https://github.com/Garkatron/ProyectoDaw2
+
+
+# Base de datos (Sprint 4)
+## Entidad/Relacion
+!(100%)[EntidadRelacionInicial](image/initialER.png "Modelo Entidad Relacion inicial")
+
+## Tablas
+La base de datos de Limpora esta compuesta por 8 tablas que gestionan toda la logica de la plataforma.
+
+**Users** es la tabla central del sistema. Almacena el perfil de cada usuario vinculado a Firebase Auth mediante `firebase_uid`, con su rol (cliente, proveedor o admin) y estadisticas de uso como puntos y citas completadas.
+
+**Services** define los tipos de limpieza disponibles en la plataforma. **UserServices** actua como puente entre usuarios y servicios, permitiendo que cada proveedor defina su propio precio por servicio.
+
+**Appointments** registra cada cita contratada, incluyendo el cliente, el proveedor, el servicio, el precio, la comision de la app y el metodo de pago. Es la tabla mas importante a nivel de negocio.
+
+**Reviews** permite que los usuarios se valoren mutuamente tras una cita. La restriccion `UNIQUE` sobre el par revisor-revisado evita valoraciones duplicadas.
+
+**Badges** y **UserBadges** forman el sistema de insignias y gamificacion de la plataforma, donde los usuarios pueden acumular logros.
+
+**EmailVerificationCodes** gestiona los codigos temporales enviados por correo para verificar la identidad del usuario, con fecha de expiracion y control de uso.
+
+!(100%)[Modelo Relacional](image/sqldiagram.png "Modelo Relacional")
+
+## Sistema Gestor de Bases de Datos (SGBD / DBMS)
+
+Actualmente, Limpora utiliza **MySQL** como sistema gestor de bases de datos relacional para almacenar informacion de usuarios, servicios, reservas y otros datos de la plataforma.
+
+Sin embargo, se planea migrar en el futuro a **MariaDB**, una alternativa compatible con MySQL que ofrece mejoras en rendimiento, escalabilidad y soporte de funciones avanzadas, manteniendo la integridad y consistencia de los datos.
+
+
+### Motivos
+- MySQL dejo de tener soporte de parte de Oracle
+- SGBD relacional maduro y confiable
+- Soporte de transacciones y consultas complejas
+- Compatibilidad entre MySQL y MariaDB
+- Facil escalabilidad para el crecimiento de la plataforma
+- Amplio soporte de la comunidad y documentacion
+
+
+
+# Tecnologias utilizadas (Sprint 5)
+
+Para este proyecto optamos por las siguientes herramientas:
+
+## Frontend
+
+El frontend de Limpora ha sido desarrollado utilizando un stack moderno basado en React y herramientas del ecosistema JavaScript actual. Estas tecnologias permiten construir una interfaz rapida, mantenible y escalable.
+
+### Vite
+
+Vite es una herramienta de construccion y entorno de desarrollo para aplicaciones web modernas que permite una ejecucion rapida del proyecto y actualizacion instantanea durante el desarrollo.
+
+#### Porque?
+
+- Alta velocidad de arranque y compilacion
+- Recarga en caliente (HMR) inmediata
+- Configuracion sencilla
+- Enfoque moderno para proyectos frontend
+- Integracion directa con React
+
+### React
+
+React es una biblioteca de JavaScript para construir interfaces de usuario basadas en componentes reutilizables y estado reactivo.
+
+#### Porque?
+
+- Estandar de facto en desarrollo frontend moderno
+- Gran ecosistema y comunidad
+- Arquitectura basada en componentes
+- Facil mantenimiento y escalabilidad
+- Amplia documentacion y soporte
+
+### Tailwind CSS
+
+Tailwind CSS es un framework de estilos basado en clases de utilidad que permite diseñar interfaces de forma rapida sin escribir CSS tradicional complejo.
+
+#### Porque?
+
+- Desarrollo visual rapido
+- Consistencia de estilos
+- Diseno responsive sencillo
+- Configuracion minima
+- Alta personalizacion
+
+### Axios
+
+Axios es un cliente HTTP basado en promesas que permite realizar peticiones al backend desde el navegador de forma sencilla y estructurada.
+
+#### Porque?
+
+- Simplifica las llamadas a la API
+- Manejo de respuestas y errores
+- Interceptores para autenticacion
+- Estandar ampliamente utilizado en React
+
+### Mock Service Worker (MSW)
+
+Mock Service Worker es una herramienta que permite simular respuestas de API en el navegador o en tests sin necesidad de un backend real.
+
+#### Porque?
+
+- Permite desarrollo sin backend disponible
+- Facil testing del frontend
+- Simulacion realista de API
+- Independencia entre frontend y backend
+- Facil reutilizacion de mocks
+
+### Zod
+
+Zod es una biblioteca de validacion de datos basada en esquemas que permite definir y comprobar estructuras de datos en tiempo de ejecucion.
+
+#### Porque?
+
+- Validacion segura de datos y formularios
+- Integracion con TypeScript
+- Prevencion de errores en API
+- Definicion clara de modelos
+- Libreria estable y madura
+
+### Zustand
+
+Zustand es una libreria ligera de gestion de estado para aplicaciones React que permite compartir datos entre componentes de forma simple.
+
+#### Porque?
+
+- Alternativa moderna a Redux
+- API simple y directa
+- Poco codigo y sin boilerplate
+- Alto rendimiento
+- Facil integracion con React
+
+## Backend
+
+El backend de Limpora ha sido desarrollado con Node.js y Express, siguiendo una arquitectura basada en API REST. Este backend gestiona la logica de negocio, autenticacion, acceso a base de datos y comunicacion con servicios externos.
+
+Se han utilizado librerias orientadas a seguridad, validacion, rendimiento y mantenibilidad, con el objetivo de garantizar un sistema robusto y escalable.
+
+### Node.js y Express
+
+Node.js permite ejecutar JavaScript en el servidor, mientras que Express proporciona una estructura ligera para construir APIs REST.
+
+#### Porque?
+
+- Entorno unificado JavaScript en frontend y backend
+- Alto rendimiento en aplicaciones web
+- Arquitectura modular
+- Amplio ecosistema
+- Estandar en APIs REST
+
+### Base de datos MySQL
+
+El sistema utiliza MySQL como base de datos relacional para almacenar usuarios, servicios, reservas y datos de la plataforma.
+
+Se emplea el driver mysql2 para la conexion y ejecucion de consultas.
+
+#### Porque?
+
+- Base de datos relacional madura
+- Soporte de transacciones
+- Integridad de datos
+- Estandar en aplicaciones web
+- Buen rendimiento
+
+### Autenticacion y seguridad
+
+El backend implementa autenticacion basada en tokens JWT y cifrado de contraseñas mediante bcrypt.
+
+Ademas, se aplican multiples capas de seguridad:
+
+- helmet: proteccion de cabeceras HTTP
+- cors: control de origenes permitidos
+- hpp: prevencion de parameter pollution
+- express-rate-limit: limitacion de peticiones
+- express-slow-down: mitigacion de ataques de fuerza bruta
+- cookie-parser: gestion segura de cookies
+
+#### Porque?
+
+- Proteccion frente a ataques comunes web
+- Control de acceso seguro
+- Prevencion de abuso de API
+- Cumplimiento de buenas practicas backend
+
+### Validacion de datos
+
+Se utiliza express-validator para validar y sanitizar datos recibidos en peticiones HTTP antes de procesarlos.
+
+#### Porque?
+
+- Prevencion de datos invalidos
+- Seguridad frente a inyecciones
+- Control de formato en API
+- Reduccion de errores en backend
+
+### Logging y monitorizacion
+
+El sistema implementa logging estructurado con pino y pino-http, junto con morgan para registros de desarrollo.
+
+#### Porque?
+
+- Registro de peticiones y errores
+- Analisis de fallos
+- Monitorizacion del servidor
+- Alto rendimiento en produccion
+
+### Servicios externos
+
+El backend integra servicios externos para funcionalidades adicionales:
+
+- firebase-admin: gestion de servicios Firebase
+    - Autenticacion con Email y contraseñas
+    - Email ya verificados
+    - Facilidad para el usuario
+- googleapis: integracion con APIs de Google
+    - OAuth
+- resend: envio de correos electronicos
+    - Verificacion Email
+    - Recuperacion de contraseñas
+    - Subcripciones a blogs
+    - Notificaciones
+    - Facturas
+
+#### Porque?
+
+- Notificaciones y comunicacion con usuarios
+- Integracion con servicios cloud
+- Automatizacion de procesos
+- Escalabilidad de funcionalidades
+
+### Documentacion de API
+
+La API REST se documenta mediante swagger-jsdoc y swagger-ui-express, permitiendo visualizar y probar endpoints desde una interfaz web.
+
+#### Porque?
+
+- Documentacion interactiva
+- Facil integracion frontend
+- Estandar OpenAPI
+- Mantenimiento de API
+
+### Herramientas de desarrollo
+
+Se utilizan herramientas para mejorar el flujo de desarrollo:
+
+- dotenv: gestion de variables de entorno
+- nodemon: recarga automatica en desarrollo
+- eslint-define-config: configuracion de linting
+
+#### Porque?
+
+- Configuracion segura
+- Desarrollo rapido
+- Codigo consistente
+- Buenas practicas
+
+
+# API Limpora (Sprint 5)
+
+Base URL: `api/v1`
+
+## Auth `/auth`
+
+| Metodo | Ruta | Descripcion | Auth |
+|--------|------|-------------|------|
+| POST | `/register` | Registra un nuevo usuario | No |
+| POST | `/login` | Inicia sesion con email y contrasena | No |
+| POST | `/logout` | Cierra la sesion activa | Si |
+| GET | `/me` | Devuelve el usuario autenticado | Si |
+| GET | `/google-url` | Genera la URL para login con Google | No |
+| GET | `/callback` | Callback de OAuth con Google | No |
+| POST | `/vec` | Verifica un codigo de email | No |
+| POST | `/sevcode` | Envia un codigo de verificacion al email | No |
+| POST | `/reg_admin` | Registra un nuevo administrador | Si - Admin |
+| DELETE | `/uid/:uid` | Elimina un usuario por UID de Firebase | Si - Admin |
+
+---
+
+## Users `/user`
+
+| Metodo | Ruta | Descripcion | Auth |
+|--------|------|-------------|------|
+| GET | `/` | Devuelve todos los usuarios | No |
+| GET | `/id/:id` | Busca un usuario por ID numerico | No |
+| GET | `/uid/:uid` | Busca un usuario por UID de Firebase | No |
+| GET | `/name/:name` | Busca un usuario por nombre | No |
+
+###! Servicios del usuario `/user/services`
+
+| Metodo | Ruta | Descripcion | Auth |
+|--------|------|-------------|------|
+| GET | `/:userId` | Lista los servicios de un usuario | No |
+| GET | `/:userId/:serviceId` | Obtiene un servicio especifico del usuario | No |
+| POST | `/:userId` | Anade un servicio al perfil del usuario | Si - Admin / Provider |
+| PATCH | `/:userId/:serviceId` | Actualiza un servicio del usuario | Si - Admin / Provider |
+| DELETE | `/:userId/:serviceId` | Elimina un servicio del usuario | Si - Admin / Provider |
+
+###! Ganancias del usuario `/user/earnings`
+
+| Metodo | Ruta | Descripcion | Auth |
+|--------|------|-------------|------|
+| GET | `/` | Devuelve las ganancias del usuario autenticado | Si - Admin / Provider |
+
+###! Citas del usuario `/user/appointments`
+
+| Metodo | Ruta | Descripcion | Auth |
+|--------|------|-------------|------|
+| GET | `/:userId` | Lista todas las citas de un usuario | Si |
+| POST | `/` | Crea una nueva cita | Si |
+
+###! Reseñas del usuario `/user/reviews`
+
+| Metodo | Ruta | Descripcion | Auth |
+|--------|------|-------------|------|
+| GET | `/` | Devuelve todas las reseñas | No |
+| GET | `/reviewer/:reviewerId` | Reseñas escritas por un usuario | No |
+| GET | `/reviewed/:reviewedId` | Reseñas recibidas por un usuario | No |
+| GET | `/reviewed/:reviewedId/average-rating` | Valoracion media de un usuario | No |
+| GET | `/username/:username` | Reseñas por nombre de usuario | No |
+| POST | `/` | Crea una nueva reseña | Si - Admin / Client |
+
+
+
+## Ranking `/ranking`
+
+| Metodo | Ruta | Descripcion | Auth |
+|--------|------|-------------|------|
+| GET | `/top` | Devuelve los usuarios con mas puntos | No |
+| GET | `/user/:userId` | Devuelve la posicion de un usuario | No |
+
+
+## Roles
+
+| Rol | Descripcion |
+|-----|-------------|
+| `admin` | Acceso total a la plataforma |
+| `provider` | Autonomo que ofrece servicios |
+| `client` | Usuario que contrata servicios |
+
+
+!(50%)[Diagrama Endpoints](image/endpointsdiagram.png "Diagrama Endpoints")
+
+
+## Notas
+
+- Los endpoints marcados con **Si** requieren una sesion activa via Firebase Auth.
+- La validacion de datos se realiza en todas las rutas mediante `express-validator`.
+- Los errores devuelven siempre un JSON con `success: false` y el mensaje correspondiente.
+
+
+# Seguridad (Sprint 6)
+
+Durante el Sprint 6, en Limpora se implementaron diversas medidas de seguridad para proteger tanto el backend como el frontend, previniendo vulnerabilidades comunes y asegurando la integridad de los datos.
+
+## Medidas implementadas
+
+### Helmet
+Se utilizó Helmet para configurar cabeceras HTTP seguras, protegiendo la aplicacion frente a ataques como clickjacking o XSS.  
+**Configuracion:** aplicacion de politicas de seguridad estandar en todas las rutas.  
+**Objetivo:** reforzar la proteccion de la aplicacion a nivel de cabeceras HTTP.
+
+### CORS
+Se configuró CORS para controlar los dominios que pueden acceder a la API, limitando el acceso solo a clientes autorizados.  
+**Configuracion:** solo se permiten solicitudes desde el dominio oficial de la aplicacion.  
+**Objetivo:** prevenir accesos no autorizados desde origenes externos.
+
+### Rate Limit y Slow Down
+Se implementaron limites de peticiones y desaceleracion progresiva para reducir el riesgo de ataques de fuerza bruta y proteger la disponibilidad del servidor.  
+**Configuracion:** limite de peticiones por IP y retraso progresivo tras cierto numero de solicitudes.  
+**Objetivo:** mantener la estabilidad del servidor y proteger la API frente a abusos.
+
+### HPP (HTTP Parameter Pollution)
+Se utilizó HPP para evitar la manipulacion de parametros HTTP con multiples valores no esperados.  
+**Configuracion:** sanitizacion de todos los parametros recibidos por las rutas del backend.  
+**Objetivo:** garantizar la integridad y coherencia de los datos procesados.
+
+
+### Express Validator y sanitizacion
+Se aplicó validacion y sanitizacion de todos los datos de entrada de los usuarios, evitando inyecciones y errores en la base de datos.  
+**Configuracion:** reglas basicas de validacion y limpieza de inputs en cada ruta sensible.  
+**Objetivo:** proteger la base de datos y mantener la seguridad de la aplicacion.
+
+# Arquitectura
+
+La aplicacion web Limpora sigue una arquitectura cliente-servidor separada en dos capas principales: frontend y backend. Ambos sistemas se comunican mediante una API REST expuesta por el backend y consumida por el frontend.
+
+Esta separacion permite desacoplar la interfaz de usuario de la logica de negocio, facilitando el mantenimiento, la evolucion del sistema y la escalabilidad del servicio tanto en horizontal como en vertical.
+
+El frontend, desarrollado en React, se ejecuta en el navegador del usuario y gestiona la experiencia visual, la navegacion y la interaccion con la plataforma. Todas las operaciones de datos se realizan mediante peticiones HTTP hacia la API.
+
+El backend, desarrollado en Node.js con Express, centraliza la logica de negocio, autenticacion, validacion de datos y acceso a la base de datos MySQL. Tambien gestiona la integracion con servicios externos como envio de correos y servicios cloud.
+
+La comunicacion entre capas sigue el modelo REST, utilizando solicitudes HTTP con respuestas en formato JSON. Esto permite:
+
+- Independencia entre frontend y backend
+- Posibilidad de multiples clientes (web, movil, admin)
+- Escalabilidad independiente de cada capa
+- Facil integracion con terceros
+- Mantenimiento modular del sistema
+
+A nivel de despliegue, la aplicacion se ejecuta en contenedores Docker orquestados mediante Docker Compose dentro de un servidor VPS en AWS. Nginx actua como proxy inverso, recibiendo el trafico HTTPS del dominio y redirigiendolo a los servicios internos correspondientes.
+
+Esta arquitectura permite:
+
+- Escalar el backend sin afectar al frontend
+- Sustituir o actualizar componentes de forma aislada
+- Desplegar nuevas versiones sin interrupciones
+- Reproducir el entorno en otros servidores
+
+.mermaid
+    flowchart TD
+    A[Usuario] --> B[Abre la aplicacion web o movil]
+    B --> C[Frontend: React + Tailwind]
+    C --> D{Accion del usuario}
+
+    D -- Registrar o Iniciar sesion --> E[Firebase Auth: login o signup]
+    D -- Solicitar servicio --> F[POST /services/request]
+    D -- Consultar datos --> G[GET /data]
+
+    E --> H{Validar token de Firebase}
+    H -- Exito --> I[Generar respuesta exitosa]
+    H -- Error --> J[Enviar error al frontend]
+
+    F --> K[Verificar token Firebase y permisos]
+    K --> L[Procesar solicitud de servicio]
+    G --> M[Verificar token Firebase y obtener datos]
+
+    L --> N[Base de datos MySQL]
+    M --> N
+    I --> N
+    L --> O[Servicios externos: Resend, Firebase, Google APIs]
+
+    N --> P[Backend retorna JSON al Frontend]
+    O --> P
+    J --> P
+
+    P --> Q[Usuario recibe respuesta]
+
+# Despliegue Sprint (7)
+
+Limpora se encuentra desplegado en un servidor VPS en la nube, accesible mediante un dominio propio. La infraestructura permite ejecutar tanto el backend como el frontend en un entorno controlado, escalable y accesible desde internet.
+
+La aplicacion esta disponible en:
+
+www.limpora.xyz
+
+## Hostinger
+
+Hostinger es el proveedor utilizado para la gestion del dominio y servicios asociados de DNS.
+
+### Porque?
+
+- Facilidad de gestion de dominios
+- Precios accesibles
+- Buena reputacion en hosting
+- Panel de control sencillo
+- Integracion rapida con VPS externos
+
+## AWS
+
+Amazon Web Services (AWS) es el proveedor de infraestructura en la nube utilizado para alojar el servidor VPS donde se ejecuta la aplicacion.
+
+El backend y los servicios del sistema se ejecutan en una instancia virtual configurada y administrada por el equipo de desarrollo.
+
+### Porque?
+
+- Infraestructura cloud escalable
+- Alta disponibilidad
+- Control total del servidor
+- Estandar profesional en despliegues
+- Amplia documentacion y soporte
+
+## Docker
+
+Docker se utiliza para contenerizar la aplicacion y sus servicios, permitiendo ejecutar el sistema en entornos aislados y reproducibles.
+
+Mediante contenedores se empaquetan el backend, dependencias y configuraciones necesarias para su ejecucion.
+
+### Porque?
+
+- Entornos consistentes entre desarrollo y produccion
+- Despliegue reproducible
+- Aislamiento de servicios
+- Facil migracion de servidor
+- Escalabilidad futura
+
+## Docker Compose
+
+Docker Compose es una herramienta que permite definir y ejecutar aplicaciones formadas por multiples contenedores mediante un unico archivo de configuracion. En Limpora se utiliza para orquestar los servicios necesarios del sistema, como el backend y la base de datos, facilitando su ejecucion conjunta.
+
+La configuracion de contenedores se define en el archivo:
+
+./docker-compose.yml
+
+### Porque?
+
+- Orquestacion sencilla de multiples servicios
+- Ejecucion completa del sistema con un solo comando
+- Configuracion declarativa y versionable
+- Facil reproduccion de entornos
+- Simplificacion del despliegue
+
+
+## GitHub Workflows
+
+GitHub Workflows (GitHub Actions) es el sistema de integracion y automatizacion utilizado para ejecutar tareas automaticas sobre el repositorio de Limpora, como pruebas, construccion y despliegue.
+
+Mediante flujos definidos en el repositorio, el sistema puede validar cambios en cada actualizacion del codigo y automatizar procesos del ciclo de desarrollo.
+
+### Porque?
+
+- Automatizacion de tareas de desarrollo
+- Integracion continua (CI)
+- Validacion automatica del codigo
+- Despliegue automatizado
+- Integracion directa con el repositorio
+
+### Su forma de usuario
+Se configuro el repositiorio con su propia cuenta en el VPS y se le dieron los permisos
+minimos necesarios para limpiar los cambios locales, bajar los cambios remotos y ejecutar
+docker compose con exito.
+
+## Nginx
+
+Nginx es el servidor web y proxy inverso utilizado en el despliegue de Limpora. Se encarga de recibir las peticiones HTTP desde internet y redirigirlas a los servicios internos de la aplicacion, como el frontend y el backend.
+
+Tambien gestiona aspectos clave del acceso publico, como el dominio, certificados SSL y distribucion de trafico hacia los contenedores correspondientes.
+
+### Porque?
+
+- Servidor web de alto rendimiento
+- Proxy inverso para aplicaciones Node.js
+- Gestion de dominio y rutas
+- Soporte de HTTPS y certificados SSL
+- Estandar en despliegues web profesionales
+
+## Certbot
+
+Certbot es la herramienta utilizada para generar y gestionar certificados SSL gratuitos de Let's Encrypt en el servidor de Limpora. Permite habilitar conexiones seguras HTTPS en el dominio de la aplicacion mediante Nginx.
+
+El sistema obtiene y renueva automaticamente los certificados, garantizando que las comunicaciones entre usuarios y la plataforma se realicen de forma cifrada.
+
+### Porque?
+
+- Habilita HTTPS en el dominio
+- Certificados SSL gratuitos y confiables
+- Integracion directa con Nginx
+- Renovacion automatica
+- Cumplimiento de seguridad web moderna
+
+# Documentacion (Sprint 8)
+Se utilizo [Quarkdown](https://quarkdown.com/) para crear documentacion de calidad
+eficientemente de forma estetica y poderosa.
+
+# De que me arrepiento...
+
+- Procrastinar
+- Esperar a que mi compañero haga algo
+- No haber empezado con el CRUD basico y luego añadir la autenticacion
+- No haber investigado un ORM para MySQL en Node.js
+- No haberme planteado el uso de Next.js para el proyecto
+- Utilizar mucha IA en el Frontend
+- No implementar i18n de primeras
+- No haber pensado en el uso de Preact como alternativa ligera y potente a React
+- No haber buscado alguna libreria de componentes React
+- No separar el monorepo a dos repositorios
+- No utilizar TypeScript
+- No utilizar Bun.js en el despliegue
+- Organizar todo pero en los pasos finales utilizar poco el Trello
+
+# De que no me arrepiento...
+
+- No rendirme...
+- Organizar el codigo y la estructura del proyecto
+- Organizar el trello **Epicamente**
+- Utilizar **Quarkdown** para la documentacion (Viva markdown)
+- Inspirarme en mis compañeros (Oauth, Captcha, etc)
+- Todas las ..... que me hice reduir el ...... que me dio esta ......
+
+# Creditos
+
+.row alignment:{spacearound}
+    .column
+        **Matias Gulias Carrascal**
+        
+        Desarrollador **principal** de Limpora
+
+        [github.com/Garkatron](https://github.com/Garkatron)
+        
+        [garkatron.site](https://garkatron.site)
+        
+        [masitacarg@gmail.com](mailto:masitacarg@gmail.com)
+
+        - Backend completo
+        - Frontend completo
+        - Integracion Backend-Frontend
+        - Organizacion
+            - Trello
+            - Estructura archivos
+            - Estructura Codigo
+        - Mockeo Completo
+        - Retoque de la base de datos
+        - Despliegue y DevOps
+        - Documentacion
+            - Memoria
+            - Swagger
+
+    .column
+        **Kevin ? ?**
+        
+        Desarrollador **frontend** de Limpora
+
+        - Base de parcial
+        - Desarrollo parcial del frontend
+
+        [github.com/?](https://github.com/?)
+        
+        [?@gmail.com](mailto:?@gmail.com)
+
+        - Nada
+        - Nada
+            - Nada
+            - Nada
+            - Nada
+        - Nada
+        - Nada
+        - Nada
+        - Nada
+            - Nada
+            - Nada
+
+
+
+# Bibligrafia
+
+.bibliography {bibliography/fib.bib}

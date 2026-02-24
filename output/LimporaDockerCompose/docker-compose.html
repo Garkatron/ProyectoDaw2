@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>LimporaDockerCompose</title>
+    <script src="script/quarkdown.js"></script>
+    <script>const capabilities = window.quarkdownCapabilities</script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="theme/theme.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.9.0/highlightjs-line-numbers.min.js"></script>
+    <script src="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-copy/dist/highlightjs-copy.min.css"/>
+    <script>capabilities.code = true;</script>
+
+    <style>
+
+        body {
+        }
+
+        .page-break {
+            break-before: always;
+        }
+
+        .quarkdown-plain .page-break {
+            break-before: avoid;
+            break-after: avoid;
+        }
+
+        body.quarkdown-plain {
+        }
+
+        body.quarkdown-slides .reveal {
+        }
+
+        @page {
+            size: auto auto;
+            margin: 0;
+        }
+
+        p {
+        }
+    </style>
+    <script>
+        const doc = new PlainDocument();
+        prepare(doc);
+    </script>
+</head>
+<body class="quarkdown quarkdown-plain">
+<aside id="margin-area-left" class="margin-area"></aside>
+<main>
+    <div class="page-margin-content page-margin-bottom-center" data-on-left-page="bottom-center" data-on-right-page="bottom-center"><span class="current-page-number">-</span></div><pre><code>services:
+  limpora-client:
+    build:
+      context: ./limpora-client
+      dockerfile: Dockerfile.prod
+    ports:
+      - &quot;127.0.0.1:3002:3000&quot;  
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - limpora-network
+
+  limpora-server:
+    build:
+      context: ./limpora-server
+      dockerfile: Dockerfile.prod
+    ports:
+      - &quot;127.0.0.1:3001:3000&quot; 
+    env_file:
+      - ./limpora-server/.env
+    environment:
+      - NODE_ENV=production
+      - FRONTEND_URL=https://www.limpora.xyz
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - limpora-network
+
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+    #ports:
+    #  - &quot;127.0.0.1:3306:3306&quot;  
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./limpora-server/src/dbscripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [&quot;CMD&quot;, &quot;mysqladmin&quot;, &quot;ping&quot;, &quot;-h&quot;, &quot;localhost&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;-p${DB_PASS}&quot;]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - limpora-network
+
+volumes:
+  mysql_data:
+  node_modules:
+
+networks:
+  limpora-network:
+    name: limpora-network
+    driver: bridge</code></pre>
+</main>
+<aside id="margin-area-right" class="margin-area"></aside>
+</body>
+</html>
