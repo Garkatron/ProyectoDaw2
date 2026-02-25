@@ -12,7 +12,7 @@ export const getUserServiceById = async (id, serviceId) => {
 
 export const addAppointment = async ({ date, clientId, serviceId, providerId, price, paymentMethod, totalAmount }) => {
   const { data } = await API.post(
-    `/appointments`,
+    `/user/appointments`,
     { date, clientId, serviceId, providerId, price, paymentMethod, totalAmount },
     { withCredentials: true }
   );

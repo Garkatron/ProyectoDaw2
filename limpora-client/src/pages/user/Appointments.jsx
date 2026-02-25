@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../../stores/auth.store";
-import { getAppointments } from "../../services/appointments.service";
+import { getAppointments, getUserServiceById } from "../../services/appointments.service";
 import Base from "../../layouts/Base";
 import Calendar from "../../components/Calendar";
-import { 
-  ClockIcon, 
-  BanknotesIcon, 
+import {
+  ClockIcon,
+  BanknotesIcon,
   CheckCircleIcon,
   ClockIcon as PendingIcon,
   ArrowPathIcon
 } from "@heroicons/react/24/outline";
 
-// Mapeo de colores por status
 const statusConfig = {
   Completed: {
     bg: "bg-green-50",
@@ -42,9 +41,7 @@ const AppointmentCard = ({ appointment }) => {
   const date = new Date(appointment.date_time);
 
   return (
-    <div
-      className={`${config.bg} ${config.border} border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow`}
-    >
+    <div className={`${config.bg} ${config.border} border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <Icon className={`h-5 w-5 ${config.text}`} />
@@ -53,11 +50,7 @@ const AppointmentCard = ({ appointment }) => {
           </span>
         </div>
         <p className="text-xs text-gray-500">
-          {date.toLocaleDateString("es-ES", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
+          {date.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
         </p>
       </div>
 
@@ -65,26 +58,27 @@ const AppointmentCard = ({ appointment }) => {
         <div className="flex items-center gap-2 text-sm">
           <ClockIcon className="h-4 w-4 text-gray-400" />
           <span className="text-gray-700">
-            {date.toLocaleTimeString("es-ES", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
           </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm">
           <BanknotesIcon className="h-4 w-4 text-gray-400" />
           <span className="font-semibold text-gray-800">
-            €{appointment.total_amount?.toFixed(2) || appointment.price.toFixed(2)}
+            €{(appointment.total_amount ?? appointment.price ?? 0)}
           </span>
-          <span className="text-xs text-gray-500">
-            ({appointment.payment_method})
-          </span>
+          <span className="text-xs text-gray-500">({appointment.payment_method})</span>
         </div>
 
         {appointment.service_name && (
           <p className="text-xs text-gray-600 mt-2 pt-2 border-t border-gray-200">
             Servicio: <span className="font-medium">{appointment.service_name}</span>
+          </p>
+        )}
+
+        {appointment.provider_id && (
+          <p className="text-xs text-gray-500">
+            Proveedor ID: <span className="font-medium">{appointment.provider_id}</span>
           </p>
         )}
       </div>
@@ -100,28 +94,41 @@ export default function Appointments() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchAppointments() {
-      if (!currentUser?.id) {
-        setError("Usuario no autenticado");
-        setLoading(false);
-        return;
-      }
+    if (!currentUser?.id) return;
 
+    const fetchAll = async () => {
       setLoading(true);
       setError(null);
-
       try {
-        const data = await getAppointments(currentUser.id);
-        setAppointments(data || []);
+        const raw = await getAppointments(currentUser.id);
+        const data = raw || [];
+
+        // Enrich each appointment with service name if not already present
+        const enriched = await Promise.all(
+          data.map(async (appt) => {
+            if (appt.service_name || !appt.service_id) return appt;
+            try {
+              const svc = await getUserServiceById(appt.provider_id ?? currentUser.id, appt.service_id);
+              return {
+                ...appt,
+                service_name: svc?.name ?? svc?.service_name ?? null,
+              };
+            } catch {
+              return appt; // silently skip if service fetch fails
+            }
+          })
+        );
+
+        setAppointments(enriched);
       } catch (err) {
         console.error("Error fetching appointments:", err);
         setError("No se pudieron cargar las citas");
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    fetchAppointments();
+    fetchAll();
   }, [currentUser]);
 
   const markedDates = appointments.map((app) => ({
@@ -130,17 +137,13 @@ export default function Appointments() {
   }));
 
   const appointmentsOnSelectedDate = appointments.filter((app) => {
-    const appDate = new Date(app.date_time);
+    const d = new Date(app.date_time);
     return (
-      appDate.getDate() === selectedDate.getDate() &&
-      appDate.getMonth() === selectedDate.getMonth() &&
-      appDate.getFullYear() === selectedDate.getFullYear()
+      d.getDate() === selectedDate.getDate() &&
+      d.getMonth() === selectedDate.getMonth() &&
+      d.getFullYear() === selectedDate.getFullYear()
     );
   });
-
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
-  };
 
   if (loading) {
     return (
@@ -173,6 +176,8 @@ export default function Appointments() {
   return (
     <Base>
       <div className="max-w-6xl mx-auto p-4 sm:p-8 space-y-6">
+
+        {/* HEADER */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Mis Citas</h1>
@@ -180,75 +185,60 @@ export default function Appointments() {
               {appointments.length} cita{appointments.length !== 1 ? "s" : ""} en total
             </p>
           </div>
-
           <div className="hidden sm:flex items-center gap-3 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-green-200" />
-              <span className="text-gray-600">Completado</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-blue-200" />
-              <span className="text-gray-600">En proceso</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-amber-200" />
-              <span className="text-gray-600">Pendiente</span>
-            </div>
+            {Object.entries(statusConfig).map(([status, config]) => (
+              <div key={status} className="flex items-center gap-1.5">
+                <div className={`w-3 h-3 rounded-full ${config.badge.split(" ")[0]}`} />
+                <span className="text-gray-600">{status}</span>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* CALENDAR + DAY PANEL */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200/60">
             <Calendar
               markedDates={markedDates}
-              onDateClick={handleDateClick}
+              onDateClick={setSelectedDate}
               selectedDate={selectedDate}
             />
           </div>
 
           <div className="bg-white rounded-xl p-4 sm:p-6 border border-gray-200/60 shadow-sm">
             <div className="mb-4 pb-3 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-800">
+              <h2 className="text-lg font-semibold text-gray-800 capitalize">
                 {selectedDate.toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
+                  weekday: "long", day: "numeric", month: "long", year: "numeric",
                 })}
               </h2>
               <p className="text-xs text-gray-500 mt-1">
-                {appointmentsOnSelectedDate.length} cita
-                {appointmentsOnSelectedDate.length !== 1 ? "s" : ""}
+                {appointmentsOnSelectedDate.length} cita{appointmentsOnSelectedDate.length !== 1 ? "s" : ""}
               </p>
             </div>
 
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
               {appointmentsOnSelectedDate.length > 0 ? (
-                appointmentsOnSelectedDate.map((appointment) => (
-                  <AppointmentCard key={appointment.id} appointment={appointment} />
+                appointmentsOnSelectedDate.map((appt) => (
+                  <AppointmentCard key={appt.id} appointment={appt} />
                 ))
               ) : (
                 <div className="text-center py-12">
                   <ClockIcon className="h-12 w-12 text-gray-200 mx-auto mb-3" />
-                  <p className="text-sm text-gray-400">
-                    No hay citas para este día
-                  </p>
+                  <p className="text-sm text-gray-400">No hay citas para este día</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
+        {/* SUMMARY STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {Object.entries(statusConfig).map(([status, config]) => {
             const count = appointments.filter((a) => a.status === status).length;
             const Icon = config.icon;
-
             return (
-              <div
-                key={status}
-                className={`${config.bg} ${config.border} border rounded-lg p-4 flex items-center gap-3`}
-              >
+              <div key={status} className={`${config.bg} ${config.border} border rounded-lg p-4 flex items-center gap-3`}>
                 <div className={`w-10 h-10 rounded-full ${config.badge} flex items-center justify-center`}>
                   <Icon className="h-5 w-5" />
                 </div>
@@ -260,6 +250,7 @@ export default function Appointments() {
             );
           })}
         </div>
+
       </div>
     </Base>
   );

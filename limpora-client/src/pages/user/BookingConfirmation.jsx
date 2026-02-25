@@ -1,10 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Calendar from "../../components/Calendar";
 import Base from "../../layouts/Base";
-import { UserCard } from "../../components/UserCard";
 import { useAuthStore } from '../../stores/auth.store';
 import { useEffect, useState } from "react";
-
+import { getUserServices } from "../../services/user_services.service";
+import { addAppointment, getAppointments } from '../../services/appointments.service';
 
 const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal"];
 
@@ -26,9 +26,13 @@ export default function BookingConfirmation() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
 
+  // Servicios del proveedor
+  const [providerServices, setProviderServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(false);
+
   // Formulario
   const [selectedTime, setSelectedTime] = useState(null);
-  const [serviceId, setServiceId] = useState("");
+  const [selectedService, setSelectedService] = useState(null); // { service_id, name, price, ... }
   const [paymentMethod, setPaymentMethod] = useState("");
 
   // Envío
@@ -77,18 +81,37 @@ export default function BookingConfirmation() {
     fetchAppointments();
   }, [providerId]);
 
+  // Fetch servicios del proveedor
+  useEffect(() => {
+    if (!providerId) return;
+
+    const fetchServices = async () => {
+      setLoadingServices(true);
+      try {
+        const services = await getUserServices(providerId);
+        setProviderServices(services);
+      } catch (err) {
+        console.error("Error fetching provider services:", err);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    fetchServices();
+  }, [providerId]);
+
   const handleDateClick = (date) => {
     const mark = markedDates.find(
       (m) => new Date(m.date).toDateString() === date.toDateString()
     );
     if (mark && (mark.status === "Pending" || mark.status === "In Process")) {
-      return; // día ocupado, no se puede seleccionar
+      return;
     }
     setSelectedDate(date);
     setSelectedTime(null);
   };
 
-  const canConfirm = selectedDate && selectedTime && serviceId.trim() && paymentMethod;
+  const canConfirm = selectedDate && selectedTime && selectedService && paymentMethod;
 
   const handleConfirm = async () => {
     if (!canConfirm) return;
@@ -103,11 +126,11 @@ export default function BookingConfirmation() {
       await addAppointment({
         date: dateTime.toISOString(),
         clientId: currentUser.id,
+        serviceId: selectedService.service_id,
         providerId,
-        serviceId: Number(serviceId),
+        price: selectedService.price ?? 0,
         paymentMethod,
-        price: 0,       // ajusta según tu lógica de negocio
-        totalAmount: 0, // ajusta según tu lógica de negocio
+        totalAmount: selectedService.price ?? 0,
       });
 
       setSuccess(true);
@@ -189,20 +212,43 @@ export default function BookingConfirmation() {
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
             <h2 className="text-base font-semibold text-gray-700">3. Detalles de la reserva</h2>
 
+            {/* SELECTOR DE SERVICIO */}
             <div>
               <label className="block text-sm text-gray-600 mb-1.5 font-medium">
-                ID del servicio
+                Servicio
               </label>
-              <input
-                type="number"
-                min="1"
-                value={serviceId}
-                onChange={(e) => setServiceId(e.target.value)}
-                placeholder="Ej: 3"
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-              />
+              {loadingServices ? (
+                <p className="text-xs text-gray-400 animate-pulse">Cargando servicios...</p>
+              ) : providerServices.length === 0 ? (
+                <p className="text-sm text-gray-400 italic">Este proveedor no tiene servicios disponibles.</p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {providerServices.map((svc) => {
+                    const isSelected = selectedService?.service_id === svc.service_id;
+                    return (
+                      <button
+                        key={svc.service_id}
+                        onClick={() => setSelectedService(svc)}
+                        className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm border transition-all text-left
+                          ${isSelected
+                            ? "bg-gray-800 text-white border-gray-800 shadow"
+                            : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+                          }`}
+                      >
+                        <span className="font-medium">{svc.name ?? svc.service_name ?? `Servicio #${svc.service_id}`}</span>
+                        {svc.price != null && (
+                          <span className={`ml-2 text-xs font-semibold ${isSelected ? "text-gray-300" : "text-gray-400"}`}>
+                            {svc.price} €
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
+            {/* MÉTODO DE PAGO */}
             <div>
               <label className="block text-sm text-gray-600 mb-1.5 font-medium">
                 Método de pago
@@ -235,7 +281,10 @@ export default function BookingConfirmation() {
                 {selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
               </li>
               <li>🕐 <span className="font-medium">Hora:</span> {selectedTime}</li>
-              <li>🛠 <span className="font-medium">Servicio ID:</span> {serviceId}</li>
+              <li>🛠 <span className="font-medium">Servicio:</span>{" "}
+                {selectedService.name ?? selectedService.service_name ?? `#${selectedService.service_id}`}
+                {selectedService.price != null && ` — ${selectedService.price} €`}
+              </li>
               <li>💳 <span className="font-medium">Pago:</span> {paymentMethod}</li>
             </ul>
 
