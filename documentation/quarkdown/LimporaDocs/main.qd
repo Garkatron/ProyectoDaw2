@@ -91,7 +91,6 @@ Actualmente, Limpora utiliza **MySQL** como sistema gestor de bases de datos rel
 
 Sin embargo, se planea migrar en el futuro a **MariaDB**, una alternativa compatible con MySQL que ofrece mejoras en rendimiento, escalabilidad y soporte de funciones avanzadas, manteniendo la integridad y consistencia de los datos.
 
-
 ### Motivos
 - MySQL dejo de tener soporte de parte de Oracle
 - SGBD relacional maduro y confiable

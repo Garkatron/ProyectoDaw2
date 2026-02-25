@@ -3,14 +3,8 @@ import { requiredEnv } from './../utils/utils.js';
 import bcrypt from "bcrypt";
 const resend = new Resend(requiredEnv("RESEND_KEY"));
 
-export default async function sendEmail(emailto, code) {
-  const verificationLink = `${requiredEnv("FRONTEND_URL")}/emailcode`;
-
-  const { data } = await resend.emails.send({
-    from: requiredEnv("RESEND_EMAIL_FROM"),
-    to: emailto,
-    subject: '✉️ Verifica tu dirección de email',
-    html: `
+const EMAIL_VERIFICATION_CODE = (code) => {
+  return { subject: '✉️ Verifica tu dirección de email', html:`
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -113,7 +107,30 @@ export default async function sendEmail(emailto, code) {
   
 </body>
 </html>
-    `,
+    `};
+}
+
+const EMAIL_NOTIFICATION_APPOINTMENT = (info) => {
+  return { subject: "Appointment confirmed", html: `<p> ${info} </p>`}
+}
+
+export async function sendEmailVerificationCode(emailto, code) {
+  return await sendEmail(emailto, EMAIL_VERIFICATION_CODE(code))
+}
+
+
+export async function sendEmailNotificationAppoinment(emailto, info) {
+  return await sendEmail(emailto, EMAIL_NOTIFICATION_APPOINTMENT(info))
+}
+
+export default async function sendEmail(emailto, {subject, html}) {
+  const verificationLink = `${requiredEnv("FRONTEND_URL")}/emailcode`;
+
+  const { data } = await resend.emails.send({
+    from: requiredEnv("RESEND_EMAIL_FROM"),
+    to: emailto,
+    subject,
+    html
   });
 
   return data;

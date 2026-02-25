@@ -1,6 +1,7 @@
 import { q_addAppointmentToUser, q_getAppointmentsByUser } from "../../databases/queries.js";
 import { APP_COMISSION } from '../../constants.js';
 import { withdb } from '../../databases/mysql.js';
+import { sendEmailNotificationAppoinment } from "../../helpers/email_verification.js";
 
 export const getUserAppointments = async (req, res) => {
   try {
@@ -22,6 +23,8 @@ export const addUserAppointment = async (req, res) => {
     const { date, clientId, serviceId, providerId, price, paymentMethod, totalAmount } = req.body;
 
     const d = new Date(date);
+
+    // TODO: await sendEmailNotificationAppoinment()
     
     // DATABASE
     const result = await withdb(conn =>

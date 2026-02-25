@@ -5,7 +5,7 @@ import { ERROR_CODES, ROLES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.
 import { withdb } from '../databases/mysql.js';
 import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserById, q_getUserByUid, q_isEmailVerified, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
 import { google } from 'googleapis';
-import sendEmail, { generateVerificationCode } from "../helpers/email_verification.js";
+import sendEmailVerificationCode, { generateVerificationCode } from "../helpers/email_verification.js";
 import { asyncHandler } from '../helpers/utils.js';
 
 const allowedRoles = ["client", "provider", "admin"];
@@ -45,7 +45,7 @@ async function sendVerifycationCode(userId, email) {
         );
 
 
-        const emailData = await sendEmail(email, verificationToken.code);
+        const emailData = await sendEmailVerificationCode(email, verificationToken.code);
 
 
         return { success: true };
@@ -198,7 +198,7 @@ export async function loginController(req, res) {
 
         if (!DISABLE_EMAIL_VERIFICATION && !userRecord.email_verified) {
             console.log('[loginController] Email not verified:', email);
-            await sendEmail(userRecord.id, email);
+            await sendEmailVerificationCode(userRecord.id, email);
 
             return res.status(403).json({
                 success: false,
