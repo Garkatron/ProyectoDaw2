@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "../../stores/auth.store";
 import { getAppointments, getUserServiceById } from "../../services/appointments.service";
 import Base from "../../layouts/Base";
+import Calendar from "../../components/Calendar";
 import { CheckCircle, Clock, Banknote, RefreshCw } from "lucide-react";
-import { Calendar } from "@mantine/dates";
 import {
   Alert,
   Badge,
@@ -11,7 +11,6 @@ import {
   Center,
   Divider,
   Group,
-  Indicator,
   Paper,
   ScrollArea,
   SimpleGrid,
@@ -26,12 +25,6 @@ const statusConfig = {
   Completed: { color: "green", icon: CheckCircle },
   Pending: { color: "yellow", icon: Clock },
   "In Process": { color: "blue", icon: RefreshCw },
-};
-
-const statusColorMap = {
-  Completed: "green",
-  Pending: "yellow",
-  "In Process": "blue",
 };
 
 const AppointmentCard = ({ appointment }) => {
@@ -131,19 +124,16 @@ export default function Appointments() {
     fetchAll();
   }, [currentUser]);
 
-  // Mapa de fecha → color de indicador (prioridad: In Process > Pending > Completed)
-  const dateIndicatorMap = appointments.reduce((acc, appt) => {
-    const key = new Date(appt.date_time).toDateString();
-    const newColor = statusColorMap[appt.status] ?? "gray";
-    if (!acc[key]) {
-      acc[key] = newColor;
-    } else if (appt.status === "In Process") {
-      acc[key] = "blue";
-    } else if (appt.status === "Pending" && acc[key] !== "blue") {
-      acc[key] = "yellow";
-    }
-    return acc;
-  }, {});
+  // Construir markedDates para el Calendar custom
+  const markedDates = Object.entries(
+    appointments.reduce((acc, appt) => {
+      const key = new Date(appt.date_time).toDateString();
+      if (!acc[key]) acc[key] = { date: new Date(appt.date_time), status: appt.status };
+      else if (appt.status === "In Process") acc[key].status = "In Process";
+      else if (appt.status === "Pending" && acc[key].status !== "In Process") acc[key].status = "Pending";
+      return acc;
+    }, {})
+  ).map(([, val]) => val);
 
   const appointmentsOnSelectedDate = appointments.filter((app) => {
     const d = new Date(app.date_time);
@@ -209,24 +199,11 @@ export default function Appointments() {
         {/* Calendar + Day Panel */}
         <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
           <Paper withBorder p={{ base: "md", sm: "lg" }}>
-            <Center>
-              <Calendar
-                value={selectedDate}
-                onChange={(val) => setSelectedDate(new Date(val))}
-                locale="es"
-                renderDay={(date) => {
-                  const nativeDate = new Date(date);
-                  const indicatorColor = dateIndicatorMap[nativeDate.toDateString()];
-                  const day = nativeDate.getDate();
-                  if (!indicatorColor) return <Box>{day}</Box>;
-                  return (
-                    <Indicator size={6} color={indicatorColor} offset={-2}>
-                      <Box>{day}</Box>
-                    </Indicator>
-                  );
-                }}
-              />
-            </Center>
+            <Calendar
+              markedDates={markedDates}
+              onDateClick={setSelectedDate}
+              selectedDate={selectedDate}
+            />
           </Paper>
 
           <Paper withBorder p={{ base: "md", sm: "lg" }}>

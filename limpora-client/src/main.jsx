@@ -15,7 +15,7 @@ initLangManager().then(() => {
       <BrowserRouter>
         <MantineProvider
           theme={mantineTheme}
-          defaultColorScheme="light"
+          defaultColorScheme="dark"
           cssVariablesResolver={(theme) => ({
             variables: {},
             light: {},

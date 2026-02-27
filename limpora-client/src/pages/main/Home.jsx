@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar";
 import News from "../../components/News";
 import logo from "../../assets/logo.svg";
 import lang from "../../utils/LangManager";
+import HERO_IMAGE from "./../../assets/hero2.jpg";
 import {
   Box,
   Center,
@@ -98,7 +99,7 @@ const AboutSection = () => (
             { value: "4.9 ★", label: "Valoración media" },
           ].map(({ value, label }) => (
             <Stack key={label} align="center" gap={2}>
-              <Text fw={700} fz="1.25rem" c="gray.9">{value}</Text>
+              <Text fw={700} fz="1.25rem">{value}</Text>
               <Text size="xs" >{label}</Text>
             </Stack>
           ))}
@@ -163,6 +164,16 @@ export default function Home() {
 
         {/* Navbar */}
         <Navbar />
+
+        <Image
+            src={HERO_IMAGE}
+            alt="Fashion"
+            w="100%"
+            h={400}
+            fit="cover"
+            radius={"xs"}
+            style={{ display: "block", objectPosition: "center 10%" }}
+          />
 
         {/* Main content */}
         <Grid gutter="lg" style={{ flex: 1 }}>

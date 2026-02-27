@@ -10,7 +10,6 @@ import {
   Box,
   Button,
   Group,
-  Loader,
   Paper,
   SimpleGrid,
   Skeleton,
@@ -28,32 +27,27 @@ const TIME_SLOTS = [
   "17:00", "17:30", "18:00", "18:30", "19:00",
 ];
 
-const LegendDot = ({ color, label }) => (
-  <Group gap={6}>
-    <Box w={10} h={10} style={{ borderRadius: "50%", backgroundColor: color }} />
-    <Text size="xs" c="gray.5">{label}</Text>
-  </Group>
-);
+const statusColorMap = {
+  Completed: "green",
+  Pending: "yellow",
+  "In Process": "blue",
+};
 
-const ToggleButton = ({ selected, onClick, children, fullWidth = false }) => (
-  <UnstyledButton
-    onClick={onClick}
-    style={{ width: fullWidth ? "100%" : undefined }}
-  >
+const ToggleButton = ({ selected, onClick, children }) => (
+  <UnstyledButton onClick={onClick} style={{ width: "100%" }}>
     <Paper
       withBorder
       p="sm"
-      radius="md"
       ta="center"
       style={{
         cursor: "pointer",
-        backgroundColor: selected ? "var(--mantine-color-dark-8)" : "white",
-        borderColor: selected ? "var(--mantine-color-dark-8)" : "var(--mantine-color-gray-3)",
-        color: selected ? "white" : "var(--mantine-color-gray-7)",
+        backgroundColor: selected ? "var(--mantine-color-default-color)" : undefined,
         transition: "all 0.15s",
       }}
     >
-      {children}
+      <Text size="sm" fw={500} c={selected ? "var(--mantine-color-body)" : undefined}>
+        {children}
+      </Text>
     </Paper>
   </UnstyledButton>
 );
@@ -66,6 +60,7 @@ export default function BookingConfirmation() {
   const providerId = location.state?.userId;
 
   const [markedDates, setMarkedDates] = useState([]);
+  const [blockedDates, setBlockedDates] = useState(new Set());
   const [selectedDate, setSelectedDate] = useState(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
 
@@ -88,19 +83,26 @@ export default function BookingConfirmation() {
         const appointments = await getAppointments(providerId);
         const dateMap = {};
         appointments.forEach((appt) => {
-          const dateKey = new Date(appt.date_time).toDateString();
-          if (!dateMap[dateKey]) dateMap[dateKey] = [];
-          dateMap[dateKey].push(appt);
+          const key = new Date(appt.date_time).toDateString();
+          if (!dateMap[key]) dateMap[key] = [];
+          dateMap[key].push(appt);
         });
-        const marks = Object.entries(dateMap).map(([, appts]) => {
-          const date = new Date(appts[0].date_time);
+
+        const marks = [];
+        const blocked = new Set();
+
+        Object.entries(dateMap).forEach(([key, appts]) => {
           const statuses = appts.map((a) => a.status?.toLowerCase());
           let status = "Pending";
           if (statuses.every((s) => s === "completed" || s === "cancelled")) status = "Completed";
           else if (statuses.some((s) => s === "in process")) status = "In Process";
-          return { date, status };
+
+          marks.push({ date: new Date(appts[0].date_time), status });
+          if (status === "Pending" || status === "In Process") blocked.add(key);
         });
+
         setMarkedDates(marks);
+        setBlockedDates(blocked);
       } catch (err) {
         console.error("Error fetching appointments:", err);
       } finally {
@@ -127,10 +129,7 @@ export default function BookingConfirmation() {
   }, [providerId]);
 
   const handleDateClick = (date) => {
-    const mark = markedDates.find(
-      (m) => new Date(m.date).toDateString() === date.toDateString()
-    );
-    if (mark && (mark.status === "Pending" || mark.status === "In Process")) return;
+    if (blockedDates.has(date.toDateString())) return;
     setSelectedDate(date);
     setSelectedTime(null);
   };
@@ -163,31 +162,40 @@ export default function BookingConfirmation() {
       setSubmitting(false);
     }
   };
-  
+
   return (
     <Base>
       <Stack maw={768} mx="auto" p="lg" gap="lg">
 
         {/* Header */}
         <Box>
-          <Title order={1} fz="1.5rem" fw={600} c="gray.8">Nueva reserva</Title>
-          <Text size="sm" c="gray.5" mt={4}>
-            Proveedor ID: <Text span fw={500} c="gray.7">{providerId}</Text>
+          <Title order={1} fz="1.5rem" fw={600}>Nueva reserva</Title>
+          <Text size="sm" c="dimmed" mt={4}>
+            Proveedor ID: <Text span fw={500}>{providerId}</Text>
           </Text>
         </Box>
 
         {/* Paso 1 — Calendario */}
-        <Paper withBorder  p="lg" shadow="sm">
-          <Text fw={600} c="gray.7" mb="sm">1. Selecciona un día</Text>
+        <Paper withBorder p="lg" shadow="sm">
+          <Text fw={600} mb="sm">1. Selecciona un día</Text>
 
           <Group gap="md" mb="md">
-            <LegendDot color="var(--mantine-color-yellow-4)" label="Pendiente" />
-            <LegendDot color="var(--mantine-color-blue-4)" label="En proceso" />
-            <LegendDot color="var(--mantine-color-green-4)" label="Completado" />
+            {Object.entries(statusColorMap).map(([label, color]) => (
+              <Group key={label} gap={6}>
+                <Box
+                  w={10} h={10}
+                  style={{
+                    borderRadius: "50%",
+                    backgroundColor: `var(--mantine-color-${color}-5)`,
+                  }}
+                />
+                <Text size="xs" c="dimmed">{label}</Text>
+              </Group>
+            ))}
           </Group>
 
           {loadingAppts && (
-            <Text size="xs" c="gray.4" mb="xs">Cargando disponibilidad...</Text>
+            <Text size="xs" c="dimmed" mb="xs">Cargando disponibilidad...</Text>
           )}
 
           <Calendar
@@ -199,8 +207,8 @@ export default function BookingConfirmation() {
 
         {/* Paso 2 — Hora */}
         {selectedDate && (
-          <Paper withBorder  p="lg" >
-            <Text fw={600} c="gray.7" mb="sm">2. Selecciona una hora</Text>
+          <Paper withBorder p="lg">
+            <Text fw={600} mb="sm">2. Selecciona una hora</Text>
             <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
               {TIME_SLOTS.map((slot) => (
                 <ToggleButton
@@ -208,7 +216,7 @@ export default function BookingConfirmation() {
                   selected={selectedTime === slot}
                   onClick={() => setSelectedTime(slot)}
                 >
-                  <Text size="sm" fw={500}>{slot}</Text>
+                  {slot}
                 </ToggleButton>
               ))}
             </SimpleGrid>
@@ -217,61 +225,45 @@ export default function BookingConfirmation() {
 
         {/* Paso 3 — Servicio y pago */}
         {selectedDate && selectedTime && (
-          <Paper withBorder  p="lg" shadow="sm">
-            <Text fw={600} c="gray.7" mb="lg">3. Detalles de la reserva</Text>
+          <Paper withBorder p="lg" shadow="sm">
+            <Text fw={600} mb="lg">3. Detalles de la reserva</Text>
 
             <Stack gap="lg">
-              {/* Servicio */}
               <Box>
-                <Text size="sm" fw={500} c="gray.6" mb="xs">Servicio</Text>
+                <Text size="sm" fw={500} c="dimmed" mb="xs">Servicio</Text>
                 {loadingServices ? (
                   <Stack gap="xs">
-                    <Skeleton height={48} radius="md" />
-                    <Skeleton height={48} radius="md" />
+                    <Skeleton height={48} />
+                    <Skeleton height={48} />
                   </Stack>
                 ) : providerServices.length === 0 ? (
-                  <Text size="sm" c="red.4" fs="italic">
+                  <Text size="sm" c="dimmed" fs="italic">
                     Este proveedor no tiene servicios disponibles.
                   </Text>
                 ) : (
                   <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-                    {providerServices.map((svc) => {
-                      const isSelected = selectedService?.service_id === svc.service_id;
-                      return (
-                        <UnstyledButton key={svc.service_id} onClick={() => setSelectedService(svc)}>
-                          <Paper
-                            withBorder
-                            px="md"
-                            py="sm"
-                            radius="md"
-                            style={{
-                              cursor: "pointer",
-                              backgroundColor: isSelected ? "var(--mantine-color-dark-8)" : "white",
-                              borderColor: isSelected ? "var(--mantine-color-dark-8)" : "var(--mantine-color-gray-3)",
-                              transition: "all 0.15s",
-                            }}
-                          >
-                            <Group justify="space-between">
-                              <Text size="sm" fw={500} c={isSelected ? "white" : "gray.7"}>
-                                {svc.name ?? svc.service_name ?? `Servicio #${svc.service_id}`}
-                              </Text>
-                              {svc.price != null && (
-                                <Text size="xs" fw={600} c={isSelected ? "gray.4" : "gray.4"}>
-                                  {svc.price} €
-                                </Text>
-                              )}
-                            </Group>
-                          </Paper>
-                        </UnstyledButton>
-                      );
-                    })}
+                    {providerServices.map((svc) => (
+                      <ToggleButton
+                        key={svc.service_id}
+                        selected={selectedService?.service_id === svc.service_id}
+                        onClick={() => setSelectedService(svc)}
+                      >
+                        <Group justify="space-between">
+                          <Text size="sm" fw={500} c={selectedService?.service_id === svc.service_id ? "var(--mantine-color-body)" : undefined}>
+                            {svc.name ?? svc.service_name ?? `Servicio #${svc.service_id}`}
+                          </Text>
+                          {svc.price != null && (
+                            <Text size="xs" fw={600} c="dimmed">{svc.price} €</Text>
+                          )}
+                        </Group>
+                      </ToggleButton>
+                    ))}
                   </SimpleGrid>
                 )}
               </Box>
 
-              {/* Método de pago */}
               <Box>
-                <Text size="sm" fw={500} c="gray.6" mb="xs">Método de pago</Text>
+                <Text size="sm" fw={500} c="dimmed" mb="xs">Método de pago</Text>
                 <SimpleGrid cols={3} spacing="xs">
                   {PAYMENT_METHODS.map((method) => (
                     <ToggleButton
@@ -279,7 +271,7 @@ export default function BookingConfirmation() {
                       selected={paymentMethod === method}
                       onClick={() => setPaymentMethod(method)}
                     >
-                      <Text size="sm" fw={500}>{method}</Text>
+                      {method}
                     </ToggleButton>
                   ))}
                 </SimpleGrid>
@@ -290,41 +282,36 @@ export default function BookingConfirmation() {
 
         {/* Resumen + Confirmar */}
         {canConfirm && (
-          <Paper withBorder  p="lg" bg="gray.0" shadow="sm">
-            <Text fw={600} c="gray.7" mb="md">Resumen</Text>
+          <Paper withBorder p="lg" shadow="sm">
+            <Text fw={600} mb="md">Resumen</Text>
             <Stack gap={6} mb="lg">
-              <Text size="sm" c="gray.6">
+              <Text size="sm">
                 📅 <Text span fw={500}>Fecha:</Text>{" "}
                 {selectedDate.toLocaleDateString("es-ES", {
                   weekday: "long", year: "numeric", month: "long", day: "numeric",
                 })}
               </Text>
-              <Text size="sm" c="gray.6">
+              <Text size="sm">
                 🕐 <Text span fw={500}>Hora:</Text> {selectedTime}
               </Text>
-              <Text size="sm" c="gray.6">
+              <Text size="sm">
                 🛠 <Text span fw={500}>Servicio:</Text>{" "}
                 {selectedService.name ?? selectedService.service_name ?? `#${selectedService.service_id}`}
                 {selectedService.price != null && ` — ${selectedService.price} €`}
               </Text>
-              <Text size="sm" c="gray.6">
+              <Text size="sm">
                 💳 <Text span fw={500}>Pago:</Text> {paymentMethod}
               </Text>
             </Stack>
 
-            {error && <Alert color="red" radius="md" mb="md">{error}</Alert>}
-            {success && (
-              <Alert color="green" radius="md" mb="md">
-                ✅ Cita confirmada. Redirigiendo...
-              </Alert>
-            )}
+            {error && <Alert color="red" mb="md">{error}</Alert>}
+            {success && <Alert color="green" mb="md">✅ Cita confirmada. Redirigiendo...</Alert>}
 
             <Button
               onClick={handleConfirm}
               disabled={submitting || success}
               loading={submitting}
-              color="dark"
-              
+              variant="default"
               size="md"
               fullWidth
             >
