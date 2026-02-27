@@ -210,7 +210,7 @@ export default function TopUsers() {
       <Stack maw={1152} mx="auto" p={{ base: "md", sm: "xl" }} gap="xl">
 
         {/* Header */}
-        <Paper withBorder p="lg" radius="md" shadow="md">
+        <Paper withBorder p="lg" radius="md">
           <Center>
             <Group gap="md">
               <Image src={logo} alt="Logo" w={128} h={128} fit="contain" style={{ flexShrink: 0 }} />
