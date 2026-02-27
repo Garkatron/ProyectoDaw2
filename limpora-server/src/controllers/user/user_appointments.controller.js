@@ -1,4 +1,4 @@
-import { q_addAppointmentToUser, q_getAppointmentsByUser } from "../../databases/queries.js";
+import { q_addAppointmentToUser, q_getAppointmentsByProvider, q_getAppointmentsByUser } from "../../databases/queries.js";
 import { APP_COMISSION } from '../../constants.js';
 import { withdb } from '../../databases/mysql.js';
 import { sendEmailNotificationAppoinment } from "../../helpers/email_verification.js";
@@ -9,6 +9,21 @@ export const getUserAppointments = async (req, res) => {
     // DATABASE
     const result = await withdb(conn =>
       q_getAppointmentsByUser(conn, userId)
+    );
+    //
+    res.status(201).json({ success: true, data: result });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error getting appointments' });
+  }
+
+};
+
+export const getProviderAppointments = async (req, res) => {
+  try {
+    const { providerId } = req.params;
+    // DATABASE
+    const result = await withdb(conn =>
+      q_getAppointmentsByProvider(conn, providerId)
     );
     //
     res.status(201).json({ success: true, data: result });

@@ -1,9 +1,15 @@
 import { API } from "./base.service";
 
 export const getAppointments = async (id) => {
-  const { data } = await API.get(`/user/appointments/${id}`, { withCredentials: true });
+  const { data } = await API.get(`/user/appointments/user/${id}`, { withCredentials: true });
   return data.data;
 };
+
+export const getProviderAppointments = async (id) => {
+  const { data } = await API.get(`/user/appointments/provider/${id}`, { withCredentials: true });
+  return data.data;
+};
+
 
 export const getUserServiceById = async (id, serviceId) => {
   const { data } = await API.get(`/user/appointments/${id}/${serviceId}`, { withCredentials: true });

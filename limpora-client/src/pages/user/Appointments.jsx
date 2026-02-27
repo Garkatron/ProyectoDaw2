@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../../stores/auth.store";
-import { getAppointments, getUserServiceById } from "../../services/appointments.service";
+import { getAppointments, getProviderAppointments, getUserServiceById } from "../../services/appointments.service";
 import Base from "../../layouts/Base";
 import Calendar from "../../components/Calendar";
 import { CheckCircle, Clock, Banknote, RefreshCw } from "lucide-react";
@@ -97,7 +97,11 @@ export default function Appointments() {
       setLoading(true);
       setError(null);
       try {
-        const raw = await getAppointments(currentUser.id);
+        
+        const raw = currentUser.role === "provider" ? 
+        await getProviderAppointments(currentUser.id) : 
+        await getAppointments(currentUser.id);
+        
         const data = raw || [];
 
         const enriched = await Promise.all(

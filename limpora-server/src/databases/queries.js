@@ -97,6 +97,18 @@ export async function q_getAppointmentsByUser(conn, userId) {
     return rows;
 }
 
+export async function q_getAppointmentsByProvider(conn, providerId) {
+    const [rows] = await conn.query(
+        `SELECT *
+         FROM Appointments
+         WHERE provider_id = ?
+         ORDER BY date_time DESC`,
+        [providerId]
+    );
+    return rows;
+}
+
+
 export async function q_addAppointmentToUser(
     conn,
     dateTime,

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { addUserAppointment, getUserAppointments } from '../../controllers/user/user_appointments.controller.js';
+import { addUserAppointment, getProviderAppointments, getUserAppointments } from '../../controllers/user/user_appointments.controller.js';
 import { mw_session } from '../../middlewares/auth.js';
 import { body, param } from 'express-validator';
 import { handleValidationErrors } from '../../utils/sanitization.js';
@@ -40,9 +40,15 @@ userAppointmentsRouter.use(mw_session);
  *         description: Error getting appointments
  */
 userAppointmentsRouter.get(
-    '/:userId', 
-    param("userId").trim().escape(),
+    '/user/:userId', 
+    param("userId").isNumeric(),
     getUserAppointments
+);
+
+userAppointmentsRouter.get(
+    '/provider/:providerId', 
+    param("providerId").isNumeric(),
+    getProviderAppointments
 );
 
 
