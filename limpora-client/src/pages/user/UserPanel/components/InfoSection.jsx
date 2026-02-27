@@ -1,18 +1,27 @@
 import lang from '../../../../utils/LangManager';
 import InfoCard from './cards/InfoCard';
+import { Divider, Flex, Group, Title } from '@mantine/core';
 
 export default function InfoSection({ targetUser }) {
     return (
-        <div className="flex flex-col md:flex-row items-center justify-start gap-6 pb-6 border-b border-gray-100">
-            <h1 className="text-2xl font-semibold text-gray-800">{targetUser.name}</h1>
+        <>
+            <Flex
+                direction={{ base: 'column', md: 'row' }}
+                align={{ base: 'flex-start', md: 'center' }}
+                gap="lg"
+            >
+                <Title order={1} fz="1.5rem" fw={600}>
+                    {targetUser.name}
+                </Title>
 
-            <div className="flex flex-wrap gap-4">
-                <InfoCard
-                    label={lang('userpanel.label.role')}
-                    value={targetUser.role}
-                />
-                
-            </div>
-        </div>
+                <Group gap="md" wrap="wrap">
+                    <InfoCard
+                        label={lang('userpanel.label.role')}
+                        value={targetUser.role}
+                    />
+                </Group>
+            </Flex>
+            <Divider />
+        </>
     );
 }

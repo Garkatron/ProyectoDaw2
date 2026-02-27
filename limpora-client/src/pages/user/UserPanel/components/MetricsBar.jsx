@@ -1,30 +1,34 @@
-import { TrophyIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { CalendarDays, Trophy } from 'lucide-react';
 import lang from '../../../../utils/LangManager';
+import { Group, Paper, Text, ThemeIcon, Divider } from '@mantine/core';
 
-const MetricPill = ({ icon: Icon, label, value, color }) => (
-    <div className={`flex items-center space-x-2 p-3 rounded-full ${color} shadow-sm border border-gray-300/20`}>
-        <Icon className="h-6 w-6 text-gray-500" />
-        <p className="text-sm font-medium text-gray-700">
-            {label}: <span className="font-semibold">{value}</span>
-        </p>
-    </div>
+const MetricPill = ({ icon: Icon, label, value }) => (
+    <Paper withBorder px="md" py="sm" radius="xl" shadow="xs">
+        <Group gap="xs">
+            <Icon size={20} />
+            <Text size="sm" fw={500}>
+                {label}: <Text span fw={700}>{value}</Text>
+            </Text>
+        </Group>
+    </Paper>
 );
 
 export default function MetricsBar({ targetUser }) {
     return (
-        <div className="flex space-x-6 items-center border-b border-gray-100 pb-6">
-            <MetricPill
-                icon={CalendarDaysIcon}
-                label={lang('userpanel.label.completed_appointments')}
-                value={targetUser.citasCompletas || 0}
-                color="bg-gray-100"
-            />
-            <MetricPill
-                icon={TrophyIcon}
-                label={lang('userpanel.label.total_points')}
-                value={targetUser.puntosTotales || 0}
-                color="bg-gray-100"
-            />
-        </div>
+        <>
+            <Group gap="md">
+                <MetricPill
+                    icon={CalendarDays}
+                    label={lang('userpanel.label.completed_appointments')}
+                    value={targetUser.citasCompletas || 0}
+                />
+                <MetricPill
+                    icon={Trophy}
+                    label={lang('userpanel.label.total_points')}
+                    value={targetUser.puntosTotales || 0}
+                />
+            </Group>
+            <Divider />
+        </>
     );
 }

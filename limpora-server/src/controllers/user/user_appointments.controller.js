@@ -24,7 +24,7 @@ export const addUserAppointment = async (req, res) => {
 
     const d = new Date(date);
 
-    // TODO: await sendEmailNotificationAppoinment()
+    // TODO: vawait sendEmailNotificationAppoinment()
     
     // DATABASE
     const result = await withdb(conn =>

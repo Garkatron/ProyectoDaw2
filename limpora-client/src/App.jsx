@@ -6,7 +6,6 @@ import Rergister from './pages/auth/Register';
 import Login from './pages/auth/Login';
 import Appointments from './pages/user/Appointments';
 import TopUsers from './pages/main/TopUsers';
-import Reviews from './pages/main/Reviews';
 import AdminPanel from './pages/admin/AdminPanel';
 import BookingConfirmation from './pages/user/BookingConfirmation';
 import Currency from './pages/user/Currency';

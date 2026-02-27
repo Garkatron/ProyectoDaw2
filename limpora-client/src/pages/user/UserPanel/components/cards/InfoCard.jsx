@@ -1,8 +1,10 @@
+import { Paper, Text } from '@mantine/core';
+
 export default function InfoCard({ label, value }) {
     return (
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-300/20">
-            <p className="text-xs font-light text-gray-500 uppercase">{label}</p>
-            <p className="text-base font-medium text-gray-800">{value}</p>
-        </div>
+        <Paper withBorder p="md" radius="md" shadow="xs">
+            <Text size="xs" fw={300} tt="uppercase" c="dimmed">{label}</Text>
+            <Text size="md" fw={500}>{value}</Text>
+        </Paper>
     );
 }
