@@ -1,10 +1,22 @@
 import logo from "../../assets/logo-provisional.png";
 import { useAuthStore } from "../../stores/auth.store";
 import { useState } from "react";
-import { Modal } from "../../components/Modal";
 import { Link, useNavigate } from "react-router-dom";
 import LoginSchema from "../../schemas/NewSessionSchema";
 import lang from "../../utils/LangManager";
+import {
+  TextInput,
+  PasswordInput,
+  Button,
+  Paper,
+  Title,
+  Stack,
+  Image,
+  Center,
+  Anchor,
+  Modal,
+  Text,
+} from "@mantine/core";
 
 export default function Login() {
   const login = useAuthStore((state) => state.login);
@@ -42,9 +54,7 @@ export default function Login() {
         setModalTitle(lang("login.success_title"));
         setModalMessage(lang("login.success_message"));
         setSuccess(true);
-        if (response.data.role === "admin") {
-          setAdmin(true);
-        }
+        if (response.data.role === "admin") setAdmin(true);
       } else {
         setModalTitle(lang("login.error_title"));
         setModalMessage(response.message || lang("login.generic_error"));
@@ -58,99 +68,67 @@ export default function Login() {
     }
   };
 
+  const handleModalClose = () => {
+    setModalOpen(false);
+    if (success) navigate(isAdmin ? "/panel/admin" : "/panel/me");
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-gray-50 p-10 rounded-xl border border-gray-200 space-y-8">
-        <header className="flex flex-col items-center space-y-2">
-          <img
-            src={logo}
-            alt="Limpora Logo"
-            className="w-28 h-28 object-contain"
-          />
-          <h1 className="text-3xl font-light text-gray-700">{lang("login.title")}</h1>
-        </header>
+    <Center mih="100vh" px="md">
+      <Paper w="100%" maw={448} p={40} withBorder>
+        <Stack align="center" mb="xl" gap="xs">
+          <Image src={logo} alt="Limpora Logo" w={112} h={112} fit="contain" />
+          <Title order={1} fw={300} fz="2rem">
+            {lang("login.title")}
+          </Title>
+        </Stack>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                {lang("login.email")}
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu.correo@ejemplo.com"
-                className="w-full p-4 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
-              />
-            </div>
+        <form onSubmit={handleSubmit}>
+          <Stack gap="md" mb="xl">
+            <TextInput
+              id="email"
+              type="email"
+              required
+              label={lang("login.email")}
+              placeholder="tu.correo@ejemplo.com"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              size="md"
+            />
+            <PasswordInput
+              id="password"
+              required
+              label={lang("login.password")}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.currentTarget.value)}
+              size="md"
+            />
+          </Stack>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                {lang("login.password")}
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full p-4 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <button
-              type="submit"
-              className="w-full p-3 bg-gray-100 text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition"
-            >
+          <Stack gap="sm" mb="md">
+            <Button type="submit" variant="default" size="md" fullWidth>
               {lang("login.submit")}
-            </button>
-            <button
-              type="button"
-              onClick={loginWithGoogle}
-              className="w-full p-3 bg-gray-100 text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition"
-            >
+            </Button>
+            <Button type="button" variant="default" size="md" fullWidth onClick={loginWithGoogle}>
               Google
-            </button>
-          </div>
+            </Button>
+          </Stack>
         </form>
 
-        <div className="text-center">
-          <Link
-            to="/register"
-            className="text-sm text-gray-600 hover:text-blue-800 transition"
-          >
+        <Center>
+          <Anchor component={Link} to="/register" size="sm">
             {lang("login.register")}
-          </Link>
-        </div>
-      </div>
+          </Anchor>
+        </Center>
+      </Paper>
 
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          if (success) {
-            if (isAdmin) {
-              navigate("/panel/admin");
-            } else {
-              navigate("/panel/me");
-            }
-          }
-        }}
-        title={modalTitle}
-        message={modalMessage}
-      />
-    </div>
+      <Modal opened={modalOpen} onClose={handleModalClose} title={modalTitle} centered>
+        <Text size="sm">{modalMessage}</Text>
+        <Button mt="md" fullWidth variant="default" onClick={handleModalClose}>
+          Aceptar
+        </Button>
+      </Modal>
+    </Center>
   );
 }

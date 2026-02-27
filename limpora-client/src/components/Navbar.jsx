@@ -1,10 +1,10 @@
-import { UserCircleIcon } from '@heroicons/react/24/outline'; // Asegúrate de tener instalados los íconos (ej: npm install @heroicons/react)
-import { Link } from 'react-router-dom';
-import lang from '../utils/LangManager';
+import { Link, useLocation } from "react-router-dom";
+import lang from "../utils/LangManager";
+import { Group, Anchor, ActionIcon, ScrollArea, Paper } from "@mantine/core";
+import { UserCircle } from "lucide-react";
 
 const navItems = [
-
-  { name: "nav.items.path.root", to: "/" }, 
+  { name: "nav.items.path.root", to: "/" },
   { name: "nav.items.path.currency", to: "/currency" },
   { name: "nav.items.path.appointments", to: "/appointments" },
   { name: "nav.items.path.userfinder", to: "/userfinder" },
@@ -13,29 +13,54 @@ const navItems = [
 
 const Navbar = () => {
   return (
-    <nav className="bg-white p-4 rounded-lg shadow-md border border-gray-300/20 flex justify-between items-center">
-      <div className="flex space-x-4 md:space-x-8 overflow-x-auto">
-        {navItems.map((item) => (
-          <Link
-            key={lang(item.name)}
-            to={item.to} 
-            className="text-gray-700 text-sm md:text-base font-medium p-2 rounded-md transition-colors whitespace-nowrap hover:bg-gray-100/50 hover:text-gray-800"
-          >
-            {lang(item.name)}
-          </Link>
-        ))}
-      </div>
-      
-      <Link 
-        to="/panel/me"
-        className="p-2 rounded-full transition-colors hover:bg-gray-100/50 cursor-pointer flex-shrink-0"
-      >
-        <UserCircleIcon className="h-8 w-8 text-gray-600" />
-      </Link>
-    </nav>
+    <Paper
+      p="md"
+      radius="md"
+      shadow="xs"
+      withBorder
+      component="nav"
+    >
+      <Group justify="space-between" wrap="nowrap">
+        <ScrollArea type="hover" offsetScrollbars scrollbarSize={4}>
+          <Group gap="xs" wrap="nowrap">
+            {navItems.map((item) => (
+              <Anchor
+                key={lang(item.name)}
+                component={Link}
+                to={item.to}
+                size="sm"
+                fw={500}
+                px="sm"
+                py={6}
+                style={{ borderRadius: "var(--mantine-radius-md)", whiteSpace: "nowrap" }}
+                styles={{
+                  root: {
+                    "&:hover": {
+                      textDecoration: "none",
+                    },
+                  },
+                }}
+              >
+                {lang(item.name)}
+              </Anchor>
+            ))}
+          </Group>
+        </ScrollArea>
+
+        <ActionIcon
+          component={Link}
+          to="/panel/me"
+          variant="subtle"
+          size="xl"
+          radius="xl"
+          aria-label="Perfil"
+          style={{ flexShrink: 0 }}
+        >
+          <UserCircle size={32} />
+        </ActionIcon>
+      </Group>
+    </Paper>
   );
 };
 
 export default Navbar;
-
-

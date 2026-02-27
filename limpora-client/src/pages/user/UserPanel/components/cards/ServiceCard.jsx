@@ -1,19 +1,26 @@
+import { ActionIcon, Group, Paper, Text } from '@mantine/core';
+import { X } from 'lucide-react';
+
 export default function ServiceCard({ service, isSelf, onDelete }) {
     return (
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-300/20 flex justify-between items-center">
-            <p className="text-sm font-medium text-gray-800">{service.service_name}</p>
-            <div className="flex items-center space-x-3">
-                <span className="text-sm font-semibold text-gray-600">{service.price}€</span>
-                {isSelf && (
-                    <button
-                        onClick={() => onDelete(service.service_id)}
-                        className="text-xs text-red-400 hover:text-red-600 transition-colors"
-                        title="Eliminar servicio"
-                    >
-                        ✕
-                    </button>
-                )}
-            </div>
-        </div>
+        <Paper withBorder p="md" radius="md" shadow="xs">
+            <Group justify="space-between">
+                <Text size="sm" fw={500}>{service.service_name}</Text>
+                <Group gap="sm">
+                    <Text size="sm" fw={600} c="dimmed">{service.price}€</Text>
+                    {isSelf && (
+                        <ActionIcon
+                            variant="subtle"
+                            color="red"
+                            size="sm"
+                            onClick={() => onDelete(service.service_id)}
+                            title="Eliminar servicio"
+                        >
+                            <X size={12} />
+                        </ActionIcon>
+                    )}
+                </Group>
+            </Group>
+        </Paper>
     );
 }

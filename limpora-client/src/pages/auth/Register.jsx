@@ -1,9 +1,22 @@
 import logo from "../../assets/logo-provisional.png";
 import { useState } from "react";
 import { useAuthStore } from "../../stores/auth.store";
-import { Modal } from "../../components/Modal";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterSchema from "../../schemas/RegisterSchema";
+import {
+  TextInput,
+  PasswordInput,
+  Select,
+  Button,
+  Paper,
+  Title,
+  Stack,
+  Group,
+  Image,
+  Center,
+  Modal,
+  Text,
+} from "@mantine/core";
 
 export default function Register() {
   const register = useAuthStore((state) => state.register);
@@ -54,86 +67,74 @@ export default function Register() {
     }
   };
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-gray-50 p-10 rounded-xl border border-gray-200 space-y-8">
-        <header className="flex flex-col items-center space-y-2">
-          <img
-            src={logo}
-            alt="Limpora Logo"
-            className="w-28 h-28 object-contain"
-          />
-          <h1 className="text-3xl font-light text-gray-700">Registro</h1>
-        </header>
+  const handleModalClose = () => {
+    setModalOpen(false);
+    if (success) navigate("/login");
+  };
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <input
-              type="text"
+  return (
+    <Center mih="100vh" px="md">
+      <Paper w="100%" maw={448} p={40} withBorder>
+        <Stack align="center" mb="xl" gap="xs">
+          <Image src={logo} alt="Limpora Logo" w={112} h={112} fit="contain" />
+          <Title order={1} fw={300} fz="2rem">
+            Registro
+          </Title>
+        </Stack>
+
+        <form onSubmit={handleSubmit}>
+          <Stack gap="md" mb="xl">
+            <TextInput
               required
               placeholder="Nombre completo"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
+              onChange={(e) => setName(e.currentTarget.value)}
+              size="md"
             />
-
-            <input
+            <TextInput
               type="email"
               required
               placeholder="Correo electrónico"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              size="md"
             />
-
-            <input
-              type="password"
+            <PasswordInput
               required
               placeholder="Contraseña"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
+              onChange={(e) => setPassword(e.currentTarget.value)}
+              size="md"
             />
-
-            {/* Selector de rol opcional */}
-            <select
+            <Select
               value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full p-4 bg-gray-100 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
-            >
-              <option value="client">Cliente</option>
-              <option value="provider">Proveedor</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
+              onChange={setRole}
+              size="md"
+              data={[
+                { value: "client", label: "Cliente" },
+                { value: "provider", label: "Proveedor" },
+                { value: "admin", label: "Admin" },
+              ]}
+            />
+          </Stack>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button
-              type="submit"
-              className="flex-1 p-3 bg-gray-100 text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition"
-            >
+          <Group grow gap="md">
+            <Button type="submit" variant="default" size="md">
               Confirmar
-            </button>
-
-            <Link
-              to="/login"
-              className="flex-1 p-3 text-center bg-gray-50 text-gray-600 font-medium rounded-md border border-gray-300 hover:bg-gray-100 transition"
-            >
+            </Button>
+            <Button component={Link} to="/login" variant="subtle" size="md">
               Cancelar
-            </Link>
-          </div>
+            </Button>
+          </Group>
         </form>
-      </div>
+      </Paper>
 
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          if (success) navigate("/login");
-        }}
-        title={modalTitle}
-        message={modalMessage}
-      />
-    </div>
+      <Modal opened={modalOpen} onClose={handleModalClose} title={modalTitle} centered>
+        <Text size="sm">{modalMessage}</Text>
+        <Button mt="md" fullWidth variant="default" onClick={handleModalClose}>
+          Aceptar
+        </Button>
+      </Modal>
+    </Center>
   );
 }

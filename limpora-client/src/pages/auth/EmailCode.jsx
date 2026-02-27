@@ -5,6 +5,17 @@ import { Modal } from "../../components/Modal";
 import logo from "../../assets/logo-provisional.png";
 import { useAuthStore } from "../../stores/auth.store";
 import lang from "../../utils/LangManager";
+import {
+  TextInput,
+  Button,
+  Paper,
+  Title,
+  Text,
+  Stack,
+  Image,
+  Center,
+  Anchor,
+} from "@mantine/core";
 
 export default function EmailCode() {
   const [code, setCode] = useState("");
@@ -53,60 +64,62 @@ export default function EmailCode() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-xl shadow-gray-200 border border-gray-300/20 space-y-6">
-        <header className="flex flex-col items-center">
-          <img
+    <Center mih="100vh" p="md">
+      <Paper w="100%" maw={448} p={32} withBorder >
+        <Stack align="center" mb="lg" gap="xs">
+          <Image
             src={logo}
             alt="Logo"
-            className="w-32 h-32 object-contain flex-shrink-0"
+            w={128}
+            h={128}
+            fit="contain"
           />
-          <h1 className="text-2xl font-light text-gray-800">
+          <Title order={1} fw={300} c="gray.8" fz="1.5rem">
             {lang("verification.title") || "Verifica tu email"}
-          </h1>
-          <p className="text-sm text-gray-600 mt-2">
+          </Title>
+          <Text size="sm" c="gray.6" ta="center">
             {lang("verification.subtitle") || "Ingresa el código enviado a tu correo"}
-          </p>
-        </header>
+          </Text>
+        </Stack>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="code"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              {lang("verification.code") || "Código"}
-            </label>
-            <input
+        <form onSubmit={handleSubmit}>
+          <Stack gap="lg">
+            <TextInput
               id="code"
               name="code"
-              type="text"
               required
-              className="w-full p-3 border border-gray-300/50 rounded-md shadow-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400/50 transition duration-150"
+              label={lang("verification.code") || "Código"}
               placeholder="123456"
-              onChange={(e) => setCode(e.target.value)}
               value={code}
+              onChange={(e) => setCode(e.currentTarget.value)}
+              size="md"
+              
             />
-          </div>
 
-          <button
-            type="submit"
-            className="w-full p-3 bg-gray-100 text-gray-800 font-medium rounded-lg shadow-sm border border-gray-300/50 transition duration-150 hover:bg-blue-200/70 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
-          >
-            {lang("verification.submit") || "Verificar"}
-          </button>
+            <Button
+              type="submit"
+              variant="default"
+              
+              size="md"
+              fullWidth
+            >
+              {lang("verification.submit") || "Verificar"}
+            </Button>
+          </Stack>
         </form>
 
-        <div className="text-center">
-          <button
+        <Center mt="md">
+          <Anchor
+            component="button"
             type="button"
+            size="sm"
+            c="gray.6"
             onClick={resendCode}
-            className="text-sm text-gray-600 hover:text-blue-800 transition duration-150"
           >
             {lang("verification.resend") || "Reenviar código"}
-          </button>
-        </div>
-      </div>
+          </Anchor>
+        </Center>
+      </Paper>
 
       <Modal
         isOpen={modalOpen}
@@ -117,6 +130,6 @@ export default function EmailCode() {
         title={modalTitle}
         message={modalMessage}
       />
-    </div>
+    </Center>
   );
 }

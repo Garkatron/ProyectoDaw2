@@ -1,10 +1,24 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Calendar from "../../components/Calendar";
 import Base from "../../layouts/Base";
-import { useAuthStore } from '../../stores/auth.store';
+import { useAuthStore } from "../../stores/auth.store";
 import { useEffect, useState } from "react";
 import { getUserServices } from "../../services/user_services.service";
-import { addAppointment, getAppointments } from '../../services/appointments.service';
+import { addAppointment, getAppointments } from "../../services/appointments.service";
+import {
+  Alert,
+  Box,
+  Button,
+  Group,
+  Loader,
+  Paper,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  UnstyledButton,
+} from "@mantine/core";
 
 const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal"];
 
@@ -14,6 +28,36 @@ const TIME_SLOTS = [
   "17:00", "17:30", "18:00", "18:30", "19:00",
 ];
 
+const LegendDot = ({ color, label }) => (
+  <Group gap={6}>
+    <Box w={10} h={10} style={{ borderRadius: "50%", backgroundColor: color }} />
+    <Text size="xs" c="gray.5">{label}</Text>
+  </Group>
+);
+
+const ToggleButton = ({ selected, onClick, children, fullWidth = false }) => (
+  <UnstyledButton
+    onClick={onClick}
+    style={{ width: fullWidth ? "100%" : undefined }}
+  >
+    <Paper
+      withBorder
+      p="sm"
+      radius="md"
+      ta="center"
+      style={{
+        cursor: "pointer",
+        backgroundColor: selected ? "var(--mantine-color-dark-8)" : "white",
+        borderColor: selected ? "var(--mantine-color-dark-8)" : "var(--mantine-color-gray-3)",
+        color: selected ? "white" : "var(--mantine-color-gray-7)",
+        transition: "all 0.15s",
+      }}
+    >
+      {children}
+    </Paper>
+  </UnstyledButton>
+);
+
 export default function BookingConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -21,55 +65,41 @@ export default function BookingConfirmation() {
 
   const providerId = location.state?.userId;
 
-  // Calendario
   const [markedDates, setMarkedDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
 
-  // Servicios del proveedor
   const [providerServices, setProviderServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(false);
 
-  // Formulario
   const [selectedTime, setSelectedTime] = useState(null);
-  const [selectedService, setSelectedService] = useState(null); // { service_id, name, price, ... }
+  const [selectedService, setSelectedService] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
 
-  // Envío
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  // Fetch appointments del proveedor para marcar días ocupados
   useEffect(() => {
     if (!providerId) return;
-
     const fetchAppointments = async () => {
       setLoadingAppts(true);
       try {
         const appointments = await getAppointments(providerId);
-
         const dateMap = {};
         appointments.forEach((appt) => {
           const dateKey = new Date(appt.date_time).toDateString();
           if (!dateMap[dateKey]) dateMap[dateKey] = [];
           dateMap[dateKey].push(appt);
         });
-
         const marks = Object.entries(dateMap).map(([, appts]) => {
           const date = new Date(appts[0].date_time);
           const statuses = appts.map((a) => a.status?.toLowerCase());
-
           let status = "Pending";
-          if (statuses.every((s) => s === "completed" || s === "cancelled")) {
-            status = "Completed";
-          } else if (statuses.some((s) => s === "in process")) {
-            status = "In Process";
-          }
-
+          if (statuses.every((s) => s === "completed" || s === "cancelled")) status = "Completed";
+          else if (statuses.some((s) => s === "in process")) status = "In Process";
           return { date, status };
         });
-
         setMarkedDates(marks);
       } catch (err) {
         console.error("Error fetching appointments:", err);
@@ -77,14 +107,11 @@ export default function BookingConfirmation() {
         setLoadingAppts(false);
       }
     };
-
     fetchAppointments();
   }, [providerId]);
 
-  // Fetch servicios del proveedor
   useEffect(() => {
     if (!providerId) return;
-
     const fetchServices = async () => {
       setLoadingServices(true);
       try {
@@ -96,7 +123,6 @@ export default function BookingConfirmation() {
         setLoadingServices(false);
       }
     };
-
     fetchServices();
   }, [providerId]);
 
@@ -104,9 +130,7 @@ export default function BookingConfirmation() {
     const mark = markedDates.find(
       (m) => new Date(m.date).toDateString() === date.toDateString()
     );
-    if (mark && (mark.status === "Pending" || mark.status === "In Process")) {
-      return;
-    }
+    if (mark && (mark.status === "Pending" || mark.status === "In Process")) return;
     setSelectedDate(date);
     setSelectedTime(null);
   };
@@ -117,12 +141,10 @@ export default function BookingConfirmation() {
     if (!canConfirm) return;
     setSubmitting(true);
     setError(null);
-
     try {
       const [hours, minutes] = selectedTime.split(":").map(Number);
       const dateTime = new Date(selectedDate);
       dateTime.setHours(hours, minutes, 0, 0);
-
       await addAppointment({
         date: dateTime.toISOString(),
         clientId: currentUser.id,
@@ -132,7 +154,6 @@ export default function BookingConfirmation() {
         paymentMethod,
         totalAmount: selectedService.price ?? 0,
       });
-
       setSuccess(true);
       setTimeout(() => navigate(-1), 2000);
     } catch (err) {
@@ -142,37 +163,31 @@ export default function BookingConfirmation() {
       setSubmitting(false);
     }
   };
-
+  
   return (
     <Base>
-      <div className="max-w-3xl mx-auto p-6 space-y-6">
+      <Stack maw={768} mx="auto" p="lg" gap="lg">
 
-        {/* CABECERA */}
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-800">Nueva reserva</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Proveedor ID: <span className="font-medium text-gray-700">{providerId}</span>
-          </p>
-        </div>
+        {/* Header */}
+        <Box>
+          <Title order={1} fz="1.5rem" fw={600} c="gray.8">Nueva reserva</Title>
+          <Text size="sm" c="gray.5" mt={4}>
+            Proveedor ID: <Text span fw={500} c="gray.7">{providerId}</Text>
+          </Text>
+        </Box>
 
-        {/* PASO 1 — CALENDARIO */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-700 mb-3">1. Selecciona un día</h2>
+        {/* Paso 1 — Calendario */}
+        <Paper withBorder  p="lg" shadow="sm">
+          <Text fw={600} c="gray.7" mb="sm">1. Selecciona un día</Text>
 
-          <div className="flex flex-wrap gap-4 mb-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Pendiente
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-400" /> En proceso
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-400" /> Completado
-            </span>
-          </div>
+          <Group gap="md" mb="md">
+            <LegendDot color="var(--mantine-color-yellow-4)" label="Pendiente" />
+            <LegendDot color="var(--mantine-color-blue-4)" label="En proceso" />
+            <LegendDot color="var(--mantine-color-green-4)" label="Completado" />
+          </Group>
 
           {loadingAppts && (
-            <p className="text-xs text-gray-400 mb-2 animate-pulse">Cargando disponibilidad...</p>
+            <Text size="xs" c="gray.4" mb="xs">Cargando disponibilidad...</Text>
           )}
 
           <Calendar
@@ -180,130 +195,145 @@ export default function BookingConfirmation() {
             onDateClick={handleDateClick}
             selectedDate={selectedDate}
           />
-        </div>
+        </Paper>
 
-        {/* PASO 2 — HORA */}
+        {/* Paso 2 — Hora */}
         {selectedDate && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-base font-semibold text-gray-700 mb-3">2. Selecciona una hora</h2>
-            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-              {TIME_SLOTS.map((slot) => {
-                const selected = selectedTime === slot;
-                return (
-                  <button
-                    key={slot}
-                    onClick={() => setSelectedTime(slot)}
-                    className={`py-2 rounded-lg text-sm font-medium border transition-all
-                      ${selected
-                        ? "bg-gray-800 text-white border-gray-800 shadow"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
-                      }`}
-                  >
-                    {slot}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <Paper withBorder  p="lg" >
+            <Text fw={600} c="gray.7" mb="sm">2. Selecciona una hora</Text>
+            <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
+              {TIME_SLOTS.map((slot) => (
+                <ToggleButton
+                  key={slot}
+                  selected={selectedTime === slot}
+                  onClick={() => setSelectedTime(slot)}
+                >
+                  <Text size="sm" fw={500}>{slot}</Text>
+                </ToggleButton>
+              ))}
+            </SimpleGrid>
+          </Paper>
         )}
 
-        {/* PASO 3 — SERVICIO Y PAGO */}
+        {/* Paso 3 — Servicio y pago */}
         {selectedDate && selectedTime && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
-            <h2 className="text-base font-semibold text-gray-700">3. Detalles de la reserva</h2>
+          <Paper withBorder  p="lg" shadow="sm">
+            <Text fw={600} c="gray.7" mb="lg">3. Detalles de la reserva</Text>
 
-            {/* SELECTOR DE SERVICIO */}
-            <div>
-              <label className="block text-sm text-gray-600 mb-1.5 font-medium">
-                Servicio
-              </label>
-              {loadingServices ? (
-                <p className="text-xs text-gray-400 animate-pulse">Cargando servicios...</p>
-              ) : providerServices.length === 0 ? (
-                <p className="text-sm text-gray-400 italic">Este proveedor no tiene servicios disponibles.</p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {providerServices.map((svc) => {
-                    const isSelected = selectedService?.service_id === svc.service_id;
-                    return (
-                      <button
-                        key={svc.service_id}
-                        onClick={() => setSelectedService(svc)}
-                        className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm border transition-all text-left
-                          ${isSelected
-                            ? "bg-gray-800 text-white border-gray-800 shadow"
-                            : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
-                          }`}
-                      >
-                        <span className="font-medium">{svc.name ?? svc.service_name ?? `Servicio #${svc.service_id}`}</span>
-                        {svc.price != null && (
-                          <span className={`ml-2 text-xs font-semibold ${isSelected ? "text-gray-300" : "text-gray-400"}`}>
-                            {svc.price} €
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <Stack gap="lg">
+              {/* Servicio */}
+              <Box>
+                <Text size="sm" fw={500} c="gray.6" mb="xs">Servicio</Text>
+                {loadingServices ? (
+                  <Stack gap="xs">
+                    <Skeleton height={48} radius="md" />
+                    <Skeleton height={48} radius="md" />
+                  </Stack>
+                ) : providerServices.length === 0 ? (
+                  <Text size="sm" c="red.4" fs="italic">
+                    Este proveedor no tiene servicios disponibles.
+                  </Text>
+                ) : (
+                  <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
+                    {providerServices.map((svc) => {
+                      const isSelected = selectedService?.service_id === svc.service_id;
+                      return (
+                        <UnstyledButton key={svc.service_id} onClick={() => setSelectedService(svc)}>
+                          <Paper
+                            withBorder
+                            px="md"
+                            py="sm"
+                            radius="md"
+                            style={{
+                              cursor: "pointer",
+                              backgroundColor: isSelected ? "var(--mantine-color-dark-8)" : "white",
+                              borderColor: isSelected ? "var(--mantine-color-dark-8)" : "var(--mantine-color-gray-3)",
+                              transition: "all 0.15s",
+                            }}
+                          >
+                            <Group justify="space-between">
+                              <Text size="sm" fw={500} c={isSelected ? "white" : "gray.7"}>
+                                {svc.name ?? svc.service_name ?? `Servicio #${svc.service_id}`}
+                              </Text>
+                              {svc.price != null && (
+                                <Text size="xs" fw={600} c={isSelected ? "gray.4" : "gray.4"}>
+                                  {svc.price} €
+                                </Text>
+                              )}
+                            </Group>
+                          </Paper>
+                        </UnstyledButton>
+                      );
+                    })}
+                  </SimpleGrid>
+                )}
+              </Box>
 
-            {/* MÉTODO DE PAGO */}
-            <div>
-              <label className="block text-sm text-gray-600 mb-1.5 font-medium">
-                Método de pago
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {PAYMENT_METHODS.map((method) => (
-                  <button
-                    key={method}
-                    onClick={() => setPaymentMethod(method)}
-                    className={`py-2.5 rounded-xl text-sm font-medium border transition-all
-                      ${paymentMethod === method
-                        ? "bg-gray-800 text-white border-gray-800 shadow"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
-                      }`}
-                  >
-                    {method}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+              {/* Método de pago */}
+              <Box>
+                <Text size="sm" fw={500} c="gray.6" mb="xs">Método de pago</Text>
+                <SimpleGrid cols={3} spacing="xs">
+                  {PAYMENT_METHODS.map((method) => (
+                    <ToggleButton
+                      key={method}
+                      selected={paymentMethod === method}
+                      onClick={() => setPaymentMethod(method)}
+                    >
+                      <Text size="sm" fw={500}>{method}</Text>
+                    </ToggleButton>
+                  ))}
+                </SimpleGrid>
+              </Box>
+            </Stack>
+          </Paper>
         )}
 
-        {/* RESUMEN + CONFIRMAR */}
+        {/* Resumen + Confirmar */}
         {canConfirm && (
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
-            <h2 className="text-base font-semibold text-gray-700">Resumen</h2>
-            <ul className="text-sm text-gray-600 space-y-1.5">
-              <li>📅 <span className="font-medium">Fecha:</span>{" "}
-                {selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-              </li>
-              <li>🕐 <span className="font-medium">Hora:</span> {selectedTime}</li>
-              <li>🛠 <span className="font-medium">Servicio:</span>{" "}
+          <Paper withBorder  p="lg" bg="gray.0" shadow="sm">
+            <Text fw={600} c="gray.7" mb="md">Resumen</Text>
+            <Stack gap={6} mb="lg">
+              <Text size="sm" c="gray.6">
+                📅 <Text span fw={500}>Fecha:</Text>{" "}
+                {selectedDate.toLocaleDateString("es-ES", {
+                  weekday: "long", year: "numeric", month: "long", day: "numeric",
+                })}
+              </Text>
+              <Text size="sm" c="gray.6">
+                🕐 <Text span fw={500}>Hora:</Text> {selectedTime}
+              </Text>
+              <Text size="sm" c="gray.6">
+                🛠 <Text span fw={500}>Servicio:</Text>{" "}
                 {selectedService.name ?? selectedService.service_name ?? `#${selectedService.service_id}`}
                 {selectedService.price != null && ` — ${selectedService.price} €`}
-              </li>
-              <li>💳 <span className="font-medium">Pago:</span> {paymentMethod}</li>
-            </ul>
+              </Text>
+              <Text size="sm" c="gray.6">
+                💳 <Text span fw={500}>Pago:</Text> {paymentMethod}
+              </Text>
+            </Stack>
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && <Alert color="red" radius="md" mb="md">{error}</Alert>}
             {success && (
-              <p className="text-sm text-green-600 font-medium">✅ Cita confirmada. Redirigiendo...</p>
+              <Alert color="green" radius="md" mb="md">
+                ✅ Cita confirmada. Redirigiendo...
+              </Alert>
             )}
 
-            <button
+            <Button
               onClick={handleConfirm}
               disabled={submitting || success}
-              className="w-full py-3 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-300 text-white text-sm font-semibold rounded-xl transition-all shadow"
+              loading={submitting}
+              color="dark"
+              
+              size="md"
+              fullWidth
             >
-              {submitting ? "Confirmando..." : "Confirmar reserva"}
-            </button>
-          </div>
+              Confirmar reserva
+            </Button>
+          </Paper>
         )}
 
-      </div>
+      </Stack>
     </Base>
   );
 }

@@ -1,31 +1,47 @@
-import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { Avatar, Box, Button, Center, Text } from '@mantine/core';
+import { LogOut } from 'lucide-react';
 
 export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
     return (
-        <div className="relative">
-            <div
-                className="h-56 w-full rounded-t-lg bg-gray-200 flex items-center justify-center text-gray-400 text-lg"
+        <Box style={{ position: 'relative' }}>
+            {/* Banner */}
+            <Box
+                h={224}
+                style={{
+                    borderRadius: 'var(--mantine-radius-md) var(--mantine-radius-md) 0 0',
+                    background: 'var(--mantine-color-default-hover)',
+                }}
             >
-                Fondo de usuario
-            </div>
+                <Center h="100%">
+                    <Text c="dimmed">Fondo de usuario</Text>
+                </Center>
+            </Box>
 
-            <div className="absolute left-6 -bottom-10">
-                <div className="w-24 h-24 rounded-full bg-gray-100 border border-gray-300 flex items-center justify-center text-3xl font-bold text-gray-600">
+            {/* Avatar */}
+            <Box style={{ position: 'absolute', left: 24, bottom: -40 }}>
+                <Avatar
+                    size={96}
+                    radius="50%"
+                    fw={700}
+                    fz="1.875rem"
+                >
                     {targetUser.name[0].toUpperCase()}
-                </div>
-            </div>
+                </Avatar>
+            </Box>
 
+            {/* Logout */}
             {isSelf && (
-                <div className="absolute top-4 right-4">
-                    <button
+                <Box style={{ position: 'absolute', top: 16, right: 16 }}>
+                    <Button
+                        variant="default"
+                        size="xs"
+                        leftSection={<LogOut size={14} />}
                         onClick={onLogout}
-                        className="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border border-gray-300 text-sm font-medium transition-colors"
                     >
-                        <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                        <span>Logout</span>
-                    </button>
-                </div>
+                        Logout
+                    </Button>
+                </Box>
             )}
-        </div>
+        </Box>
     );
 }

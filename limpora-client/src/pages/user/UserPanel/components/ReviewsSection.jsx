@@ -1,5 +1,17 @@
 import lang from '../../../../utils/LangManager';
 import ReviewCard from './cards/ReviewCard';
+import {
+    Alert,
+    Button,
+    Divider,
+    Group,
+    SimpleGrid,
+    Stack,
+    Text,
+    Textarea,
+    Title,
+    UnstyledButton,
+} from '@mantine/core';
 
 export default function ReviewsSection({
     userReviews,
@@ -14,67 +26,76 @@ export default function ReviewsSection({
     onSubmit,
 }) {
     return (
-        <div className="space-y-6">
-            <div>
-                <h2 className="text-xl font-light text-gray-700 pb-2 border-b border-gray-200">
-                    {lang('userpanel.title.reviews')}
-                </h2>
+        <Stack gap="md">
+            <Title order={2} fw={300} fz="xl">
+                {lang('userpanel.title.reviews')}
+            </Title>
+            <Divider />
 
-                {userReviews.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        {userReviews.map((review) => (
-                            <ReviewCard key={review.id} review={review} />
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-gray-500 mt-4">No hay reseñas aún.</p>
-                )}
-            </div>
+            {userReviews.length > 0 ? (
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                    {userReviews.map((review) => (
+                        <ReviewCard key={review.id} review={review} />
+                    ))}
+                </SimpleGrid>
+            ) : (
+                <Text size="sm" c="dimmed">No hay reseñas aún.</Text>
+            )}
 
             {canReview && (
-                <div className="pt-4 border-t border-gray-200 space-y-4">
-                    <h3 className="text-lg font-light text-gray-700">Dejar una reseña</h3>
+                <Stack gap="sm" pt="sm">
+                    <Divider />
+                    <Title order={3} fw={300} fz="lg">Dejar una reseña</Title>
 
                     {reviewSuccess && (
-                        <p className="text-green-600 text-sm">¡Reseña enviada correctamente!</p>
+                        <Alert color="green" variant="light">¡Reseña enviada correctamente!</Alert>
                     )}
                     {reviewError && (
-                        <p className="text-red-500 text-sm">{reviewError}</p>
+                        <Alert color="red" variant="light">{reviewError}</Alert>
                     )}
 
-                    <form onSubmit={onSubmit} className="space-y-3">
-                        <div className="flex space-x-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    type="button"
-                                    onClick={() => setReviewRating(star)}
-                                    className={`text-2xl transition-colors ${star <= reviewRating ? 'text-yellow-400' : 'text-gray-300'}`}
-                                >
-                                    ★
-                                </button>
-                            ))}
-                        </div>
+                    <form onSubmit={onSubmit}>
+                        <Stack gap="sm">
+                            <Group gap={4}>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <UnstyledButton
+                                        key={star}
+                                        type="button"
+                                        onClick={() => setReviewRating(star)}
+                                        fz="1.5rem"
+                                        style={{
+                                            color: star <= reviewRating
+                                                ? 'var(--mantine-color-yellow-4)'
+                                                : 'var(--mantine-color-default-border)',
+                                            transition: 'color 0.15s',
+                                        }}
+                                    >
+                                        ★
+                                    </UnstyledButton>
+                                ))}
+                            </Group>
 
-                        <textarea
-                            value={reviewContent}
-                            onChange={(e) => setReviewContent(e.target.value)}
-                            required
-                            placeholder="Escribe tu reseña..."
-                            rows={3}
-                            className="w-full p-3 bg-gray-100 border border-gray-300 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-300 transition resize-none"
-                        />
+                            <Textarea
+                                value={reviewContent}
+                                onChange={(e) => setReviewContent(e.target.value)}
+                                required
+                                placeholder="Escribe tu reseña..."
+                                rows={3}
+                                resize="none"
+                            />
 
-                        <button
-                            type="submit"
-                            disabled={reviewSubmitting}
-                            className="px-5 py-2 bg-gray-100 text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition disabled:opacity-50"
-                        >
-                            {reviewSubmitting ? 'Enviando...' : 'Enviar reseña'}
-                        </button>
+                            <Button
+                                type="submit"
+                                variant="default"
+                                loading={reviewSubmitting}
+                                w="fit-content"
+                            >
+                                Enviar reseña
+                            </Button>
+                        </Stack>
                     </form>
-                </div>
+                </Stack>
             )}
-        </div>
+        </Stack>
     );
 }

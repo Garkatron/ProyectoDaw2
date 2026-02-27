@@ -1,5 +1,18 @@
 import lang from '../../../../utils/LangManager';
 import ServiceCard from './cards/ServiceCard';
+import {
+    Alert,
+    Button,
+    Divider,
+    Group,
+    NumberInput,
+    Select,
+    SimpleGrid,
+    Stack,
+    Text,
+    Title,
+} from '@mantine/core';
+import { useState } from 'react';
 
 export default function ServicesSection({
     isSelf,
@@ -14,14 +27,19 @@ export default function ServicesSection({
     serviceSubmitting,
     serviceError,
 }) {
+    const availableServices = allServices
+        .filter((s) => !userServices.some((us) => us.service_id === s.id))
+        .map((s) => ({ value: String(s.id), label: s.name }));
+
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-light text-gray-700 pb-2 border-b border-gray-200">
+        <Stack gap="md">
+            <Title order={2} fw={300} fz="xl">
                 {lang('userpanel.title.services') ?? 'Servicios'}
-            </h2>
+            </Title>
+            <Divider />
 
             {userServices.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
                     {userServices.map((service) => (
                         <ServiceCard
                             key={service.service_id}
@@ -30,55 +48,52 @@ export default function ServicesSection({
                             onDelete={onDelete}
                         />
                     ))}
-                </div>
+                </SimpleGrid>
             ) : (
-                <p className="text-gray-500 text-sm mt-2">No hay servicios registrados.</p>
+                <Text size="sm" c="dimmed">No hay servicios registrados.</Text>
             )}
 
             {isSelf && (
-                <div className="pt-4 border-t border-gray-200 space-y-3">
-                    <h3 className="text-lg font-light text-gray-700">Añadir servicio</h3>
+                <Stack gap="sm" pt="sm">
+                    <Divider />
+                    <Title order={3} fw={300} fz="lg">Añadir servicio</Title>
 
-                    {serviceError && <p className="text-red-500 text-sm">{serviceError}</p>}
+                    {serviceError && (
+                        <Alert color="red" variant="light">{serviceError}</Alert>
+                    )}
 
-                    <form onSubmit={onAdd} className="flex flex-col sm:flex-row gap-3">
-                        <select
-                            value={selectedServiceId}
-                            onChange={(e) => setSelectedServiceId(Number(e.target.value))}
-                            required
-                            className="flex-1 p-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
-                        >
-                            <option value="">Selecciona un servicio...</option>
-                            {allServices
-                                .filter((s) => !userServices.some((us) => us.service_id === s.id))
-                                .map((s) => (
-                                    <option key={s.id} value={s.id}>
-                                        {s.name}
-                                    </option>
-                                ))}
-                        </select>
+                    <form onSubmit={onAdd}>
+                        <Group align="flex-end" gap="sm" wrap="wrap">
+                            <Select
+                                style={{ flex: 1, minWidth: 180 }}
+                                placeholder="Selecciona un servicio..."
+                                data={availableServices}
+                                value={selectedServiceId ? String(selectedServiceId) : null}
+                                onChange={(val) => setSelectedServiceId(Number(val))}
+                                required
+                            />
 
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={selectedServicePrice}
-                            onChange={(e) => setSelectedServicePrice(e.target.value)}
-                            required
-                            placeholder="Precio (€)"
-                            className="w-32 p-2 bg-gray-100 border border-gray-300 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-300 transition"
-                        />
+                            <NumberInput
+                                w={128}
+                                placeholder="Precio (€)"
+                                min={0}
+                                decimalScale={2}
+                                value={selectedServicePrice}
+                                onChange={setSelectedServicePrice}
+                                required
+                            />
 
-                        <button
-                            type="submit"
-                            disabled={serviceSubmitting}
-                            className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition disabled:opacity-50"
-                        >
-                            {serviceSubmitting ? 'Añadiendo...' : 'Añadir'}
-                        </button>
+                            <Button
+                                type="submit"
+                                variant="default"
+                                loading={serviceSubmitting}
+                            >
+                                Añadir
+                            </Button>
+                        </Group>
                     </form>
-                </div>
+                </Stack>
             )}
-        </div>
+        </Stack>
     );
 }
