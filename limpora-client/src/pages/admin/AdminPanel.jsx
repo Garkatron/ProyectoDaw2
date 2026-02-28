@@ -1,18 +1,26 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminUserCard from "../../components/admin/AdminUserCard";
-import AdminModal from "../../components/admin/AdminModal";
 import Alert from "../../components/Alert";
-
-import {
-  UserPlusIcon,
-  TrashIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-} from "@heroicons/react/24/outline";
 import { deleteUser } from "../../services/user.service";
+import { UserPlus, Search } from "lucide-react";
+import {
+  Box,
+  Button,
+  Grid,
+  Group,
+  Loader,
+  Modal,
+  Paper,
+  Select,
+  SimpleGrid,
+  Stack,
+  Text,
+  TextInput,
+  PasswordInput,
+  Title,
+  Alert as MantineAlert,
+} from "@mantine/core";
 
 export default function AdminPanel() {
   const [users, setUsers] = useState([]);
@@ -24,39 +32,20 @@ export default function AdminPanel() {
   const [showRegisterAdminModal, setShowRegisterAdminModal] = useState(false);
   const [alert, setAlert] = useState(null);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "client",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "client" });
+  const [adminFormData, setAdminFormData] = useState({ name: "", email: "", password: "" });
 
-  const [adminFormData, setAdminFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    filterUsers();
-  }, [searchTerm, filterRole, users]);
+  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => { filterUsers(); }, [searchTerm, filterRole, users]);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/api/v1/user", {
-        withCredentials: true,
-      });
-      const allUsers = response.data.data || [];
-      const nonAdminUsers = allUsers.filter((u) => u.role !== "admin");
-      setUsers(allUsers);
-      setFilteredUsers(allUsers);
+      const response = await axios.get("/api/v1/user", { withCredentials: true });
+      setUsers(response.data.data || []);
+      setFilteredUsers(response.data.data || []);
     } catch (err) {
-      console.error("Error fetching users:", err);
+      console.error(err);
       showAlert("error", "Error al cargar usuarios");
     } finally {
       setLoading(false);
@@ -65,89 +54,43 @@ export default function AdminPanel() {
 
   const filterUsers = () => {
     let filtered = users;
-
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (u) =>
-          u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          u.email.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-    }
-
-    if (filterRole !== "all") {
-      filtered = filtered.filter((u) => u.role === filterRole);
-    }
-
+    if (searchTerm) filtered = filtered.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (filterRole !== "all") filtered = filtered.filter(u => u.role === filterRole);
     setFilteredUsers(filtered);
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
     try {
-      await axios.post(
-        "/api/v1/auth/register",
-        {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        },
-        {
-          withCredentials: true,
-        },
-      );
-
-      showAlert("success", `Usuario ${formData.name} registrado exitosamente`);
+      await axios.post("/api/v1/auth/register", formData, { withCredentials: true });
+      showAlert("success", `Usuario ${formData.name} registrado`);
       setShowRegisterModal(false);
       setFormData({ name: "", email: "", password: "", role: "client" });
       fetchUsers();
     } catch (err) {
-      console.error("Error registering user:", err);
-      showAlert(
-        "error",
-        err.response?.data?.message || "Error al registrar usuario",
-      );
+      console.error(err);
+      showAlert("error", err.response?.data?.message || "Error al registrar usuario");
     }
   };
 
   const handleRegisterAdmin = async (e) => {
     e.preventDefault();
-
     try {
-      await axios.post(
-        "/api/v1/auth/reg_admin",
-        {
-          email: adminFormData.email,
-          password: adminFormData.password,
-          name: adminFormData.name,
-        },
-        {
-          withCredentials: true,
-        },
-      );
-
-      showAlert(
-        "success",
-        `Admin ${adminFormData.email} registrado exitosamente`,
-      );
+      await axios.post("/api/v1/auth/reg_admin", adminFormData, { withCredentials: true });
+      showAlert("success", `Admin ${adminFormData.email} registrado`);
       setShowRegisterAdminModal(false);
       setAdminFormData({ name: "", email: "", password: "" });
     } catch (err) {
-      console.error("Error registering admin:", err);
-      showAlert(
-        "error",
-        err.response?.data?.message || "Error al registrar admin",
-      );
+      console.error(err);
+      showAlert("error", err.response?.data?.message || "Error al registrar admin");
     }
   };
 
   const handleDelete = async (user) => {
-    if (!window.confirm(`¿Estás seguro de eliminar a ${user.name}?`)) return;
-
+    if (!window.confirm(`¿Eliminar a ${user.name}?`)) return;
     try {
       await deleteUser(user.firebase_uid);
-      showAlert("success", `Usuario ${user.name} eliminado exitosamente`);
+      showAlert("success", `Usuario ${user.name} eliminado`);
       fetchUsers();
     } catch (err) {
       showAlert("error", err.message || "Error al eliminar usuario");
@@ -161,279 +104,208 @@ export default function AdminPanel() {
 
   const stats = {
     total: users.length,
-    providers: users.filter((u) => u.role === "provider").length,
-    clients: users.filter((u) => u.role === "client").length,
+    providers: users.filter(u => u.role === "provider").length,
+    clients: users.filter(u => u.role === "client").length,
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-6">
+    <Box mih="100vh" bg="gray.0">
+      <Stack maw={1280} mx="auto" p="md" gap="md">
+
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-xl border border-gray-300/20 p-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="text-3xl font-semibold text-gray-800">
+        <Paper withBorder p="lg" >
+          <Group justify="space-between" wrap="wrap">
+            <Box>
+              <Title order={1} fz="1.875rem" fw={600} c="gray.8">
                 Panel de Administración
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Gestiona usuarios del sistema
-              </p>
-            </div>
-            <div className="flex space-x-3">
-              <button
+              </Title>
+              <Text size="sm" c="gray.5" mt={4}>Gestiona usuarios del sistema</Text>
+            </Box>
+            <Group gap="sm">
+              <Button
+                leftSection={<UserPlus size={18} />}
                 onClick={() => setShowRegisterModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition-colors"
               >
-                <UserPlusIcon className="h-5 w-5" />
-                <span>Nuevo Usuario</span>
-              </button>
-              <button
+                Nuevo Usuario
+              </Button>
+              <Button
+                leftSection={<UserPlus size={18} />}
+                color="dark"
                 onClick={() => setShowRegisterAdminModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg shadow-sm transition-colors"
               >
-                <UserPlusIcon className="h-5 w-5" />
-                <span>Nuevo Admin</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+                Nuevo Admin
+              </Button>
+            </Group>
+          </Group>
+        </Paper>
 
-      {alert && (
-        <Alert
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300/20">
-          <p className="text-xs font-light text-gray-500 uppercase">
-            Total Usuarios
-          </p>
-          <p className="text-3xl font-semibold text-gray-800 mt-2">
-            {stats.total}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300/20">
-          <p className="text-xs font-light text-gray-500 uppercase">
-            Proveedores
-          </p>
-          <p className="text-3xl font-semibold text-blue-600 mt-2">
-            {stats.providers}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300/20">
-          <p className="text-xs font-light text-gray-500 uppercase">Clientes</p>
-          <p className="text-3xl font-semibold text-purple-600 mt-2">
-            {stats.clients}
-          </p>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-300/20 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar por nombre o email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <select
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">Todos los roles</option>
-            <option value="provider">Proveedores</option>
-            <option value="client">Clientes</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Users List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-300/20 p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Usuarios ({filteredUsers.length})
-        </h2>
-
-        {loading ? (
-          <p className="text-gray-500 text-center py-8">Cargando usuarios...</p>
-        ) : filteredUsers.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
-            No se encontraron usuarios
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredUsers.map((user) => (
-              <AdminUserCard
-                key={user.id}
-                user={user}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
+        {alert && (
+          <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
         )}
-      </div>
 
-      {/* Register Modal */}
-      <AdminModal
-        isOpen={showRegisterModal}
+        {/* Stats */}
+        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+          <Paper withBorder p="lg"  ta="center">
+            <Text size="xs" fw={300} c="gray.5" tt="uppercase">Total Usuarios</Text>
+            <Text fz="1.875rem" fw={600} c="gray.8" mt="xs">{stats.total}</Text>
+          </Paper>
+          <Paper withBorder p="lg"  ta="center">
+            <Text size="xs" fw={300} c="gray.5" tt="uppercase">Proveedores</Text>
+            <Text fz="1.875rem" fw={600} c="blue.6" mt="xs">{stats.providers}</Text>
+          </Paper>
+          <Paper withBorder p="lg"  ta="center">
+            <Text size="xs" fw={300} c="gray.5" tt="uppercase">Clientes</Text>
+            <Text fz="1.875rem" fw={600} c="violet.6" mt="xs">{stats.clients}</Text>
+          </Paper>
+        </SimpleGrid>
+
+        {/* Filters */}
+        <Paper withBorder p="md" >
+          <Grid>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <TextInput
+                placeholder="Buscar nombre o email..."
+                leftSection={<Search size={16} />}
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.currentTarget.value)}
+                
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Select
+                value={filterRole}
+                onChange={setFilterRole}
+                
+                data={[
+                  { value: "all", label: "Todos los roles" },
+                  { value: "provider", label: "Proveedores" },
+                  { value: "client", label: "Clientes" },
+                ]}
+              />
+            </Grid.Col>
+          </Grid>
+        </Paper>
+
+        {/* Users List */}
+        <Paper withBorder p="lg" >
+          <Title order={2} fz="1.25rem" fw={600} c="gray.8" mb="md">
+            Usuarios ({filteredUsers.length})
+          </Title>
+          {loading ? (
+            <Group justify="center" py={32}>
+              <Loader size="sm" />
+              <Text c="gray.5">Cargando usuarios...</Text>
+            </Group>
+          ) : filteredUsers.length === 0 ? (
+            <Text c="gray.5" ta="center" py={32}>No se encontraron usuarios</Text>
+          ) : (
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+              {filteredUsers.map(user => (
+                <AdminUserCard key={user.id} user={user} onDelete={handleDelete} />
+              ))}
+            </SimpleGrid>
+          )}
+        </Paper>
+      </Stack>
+
+      {/* Register User Modal */}
+      <Modal
+        opened={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
         title="Registrar Nuevo Usuario"
+        
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre
-            </label>
-            <input
-              type="text"
+        <form onSubmit={handleRegister}>
+          <Stack gap="sm">
+            <TextInput
+              label="Nombre"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={e => setFormData({ ...formData, name: e.currentTarget.value })}
+              
+              required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
+            <TextInput
+              label="Email"
               type="email"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={e => setFormData({ ...formData, email: e.currentTarget.value })}
+              
+              required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contraseña
-            </label>
-            <input
-              type="password"
+            <PasswordInput
+              label="Contraseña"
               value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={e => setFormData({ ...formData, password: e.currentTarget.value })}
+              
+              required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Rol
-            </label>
-            <select
+            <Select
+              label="Rol"
               value={formData.role}
-              onChange={(e) =>
-                setFormData({ ...formData, role: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="client">Cliente</option>
-              <option value="provider">Proveedor</option>
-            </select>
-          </div>
-
-          <div className="flex space-x-3 pt-4">
-            <button
-              onClick={() => setShowRegisterModal(false)}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleRegister}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              Registrar
-            </button>
-          </div>
-        </div>
-      </AdminModal>
+              onChange={val => setFormData({ ...formData, role: val })}
+              
+              data={[
+                { value: "client", label: "Cliente" },
+                { value: "provider", label: "Proveedor" },
+              ]}
+            />
+            <Group grow mt="sm">
+              <Button variant="default"  onClick={() => setShowRegisterModal(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" >
+                Registrar
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
 
       {/* Register Admin Modal */}
-      <AdminModal
-        isOpen={showRegisterAdminModal}
+      <Modal
+        opened={showRegisterAdminModal}
         onClose={() => setShowRegisterAdminModal(false)}
         title="Registrar Nuevo Administrador"
+        
       >
-        <div className="space-y-4">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-            <p className="text-sm text-yellow-800">
+        <form onSubmit={handleRegisterAdmin}>
+          <Stack gap="sm">
+            <MantineAlert color="yellow" >
               ⚠️ Los administradores tienen acceso completo al sistema.
-            </p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              type="Name"
+            </MantineAlert>
+            <TextInput
+              label="Nombre"
               value={adminFormData.name}
-              onChange={(e) =>
-                setAdminFormData({ ...adminFormData, name: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              onChange={e => setAdminFormData({ ...adminFormData, name: e.currentTarget.value })}
+              
+              required
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
+            <TextInput
+              label="Email"
               type="email"
               value={adminFormData.email}
-              onChange={(e) =>
-                setAdminFormData({ ...adminFormData, email: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              onChange={e => setAdminFormData({ ...adminFormData, email: e.currentTarget.value })}
+              
+              required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contraseña
-            </label>
-            <input
-              type="password"
+            <PasswordInput
+              label="Contraseña"
               value={adminFormData.password}
-              onChange={(e) =>
-                setAdminFormData({ ...adminFormData, password: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              onChange={e => setAdminFormData({ ...adminFormData, password: e.currentTarget.value })}
+              
+              required
             />
-          </div>
-
-          <div className="flex space-x-3 pt-4">
-            <button
-              onClick={() => setShowRegisterAdminModal(false)}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleRegisterAdmin}
-              className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-lg transition-colors"
-            >
-              Registrar Admin
-            </button>
-          </div>
-        </div>
-      </AdminModal>
-    </div>
+            <Group grow mt="sm">
+              <Button variant="default"  onClick={() => setShowRegisterAdminModal(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" color="dark" >
+                Registrar Admin
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
+    </Box>
   );
 }

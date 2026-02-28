@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 const Base = ({ children }) => {
     return (
         // Usamos min-h-screen para que ocupe al menos la altura del viewport
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
           <Navbar />
             {children}
         </div>

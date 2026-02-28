@@ -1,166 +1,157 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import {
+  ActionIcon,
+  Box,
+  Group,
+  Indicator,
+  Paper,
+  SimpleGrid,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const MONTHS = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+const statusColorMap = {
+  Completed: "green",
+  Pending: "yellow",
+  "In Process": "blue",
+};
 
 /**
  * Calendar Component
- * 
- * @param {Object} props
- * @param {Array} props.markedDates - Array de objetos { date: Date|string, color: string, status?: string }
- * @param {Function} props.onDateClick - Callback (date: Date) => void cuando se hace click en un día
- * @param {Date} props.selectedDate - Fecha seleccionada externamente (opcional)
+ *
+ * @param {Array}    markedDates  - Array de { date: Date|string, status?: string }
+ * @param {Function} onDateClick  - Callback (date: Date) => void
+ * @param {Date}     selectedDate - Fecha seleccionada externamente
  */
-export default function Calendar({ 
-  markedDates = [], 
-  onDateClick,
-  selectedDate 
-}) {
+export default function Calendar({ markedDates = [], onDateClick, selectedDate }) {
   const [current, setCurrent] = useState(new Date());
 
-  const months = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-  ];
-  const weekdays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
-  function changeMonth(offset) {
+  const changeMonth = (offset) =>
     setCurrent(new Date(current.getFullYear(), current.getMonth() + offset, 1));
-  }
-
-  function handleDayClick(day) {
-    if (onDateClick) {
-      onDateClick(day.date);
-    }
-    setCurrent(day.date);
-  }
-
-  return (
-    <div className="w-full max-w-md mx-auto p-4 sm:p-6 bg-white rounded-xl border border-gray-200/60 shadow-sm">
-      <header className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <h2 className="text-gray-800 text-lg sm:text-xl font-semibold w-full sm:w-auto text-center sm:text-left">
-          {months[current.getMonth()]} {current.getFullYear()}
-        </h2>
-
-        <div className="flex gap-2 mx-auto sm:mx-0">
-          <button
-            onClick={() => changeMonth(-1)}
-            className="w-9 h-9 bg-white border border-gray-200 rounded-lg text-gray-600 shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center font-medium"
-            aria-label="Mes anterior"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => changeMonth(1)}
-            className="w-9 h-9 bg-white border border-gray-200 rounded-lg text-gray-600 shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center font-medium"
-            aria-label="Mes siguiente"
-          >
-            ›
-          </button>
-        </div>
-      </header>
-
-      <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center mb-3">
-        {weekdays.map((w) => (
-          <div
-            key={w}
-            className="text-[10px] sm:text-xs text-gray-400 font-semibold uppercase tracking-wide"
-          >
-            {w}
-          </div>
-        ))}
-      </div>
-
-      <CalendarDays
-        day={current}
-        selectedDate={selectedDate}
-        markedDates={markedDates}
-        onDayClick={handleDayClick}
-      />
-    </div>
-  );
-}
-
-function CalendarDays({ day, selectedDate, markedDates, onDayClick }) {
-  const year = day.getFullYear();
-  const month = day.getMonth();
-
-  const first = new Date(year, month, 1);
-  const start = new Date(first);
-  start.setDate(first.getDate() - first.getDay());
 
   const normalizedMarks = markedDates.map((m) => ({
-    date: typeof m.date === "string" ? new Date(m.date) : m.date,
-    color: m.color || "bg-blue-100",
+    date: m.date instanceof Date ? m.date : new Date(m.date),
     status: m.status,
+    color: statusColorMap[m.status] ?? "gray",
   }));
 
-  const days = [];
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
+  // Build 42-day grid
+  const year = current.getFullYear();
+  const month = current.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startDate = new Date(firstDay);
+  startDate.setDate(firstDay.getDate() - firstDay.getDay());
+
+  const days = Array.from({ length: 42 }, (_, i) => {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
 
     const mark = normalizedMarks.find(
-      (m) =>
-        m.date.getDate() === d.getDate() &&
-        m.date.getMonth() === d.getMonth() &&
-        m.date.getFullYear() === d.getFullYear()
+      (m) => m.date.toDateString() === date.toDateString()
     );
-
+    const isCurrentMonth = date.getMonth() === month;
     const isSelected = selectedDate
-      ? d.toDateString() === selectedDate.toDateString()
-      : d.toDateString() === day.toDateString();
+      ? date.toDateString() === selectedDate.toDateString()
+      : date.toDateString() === current.toDateString();
 
-    days.push({
-      date: d,
-      number: d.getDate(),
-      currentMonth: d.getMonth() === month,
-      selected: isSelected,
-      mark,
-      key: d.toISOString(),
-    });
-  }
+    return { date, mark, isCurrentMonth, isSelected };
+  });
 
   return (
-    <div className="grid grid-cols-7 gap-1 sm:gap-2">
-      {days.map((d) => {
-        let baseClasses =
-          "min-w-0 h-9 sm:h-11 rounded-lg text-xs sm:text-sm flex flex-col items-center justify-center border transition-all relative overflow-hidden";
+    <Paper withBorder p="md" radius="md" w="100%" maw={400} mx="auto">
+      {/* Header */}
+      <Group justify="space-between" align="center" mb="md">
+        <Text fw={600} fz="lg">
+          {MONTHS[month]} {year}
+        </Text>
+        <Group gap="xs">
+          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
+            <ChevronLeft size={16} />
+          </ActionIcon>
+          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(1)} aria-label="Mes siguiente">
+            <ChevronRight size={16} />
+          </ActionIcon>
+        </Group>
+      </Group>
 
-        let stateClasses = "";
-        if (d.selected) {
-          stateClasses = "bg-gray-800 border-gray-800 text-white shadow-md font-semibold";
-        } else if (d.mark) {
-          const statusColors = {
-            Completed: "bg-green-50 border-green-300 text-green-700",
-            Pending: "bg-amber-50 border-amber-300 text-amber-700",
-            "In Process": "bg-blue-50 border-blue-300 text-blue-700",
-          };
-          stateClasses =
-            statusColors[d.mark.status] ||
-            `${d.mark.color} border-gray-300 text-gray-800`;
-        } else if (d.currentMonth) {
-          stateClasses =
-            "bg-white border-gray-200/60 text-gray-700 hover:bg-gray-50 hover:border-gray-300";
-        } else {
-          stateClasses =
-            "bg-gray-50 border-transparent text-gray-400 hover:bg-gray-100";
-        }
+      {/* Weekday headers */}
+      <SimpleGrid cols={7} spacing={4} mb="xs">
+        {WEEKDAYS.map((w) => (
+          <Text key={w} size="xs" c="dimmed" fw={600} tt="uppercase" ta="center">
+            {w}
+          </Text>
+        ))}
+      </SimpleGrid>
 
-        return (
-          <button
-            key={d.key}
-            onClick={() => onDayClick(d)}
-            className={`${baseClasses} ${stateClasses}`}
-            disabled={!d.currentMonth}
-          >
-            <span className={d.selected ? "font-bold" : "font-normal"}>
-              {d.number}
-            </span>
+      {/* Day grid */}
+      <SimpleGrid cols={7} spacing={4}>
+        {days.map(({ date, mark, isCurrentMonth, isSelected }) => {
+          const dayContent = (
+            <UnstyledButton
+              onClick={() => {
+                if (!isCurrentMonth) return;
+                if (onDateClick) onDateClick(date);
+                setCurrent(date);
+              }}
+              style={{ width: "100%" }}
+            >
+              <Box
+                h={40}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "var(--mantine-radius-md)",
+                  cursor: isCurrentMonth ? "pointer" : "default",
+                  backgroundColor: isSelected
+                    ? "var(--mantine-color-default-color)"
+                    : mark && isCurrentMonth
+                    ? `var(--mantine-color-${mark.color}-0)`
+                    : undefined,
+                  border: isSelected
+                    ? undefined
+                    : mark && isCurrentMonth
+                    ? `1px solid var(--mantine-color-${mark.color}-3)`
+                    : "1px solid transparent",
+                  transition: "background 0.15s",
+                  opacity: isCurrentMonth ? 1 : 0.3,
+                }}
+              >
+                <Text
+                  size="sm"
+                  fw={isSelected ? 700 : 400}
+                  c={
+                    isSelected
+                      ? "var(--mantine-color-body)"
+                      : mark && isCurrentMonth
+                      ? `${mark.color}.7`
+                      : undefined
+                  }
+                >
+                  {date.getDate()}
+                </Text>
+              </Box>
+            </UnstyledButton>
+          );
 
-            {d.mark && !d.selected && (
-              <span className="absolute bottom-1 w-1 h-1 rounded-full bg-current opacity-60" />
-            )}
-          </button>
-        );
-      })}
-    </div>
+          if (mark && isCurrentMonth && !isSelected) {
+            return (
+              <Indicator key={date.toISOString()} size={5} color={mark.color} offset={4}>
+                {dayContent}
+              </Indicator>
+            );
+          }
+
+          return <Box key={date.toISOString()}>{dayContent}</Box>;
+        })}
+      </SimpleGrid>
+    </Paper>
   );
 }

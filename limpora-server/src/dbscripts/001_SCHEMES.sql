@@ -72,11 +72,27 @@ CREATE TABLE Reviews (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT,
     rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    user_id INT NOT NULL,
-    provider_id INT NOT NULL,
+    reviewer_id INT NOT NULL,
+    reviewed_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(id),
-    FOREIGN KEY (provider_id) REFERENCES Users(id)
+
+    UNIQUE (reviewer_id, reviewed_id),
+
+    FOREIGN KEY (reviewer_id) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewed_id) REFERENCES Users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS UserServices (
+    user_id     INT NOT NULL,
+    service_id  INT NOT NULL,
+    price       DECIMAL(10, 2) NOT NULL,
+    is_active   TINYINT(1) NOT NULL DEFAULT 1,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (user_id, service_id),
+    CONSTRAINT fk_userservices_user    FOREIGN KEY (user_id)    REFERENCES Users(id)    ON DELETE CASCADE,
+    CONSTRAINT fk_userservices_service FOREIGN KEY (service_id) REFERENCES Services(id) ON DELETE CASCADE
 );
 
 -- =========================

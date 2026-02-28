@@ -1,20 +1,19 @@
 import admin from '../configs/firebase_config.js';
 import axios from 'axios';
 import { requiredEnv, newGoogleOauth2, getAuthUrl } from '../utils/utils.js';
-import { ERROR_CODES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
+import { ERROR_CODES, ROLES, SUCCESS_MESSAGES, USER_ERRORS } from '../constants.js';
 import { withdb } from '../databases/mysql.js';
 import { q_addEmailVerificationCode, q_addUser, q_deleteUserByUid, q_getUserById, q_getUserByUid, q_isEmailVerified, q_userExists, q_verifyEmailCode } from '../databases/queries.js';
 import { google } from 'googleapis';
-import sendEmail, { generateVerificationCode } from "../helpers/email_verification.js";
+import sendEmailVerificationCode, { generateVerificationCode } from "../helpers/email_verification.js";
 import { asyncHandler } from '../helpers/utils.js';
 
 const allowedRoles = ["client", "provider", "admin"];
-
-
+const DISABLE_EMAIL_VERIFICATION = true;
 export async function emailVerificationController(req, res) {
     const { code } = req.body;
     console.log(req.body);
-    
+
     try {
         const userId = await withdb(conn => q_verifyEmailCode(conn, code));
 
@@ -40,13 +39,13 @@ export async function emailVerificationController(req, res) {
 async function sendVerifycationCode(userId, email) {
     try {
         const verificationToken = await generateVerificationCode();
-        
-        await withdb(conn => 
+
+        await withdb(conn =>
             q_addEmailVerificationCode(conn, userId, verificationToken.hashedCode)
         );
 
-        
-        const emailData = await sendEmail(email, verificationToken.code);
+
+        const emailData = await sendEmailVerificationCode(email, verificationToken.code);
 
 
         return { success: true };
@@ -68,7 +67,7 @@ export async function sendVerificationEmailController(req, res) {
 
     try {
         const user = await withdb(conn => q_getUserById(conn, id));
-        
+
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -100,6 +99,7 @@ export async function sendVerificationEmailController(req, res) {
 export async function registerController(req, res) {
     const { name, email, password, role = "client" } = req.body;
 
+
     if (!name || !email || !password) {
         return res.status(400).json({ success: false, errors: [USER_ERRORS.EMAIL_PASSWORD_USERNAME_NEEDED] });
     }
@@ -111,7 +111,7 @@ export async function registerController(req, res) {
         const firebaseUser = await admin.auth().createUser({ email, password, displayName: name });
         await admin.auth().setCustomUserClaims(firebaseUser.uid, { role });
 
-        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, role));
+        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, role, DISABLE_EMAIL_VERIFICATION));
 
         let userRecord = await withdb(conn => q_getUserByUid(conn, firebaseUser.uid));
         if (!userRecord) {
@@ -136,7 +136,7 @@ export async function registerController(req, res) {
             case "auth/invalid-email": errorObj = USER_ERRORS.INVALID_EMAIL; break;
             case "auth/weak-password": errorObj = USER_ERRORS.WEAK_PASSWORD; break;
             default: errorObj = ERROR_CODES.INTERNAL_ERROR; console.log(err); break
-        }        
+        }
         res.status(400).json({ success: false, errors: [errorObj] });
     }
 }
@@ -147,8 +147,8 @@ export async function registerController(req, res) {
 export async function loginController(req, res) {
     const { email, password } = req.body;
 
-    console.log('[loginController] Request body:', { 
-        email, 
+    console.log('[loginController] Request body:', {
+        email,
         password: password ? '***' : undefined,
         hasEmail: !!email,
         hasPassword: !!password
@@ -164,7 +164,7 @@ export async function loginController(req, res) {
 
     try {
         console.log('[loginController] Calling Firebase auth...');
-        
+
         const response = await axios.post(
             `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${requiredEnv("FIREBASE_API_KEY")}`,
             { email, password, returnSecureToken: true }
@@ -179,16 +179,26 @@ export async function loginController(req, res) {
         );
 
         if (!userRecord) {
-            console.log('[loginController] User not found in DB, uid:', uid);
-            return res.status(403).json({
-                success: false,
-                errors: [USER_ERRORS.USER_NOT_REGISTERED]
-            });
+            console.log('[loginController] User not found in DB, uid:', uid, '— creating from Firebase record...');
+            const firebaseUser = await admin.auth().getUser(uid);
+            await withdb(conn => q_addUser(conn, 
+                uid,
+                firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                firebaseUser.email,
+                ROLES.CLIENT,
+                !DISABLE_EMAIL_VERIFICATION && firebaseUser.emailVerified,
+            ));
+            userRecord = await withdb(conn => q_getUserByUid(conn, uid));
+            if (!userRecord) {
+                console.log('[loginController] Failed to create user in DB, uid:', uid);
+                return res.status(500).json({ success: false, errors: ['Error al crear el usuario en la base de datos'] });
+            }
+            console.log('[loginController] User created in DB:', { uid, email });
         }
 
-        if (!userRecord.email_verified) {
+        if (!DISABLE_EMAIL_VERIFICATION && !userRecord.email_verified) {
             console.log('[loginController] Email not verified:', email);
-            await sendEmail(userRecord.id, email);
+            await sendEmailVerificationCode(userRecord.id, email);
 
             return res.status(403).json({
                 success: false,
@@ -300,7 +310,7 @@ export async function googleCallback(req, res) {
 
         // Revisar o crear en SQL
         const exists = await withdb(conn => q_userExists(conn, firebaseUser.uid));
-        if (!exists) await withdb(conn => q_addUser(conn, firebaseUser.uid, name, 'client'));
+        if (!exists) await withdb(conn => q_addUser(conn, firebaseUser.uid, name, 'client', DISABLE_EMAIL_VERIFICATION));
 
         const userRecord = await withdb(conn => q_getUserByUid(conn, firebaseUser.uid));
         const role = userRecord?.role || firebaseUser.customClaims?.role || "client";
@@ -410,7 +420,7 @@ export async function registerAdmin(req, res) {
         await admin.auth().setCustomUserClaims(firebaseUser.uid, { role: "admin" });
 
         // Guardar en SQL solo datos extendidos
-        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, "admin"));
+        await withdb(conn => q_addUser(conn, firebaseUser.uid, name, "admin", DISABLE_EMAIL_VERIFICATION));
 
         res.status(201).json({
             success: true,

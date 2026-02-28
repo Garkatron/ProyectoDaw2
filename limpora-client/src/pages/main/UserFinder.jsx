@@ -2,7 +2,21 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Base from "../../layouts/Base";
 import { UserCard } from "../../components/UserCard";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
+import { Search } from "lucide-react";
+import {
+  Box,
+  Button,
+  Center,
+  Group,
+  Loader,
+  Paper,
+  SimpleGrid,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
 
 export default function UserFinder() {
   const [users, setUsers] = useState([]);
@@ -13,7 +27,6 @@ export default function UserFinder() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [activeServices, setActiveServices] = useState([]);
 
-  // Debounce búsqueda
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchTerm), 300);
     return () => clearTimeout(handler);
@@ -33,7 +46,7 @@ export default function UserFinder() {
     try {
       const res = await axios.get("/api/v1/user", { withCredentials: true });
       const allUsers = res.data.data || [];
-      const nonAdmin = allUsers.filter(u => u.role !== "admin" && u.role !== "client");
+      const nonAdmin = allUsers.filter((u) => u.role !== "admin" && u.role !== "client");
       setUsers(nonAdmin);
       setFilteredUsers(nonAdmin);
     } catch (err) {
@@ -56,28 +69,25 @@ export default function UserFinder() {
 
   const filterUsers = () => {
     let filtered = users;
-
     if (debouncedSearch) {
-      filtered = filtered.filter(u =>
+      filtered = filtered.filter((u) =>
         u.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
-
     if (activeServices.length > 0) {
-      filtered = filtered.filter(u =>
-        u.services?.some(s => activeServices.includes(s.name))
+      filtered = filtered.filter((u) =>
+        u.services?.some((s) => activeServices.includes(s.name))
       );
     }
-
     setFilteredUsers(filtered);
   };
 
   const toggleService = (serviceName) => {
-    if (activeServices.includes(serviceName)) {
-      setActiveServices(activeServices.filter(s => s !== serviceName));
-    } else {
-      setActiveServices([...activeServices, serviceName]);
-    }
+    setActiveServices((prev) =>
+      prev.includes(serviceName)
+        ? prev.filter((s) => s !== serviceName)
+        : [...prev, serviceName]
+    );
   };
 
   const clearFilters = () => {
@@ -85,76 +95,90 @@ export default function UserFinder() {
     setActiveServices([]);
   };
 
+  const hasFilters = activeServices.length > 0 || searchTerm;
+
   return (
     <Base>
-      {/* BUSCADOR Y FILTROS */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
-        {/* Buscador */}
-        <div className="relative mb-6">
-          <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar por nombre..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl
-                       focus:ring-2 focus:ring-blue-400 focus:border-transparent 
-                       shadow-sm transition placeholder-gray-400"
-          />
-        </div>
+      <Stack gap="lg">
+        {/* Buscador y filtros */}
+        <Paper withBorder  p="lg" >
+          <Stack gap="md">
+            <TextInput
+              placeholder="Buscar por nombre..."
+              leftSection={<Search size={18} />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.currentTarget.value)}
+              
+              size="md"
+            />
 
-        {/* Filtros por servicios */}
-        <div className="flex flex-wrap gap-3 mb-4">
-          {services.map(s => (
-            <button
-              key={s.id || s.name}
-              onClick={() => toggleService(s.name)}
-              className={`px-4 py-1 rounded-full text-sm font-medium transition
-                          ${activeServices.includes(s.name)
-                            ? "bg-blue-500 text-white shadow"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-            >
-              {s.name}
-            </button>
-          ))}
-        </div>
+            <Group gap="xs" wrap="wrap">
+              {services.map((s) => (
+                <Button
+                  key={s.id || s.name}
+                  onClick={() => toggleService(s.name)}
+                  size="xs"
+                  radius="lg"
+                  
+                  variant={activeServices.includes(s.name) ? "filled" : "light"}
+                  color={activeServices.includes(s.name) ? "blue" : "gray"}
+                >
+                  {s.name}
+                </Button>
+              ))}
+            </Group>
 
-        {(activeServices.length > 0 || searchTerm) && (
-          <button
-            onClick={clearFilters}
-            className="mt-2 px-5 py-2 text-sm bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition shadow-sm"
-          >
-            Limpiar filtros
-          </button>
-        )}
-      </div>
+            {hasFilters && (
+              <Box>
+                <Button
+                  onClick={clearFilters}
+                  size="xs"
+                  
+                  variant="light"
+                  color="red"
+                >
+                  Limpiar filtros
+                </Button>
+              </Box>
+            )}
+          </Stack>
+        </Paper>
 
-      {/* RESULTADOS */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          Usuarios ({filteredUsers.length})
-        </h2>
+        {/* Resultados */}
+        <Paper withBorder  p="lg" >
+          <Title order={2} fz="1.25rem" fw={600}  mb="lg">
+            Usuarios ({filteredUsers.length})
+          </Title>
 
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-          </div>
-        ) : filteredUsers.length === 0 ? (
-          <p className="text-gray-500 text-center py-16 text-lg">
-            No se encontraron usuarios
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredUsers.map(user => (
-              <UserCard
-                key={user.id}
-                user={user}
-                className="hover:scale-105 transition-transform"
-              />
-            ))}
-          </div>
-        )}
-      </div>
+          {loading ? (
+            <Center py={64}>
+              <Loader size="lg" />
+            </Center>
+          ) : filteredUsers.length === 0 ? (
+            <Text ta="center" py={64} fz="lg">
+              No se encontraron usuarios
+            </Text>
+          ) : (
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+              {filteredUsers.map((user) => (
+                <Link
+                  key={user.id}
+                  to="/booking"
+                  state={{ userId: user.id }}
+                  style={{ textDecoration: "none" }}
+                >
+                  <Box style={{ transition: "transform 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                  >
+                    <UserCard user={user} />
+                  </Box>
+                </Link>
+              ))}
+            </SimpleGrid>
+          )}
+        </Paper>
+      </Stack>
     </Base>
   );
 }
