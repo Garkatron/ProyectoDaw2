@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Base from "../../layouts/Base";
-import { getUserEarnings } from "../../services/earnings.service";
 import {
   Avatar,
   Box,

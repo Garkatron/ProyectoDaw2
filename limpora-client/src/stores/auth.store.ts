@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import axios from 'axios';
 import { API } from '../lib/api';
 import Login from '../pages/auth/Login';
-import { UserRole } from '../../../server/src/enums/Role.enum';
+import { UserRole } from '../../../common/enums/Role.enum';
 
 interface User {
     id: number;

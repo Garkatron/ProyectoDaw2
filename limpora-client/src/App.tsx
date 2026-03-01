@@ -13,15 +13,11 @@ import UserFinder from './pages/main/UserFinder';
 import EmailCode from './pages/auth/EmailCode';
 import UserPanel from './pages/user/UserPanel/index';
 
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/register" element={<Rergister />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/emailcode" element={<EmailCode />} />
+// <Route path="/emailcode" element={<EmailCode />} />
 
-      <Route element={<PrivateRoute />}>
+/*
+
+<Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />
 
         <Route path="/currency" element={<Currency />} />
@@ -31,6 +27,15 @@ function App() {
         <Route path="/top" element={<TopUsers />} />
         <Route path="/panel/admin" element={<AdminPanel />} />
       </Route>
+*/
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/register" element={<Rergister />} />
+      <Route path="/login" element={<Login />} />
+
+      
     </Routes>
   );
 }

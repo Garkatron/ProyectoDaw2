@@ -10,41 +10,36 @@ import { reviewsController } from './modules/reviews';
 // ? Security
 import { cors } from '@elysiajs/cors';
 import { rateLimit } from 'elysia-rate-limit';
-import { elysiaHelmet, permission } from 'elysiajs-helmet';
 
 // ? Documentation
 import openapi from '@elysiajs/openapi';
 import { providerServicesController } from './modules/user_services';
+// import { elysiaHelmet, permission } from 'elysiajs-helmet';
+
+const securityHeaders = new Elysia({ name: 'security-headers' })
+    .onRequest(({ set }) => {
+        set.headers['X-Frame-Options']           = 'SAMEORIGIN'
+        set.headers['X-XSS-Protection']          = '1; mode=block'
+        set.headers['X-Content-Type-Options']    = 'nosniff'
+        set.headers['Referrer-Policy']           = 'strict-origin-when-cross-origin'
+
+        if (Bun.env.NODE_ENV === 'production') {
+            set.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+            set.headers['Content-Security-Policy']   = [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
+                "font-src 'self' https://cdn.jsdelivr.net",
+                "img-src 'self' data: https:",
+                "connect-src 'self'",
+            ].join('; ')
+        }
+    })
 
 // ? Definition
 const app = new Elysia()
     // Security
-    .use(
-        elysiaHelmet({
-            csp: Bun.env.NODE_ENV === 'production'
-                ? {
-                    defaultSrc:  [permission.SELF],
-                    scriptSrc:   [permission.SELF, permission.UNSAFE_INLINE, 'https://cdn.jsdelivr.net', 'https://unpkg.com'],
-                    styleSrc:    [permission.SELF, permission.UNSAFE_INLINE, 'https://cdn.jsdelivr.net', 'https://unpkg.com'],
-                    fontSrc:     [permission.SELF, 'https://cdn.jsdelivr.net'],
-                    imgSrc:      [permission.SELF, permission.DATA, permission.HTTPS],
-                    connectSrc:  [permission.SELF],
-                }
-                : {
-                    defaultSrc:  [permission.SELF, permission.UNSAFE_INLINE, permission.HTTPS, permission.DATA, permission.BLOB],
-                    scriptSrc:   [permission.SELF, permission.UNSAFE_INLINE, permission.HTTPS, permission.BLOB],
-                    styleSrc:    [permission.SELF, permission.UNSAFE_INLINE, permission.HTTPS],
-                    fontSrc:     [permission.SELF, permission.HTTPS, permission.DATA],
-                    imgSrc:      [permission.SELF, permission.DATA, permission.HTTPS, permission.BLOB],
-                    connectSrc:  [permission.SELF, permission.HTTPS, permission.BLOB],
-                    frameSrc:    [permission.SELF, permission.HTTPS],
-                    objectSrc:   [permission.NONE],
-                },
-            frameOptions:   'SAMEORIGIN',
-            xssProtection:  true,
-            referrerPolicy: 'strict-origin-when-cross-origin',
-        })
-    )
+    .use(securityHeaders)
     .use(
         rateLimit({
             duration: 60000,

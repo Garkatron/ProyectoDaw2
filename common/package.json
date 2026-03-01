@@ -4,5 +4,8 @@
     "type": "module",
     "exports": {
         "./*": "./src/*"
+    },
+    "dependencies": {
+        "elysia": "1.4.27"
     }
 }

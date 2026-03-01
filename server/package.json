@@ -10,11 +10,11 @@
     "dependencies": {
         "@elysiajs/cors": "^1.4.1",
         "@elysiajs/openapi": "^1.4.14",
-        "elysia": "1.4.27",
         "elysia-rate-limit": "^4.5.0",
         "elysiajs-helmet": "^1.0.4",
         "firebase-admin": "^13.7.0",
-        "@limpora/common": "file:../common"
+        "@limpora/common": "file:../common",
+        "elysia": "file:../common/node_modules/elysia"
     },
     "devDependencies": {
         "bun-types": "latest"

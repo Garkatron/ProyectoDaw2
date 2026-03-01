@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../../stores/auth.store";
-import { getAppointments, getProviderAppointments, getUserServiceById } from "../../services/appointments.service";
 import Base from "../../layouts/Base";
 import Calendar from "../../components/Calendar";
 import { CheckCircle, Clock, Banknote, RefreshCw } from "lucide-react";

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Base from "../../layouts/Base";
 import logo from "../../assets/logo-provisional.png";
 import lang from "../../utils/LangManager";
-import { getTopUsers } from "../../services/ranking.service";
 import {
   Alert,
   Avatar,

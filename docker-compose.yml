@@ -1,8 +1,8 @@
 services:
   limpora-client:
     build:
-      context: ./limpora-client
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: ./limpora-client/Dockerfile.prod
     ports:
       - "127.0.0.1:3002:3000"
     environment:
@@ -13,8 +13,8 @@ services:
 
   limpora-server:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./server/Dockerfile 
     ports:
       - "127.0.0.1:3001:3000"
     env_file:

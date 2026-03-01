@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { sendVerifycationCode, sendVerifycationEmail } from "../../services/email.service";
 import { Modal } from "../../components/Modal";
 import logo from "../../assets/logo-provisional.png";
 import { useAuthStore } from "../../stores/auth.store";
@@ -30,8 +29,7 @@ export default function EmailCode() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const result = await sendVerifycationCode(code);
+    const result = await sendVerifycationCode(code);
 
       if (result) {
         setModalTitle(lang("verification.success_title") || "Éxito");
@@ -48,6 +46,7 @@ export default function EmailCode() {
       setModalMessage(err.message || "Error al verificar el código");
       setModalOpen(true);
     }
+      
   };
 
   const resendCode = async () => {

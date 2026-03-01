@@ -3,8 +3,6 @@ import Calendar from "../../components/Calendar";
 import Base from "../../layouts/Base";
 import { useAuthStore } from "../../stores/auth.store";
 import { useEffect, useState } from "react";
-import { getUserServices } from "../../services/user_services.service";
-import { addAppointment, getAppointments } from "../../services/appointments.service";
 import {
   Alert,
   Box,
