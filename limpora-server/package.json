@@ -16,7 +16,7 @@
         "format": "prettier --write src"
     },
     "dependencies": {
-        "@limpora/common": "file:../common",
+        "@limpora/common": "workspace:*",
         "axios": "^1.13.5",
         "bcrypt": "^6.0.0",
         "cookie-parser": "^1.4.7",

@@ -2,7 +2,7 @@ services:
   limpora-client:
     build:
       context: .
-      dockerfile: ./limpora-client/Dockerfile.prod
+      dockerfile: ./infra/docker/client.prod.Dockerfile
     ports:
       - "127.0.0.1:3002:3000"
     environment:
@@ -14,16 +14,17 @@ services:
   limpora-server:
     build:
       context: .
-      dockerfile: ./server/Dockerfile 
+      dockerfile: ./infra/docker/server.prod.Dockerfile
     ports:
       - "127.0.0.1:3001:3000"
     env_file:
-      - ./server/.env
+      - ./apps/server/.env
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=https://www.limpora.xyz
     volumes:
-      - ./server/data:/usr/src/app/data
+      # Asegúrate de que esta carpeta exista en tu host
+      - ./apps/server/data:/usr/src/app/apps/server/data
     restart: unless-stopped
     networks:
       - limpora-network
