@@ -21,37 +21,27 @@ const app = new Elysia()
     // Security
     .use(
         elysiaHelmet({
-            ...(Bun.env.NODE_ENV === 'production' && {
-                csp: {
-                    defaultSrc: [permission.SELF],
-                    scriptSrc: [
-                        permission.SELF,
-                        permission.UNSAFE_INLINE,
-                        'https://cdn.jsdelivr.net',
-                        'https://unpkg.com',
-                    ],
-                    styleSrc: [
-                        permission.SELF,
-                        permission.UNSAFE_INLINE,
-                        'https://cdn.jsdelivr.net',
-                        'https://unpkg.com',
-                    ],
-                    fontSrc: [permission.SELF, 'https://cdn.jsdelivr.net'],
-                    imgSrc: [permission.SELF, permission.DATA, permission.HTTPS],
-                    connectSrc: [permission.SELF],
+            csp: Bun.env.NODE_ENV === 'production'
+                ? {
+                    defaultSrc:  [permission.SELF],
+                    scriptSrc:   [permission.SELF, permission.UNSAFE_INLINE, 'https://cdn.jsdelivr.net', 'https://unpkg.com'],
+                    styleSrc:    [permission.SELF, permission.UNSAFE_INLINE, 'https://cdn.jsdelivr.net', 'https://unpkg.com'],
+                    fontSrc:     [permission.SELF, 'https://cdn.jsdelivr.net'],
+                    imgSrc:      [permission.SELF, permission.DATA, permission.HTTPS],
+                    connectSrc:  [permission.SELF],
+                }
+                : {
+                    defaultSrc:  [permission.SELF, permission.UNSAFE_INLINE, permission.HTTPS, permission.DATA, permission.BLOB],
+                    scriptSrc:   [permission.SELF, permission.UNSAFE_INLINE, permission.HTTPS, permission.BLOB],
+                    styleSrc:    [permission.SELF, permission.UNSAFE_INLINE, permission.HTTPS],
+                    fontSrc:     [permission.SELF, permission.HTTPS, permission.DATA],
+                    imgSrc:      [permission.SELF, permission.DATA, permission.HTTPS, permission.BLOB],
+                    connectSrc:  [permission.SELF, permission.HTTPS, permission.BLOB],
+                    frameSrc:    [permission.SELF, permission.HTTPS],
+                    objectSrc:   [permission.NONE],
                 },
-                hsts: {
-                    maxAge: 31536000,
-                    includeSubDomains: true,
-                    preload: true,
-                },
-                permissionsPolicy: {
-                    camera: [permission.NONE],
-                    microphone: [permission.NONE],
-                },
-            }),
-            frameOptions: 'DENY',
-            xssProtection: true,
+            frameOptions:   'SAMEORIGIN',
+            xssProtection:  true,
             referrerPolicy: 'strict-origin-when-cross-origin',
         })
     )
