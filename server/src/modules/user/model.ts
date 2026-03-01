@@ -1,5 +1,5 @@
+import { UserRole } from '@limpora/common/enums/Role.enum';
 import { t, type UnwrapSchema } from 'elysia';
-import { UserRole } from '../../enums/Role.enum';
 
 const UserObject = t.Object({
     id:           t.Number(),

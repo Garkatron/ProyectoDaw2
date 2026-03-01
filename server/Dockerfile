@@ -9,9 +9,13 @@ RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY common/ /usr/src/common/ 
+COPY common/ /usr/src/common/
 COPY server/src src/
 COPY server/package.json .
+
+RUN mkdir -p node_modules/@limpora && \
+    ln -sf /usr/src/common node_modules/@limpora/common && \
+    ln -sf /usr/src/common/node_modules/elysia node_modules/elysia
 
 USER bun
 EXPOSE 3000/tcp

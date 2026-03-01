@@ -17,6 +17,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { API } from "../../lib/api";
 
 export default function UserFinder() {
   const [users, setUsers] = useState([]);
@@ -44,6 +45,7 @@ export default function UserFinder() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
+      const {data, error} = API.user.get();
       const res = await axios.get("/api/v1/user", { withCredentials: true });
       const allUsers = res.data.data || [];
       const nonAdmin = allUsers.filter((u) => u.role !== "admin" && u.role !== "client");

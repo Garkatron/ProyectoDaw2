@@ -13,13 +13,20 @@ interface User {
     member_since: string;
 }
 
+interface AuthResult {
+    success: boolean;
+    error?: string;
+}
+
 interface AuthStore {
     user: User | null;
     isAuthenticated: boolean;
     error: string | null;
     fetchUser: () => Promise<void>;
-    login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string, role: string) => Promise<void>;
+    login: (email: string, password: string) => Promise<AuthResult>;
+    register: (name: string, email: string, password: string, role: string) => Promise<AuthResult>;
+    logout: () => Promise<AuthResult>;
+    clearError: () => void;
 }
 
 const errorToString = (value: unknown): string => {
@@ -52,22 +59,24 @@ export const useAuthStore = create<AuthStore>()(
                 set({ user: data, isAuthenticated: true, error: null });
             },
 
-            login: async (email: string, password: string) => {
+            login: async (email, password): Promise<AuthResult> => {
                 set({ error: null });
 
                 const { data, error } = await API.auth.login.post({ email, password });
 
                 if (error) {
-                    set({ user: null, isAuthenticated: false, error: errorToString(error.value) });
-                    return;
+                    const msg = errorToString(error.value);
+                    set({ user: null, isAuthenticated: false, error: msg });
+                    return { success: false, error: msg };
                 }
 
                 localStorage.setItem('firebase_token', data.token);
                 await get().fetchUser();
                 set({ isAuthenticated: true });
+                return { success: true };
             },
 
-            register: async (name, email, password, role = 'client') => {
+            register: async (name, email, password, role = 'client'): Promise<AuthResult> => {
                 set({ error: null });
 
                 const { data, error } = await API.auth.register.post({
@@ -78,24 +87,28 @@ export const useAuthStore = create<AuthStore>()(
                 });
 
                 if (error) {
-                    set({ user: null, isAuthenticated: false, error: errorToString(error.value) });
-                    return;
+                    const msg = errorToString(error.value);
+                    set({ error: msg });
+                    return { success: false, error: msg };
                 }
 
-                window.location.href = '/login';
+                return { success: true };
             },
 
-            logout: async () => {
+            logout: async (): Promise<AuthResult> => {
                 set({ error: null });
 
-                const { data, error } = await API.auth.logout.post();
+                const { error } = await API.auth.logout.post({});
 
                 if (error) {
-                    set({ user: null, isAuthenticated: false, error: errorToString(error.value) });
-                    return;
+                    const msg = errorToString(error.value);
+                    set({ error: msg });
+                    return { success: false, error: msg };
                 }
 
+                localStorage.removeItem('firebase_token');
                 set({ user: null, isAuthenticated: false, error: null });
+                return { success: true };
             },
 
             // TODO: Write OAuth submodule backend

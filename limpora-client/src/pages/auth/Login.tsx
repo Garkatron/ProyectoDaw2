@@ -1,134 +1,130 @@
-import logo from "../../assets/logo-provisional.png";
-import { useAuthStore } from "../../stores/auth.store";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import LoginSchema from "../../schemas/NewSessionSchema";
-import lang from "../../utils/LangManager";
+import logo from '../../assets/logo-provisional.png';
+import { useAuthStore } from '../../stores/auth.store';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import LoginSchema from '../../schemas/NewSessionSchema';
+import lang from '../../utils/LangManager';
 import {
-  TextInput,
-  PasswordInput,
-  Button,
-  Paper,
-  Title,
-  Stack,
-  Image,
-  Center,
-  Anchor,
-  Modal,
-  Text,
-} from "@mantine/core";
+    TextInput,
+    PasswordInput,
+    Button,
+    Paper,
+    Title,
+    Stack,
+    Image,
+    Center,
+    Anchor,
+    Modal,
+    Text,
+} from '@mantine/core';
+import { UserRole } from '../../../../common/enums/Role.enum';
 
 export default function Login() {
-  const login = useAuthStore((state) => state.login);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const login = useAuthStore((state) => state.login);
+    const user = useAuthStore((state) => state.user);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalMessage, setModalMessage] = useState('');
+    const [success, setSuccess] = useState(false);
+    const [isAdmin, setAdmin] = useState(false);
+    const navigate = useNavigate();
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalMessage, setModalMessage] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [isAdmin, setAdmin] = useState(false);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-  const navigate = useNavigate();
+        const result = LoginSchema.safeParse({ email, password });
 
-  const loginWithGoogle = async () => {
-    window.location.href = "/api/v1/auth/google-url";
-  };
+        if (!result.success) {
+            setModalTitle(lang('login.validation_error'));
+            setModalMessage(result.error.issues[0]?.message ?? 'Validation error');
+            setModalOpen(true);
+            return;
+        }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+        const response = await login(result.data.email, result.data.password);
 
-    const result = LoginSchema.safeParse({ email, password });
+        if (response.success) {
+            setModalTitle(lang('login.success_title'));
+            setModalMessage(lang('login.success_message'));
+            setSuccess(true);
+            if (user?.role === UserRole.Admin) setAdmin(true);
+        } else {
+            setModalTitle(lang('login.error_title'));
+            setModalMessage(response.error ?? lang('login.generic_error'));
+        }
 
-    if (!result.success) {
-      setModalTitle(lang("login.validation_error"));
-      setModalMessage(result.error.issues[0].message);
-      setModalOpen(true);
-      return;
-    }
+        setModalOpen(true);
+    };
 
-    try {
-      const response = await login(result.data.email, result.data.password);
+    const handleModalClose = () => {
+        setModalOpen(false);
+        if (success) navigate(isAdmin ? '/panel/admin' : '/panel/me');
+    };
 
-      if (response.success) {
-        setModalTitle(lang("login.success_title"));
-        setModalMessage(lang("login.success_message"));
-        setSuccess(true);
-        if (response.data.role === "admin") setAdmin(true);
-      } else {
-        setModalTitle(lang("login.error_title"));
-        setModalMessage(response.message || lang("login.generic_error"));
-      }
+    return (
+        <Center mih="100vh" px="md">
+            <Paper w="100%" maw={448} p={40} withBorder>
+                <Stack align="center" mb="xl" gap="xs">
+                    <Image src={logo} alt="Limpora Logo" w={112} h={112} fit="contain" />
+                    <Title order={1} fw={300} fz="2rem">
+                        {lang('login.title')}
+                    </Title>
+                </Stack>
 
-      setModalOpen(true);
-    } catch (err) {
-      setModalTitle(lang("login.error_title"));
-      setModalMessage(err.message || lang("login.login_error"));
-      setModalOpen(true);
-    }
-  };
+                <form onSubmit={handleSubmit}>
+                    <Stack gap="md" mb="xl">
+                        <TextInput
+                            id="email"
+                            type="email"
+                            required
+                            label={lang('login.email')}
+                            placeholder="tu.correo@ejemplo.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.currentTarget.value)}
+                            size="md"
+                        />
+                        <PasswordInput
+                            id="password"
+                            required
+                            label={lang('login.password')}
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.currentTarget.value)}
+                            size="md"
+                        />
+                    </Stack>
 
-  const handleModalClose = () => {
-    setModalOpen(false);
-    if (success) navigate(isAdmin ? "/panel/admin" : "/panel/me");
-  };
+                    <Stack gap="sm" mb="md">
+                        <Button type="submit" variant="default" size="md" fullWidth>
+                            {lang('login.submit')}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="default"
+                            size="md"
+                            fullWidth
+                            onClick={() => (window.location.href = '/api/v1/auth/google-url')}
+                        >
+                            Google
+                        </Button>
+                    </Stack>
+                </form>
 
-  return (
-    <Center mih="100vh" px="md">
-      <Paper w="100%" maw={448} p={40} withBorder>
-        <Stack align="center" mb="xl" gap="xs">
-          <Image src={logo} alt="Limpora Logo" w={112} h={112} fit="contain" />
-          <Title order={1} fw={300} fz="2rem">
-            {lang("login.title")}
-          </Title>
-        </Stack>
+                <Center>
+                    <Anchor component={Link} to="/register" size="sm">
+                        {lang('login.register')}
+                    </Anchor>
+                </Center>
+            </Paper>
 
-        <form onSubmit={handleSubmit}>
-          <Stack gap="md" mb="xl">
-            <TextInput
-              id="email"
-              type="email"
-              required
-              label={lang("login.email")}
-              placeholder="tu.correo@ejemplo.com"
-              value={email}
-              onChange={(e) => setEmail(e.currentTarget.value)}
-              size="md"
-            />
-            <PasswordInput
-              id="password"
-              required
-              label={lang("login.password")}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.currentTarget.value)}
-              size="md"
-            />
-          </Stack>
-
-          <Stack gap="sm" mb="md">
-            <Button type="submit" variant="default" size="md" fullWidth>
-              {lang("login.submit")}
-            </Button>
-            <Button type="button" variant="default" size="md" fullWidth onClick={loginWithGoogle}>
-              Google
-            </Button>
-          </Stack>
-        </form>
-
-        <Center>
-          <Anchor component={Link} to="/register" size="sm">
-            {lang("login.register")}
-          </Anchor>
+            <Modal opened={modalOpen} onClose={handleModalClose} title={modalTitle} centered>
+                <Text size="sm">{modalMessage}</Text>
+                <Button mt="md" fullWidth variant="default" onClick={handleModalClose}>
+                    Aceptar
+                </Button>
+            </Modal>
         </Center>
-      </Paper>
-
-      <Modal opened={modalOpen} onClose={handleModalClose} title={modalTitle} centered>
-        <Text size="sm">{modalMessage}</Text>
-        <Button mt="md" fullWidth variant="default" onClick={handleModalClose}>
-          Aceptar
-        </Button>
-      </Modal>
-    </Center>
-  );
+    );
 }

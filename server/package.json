@@ -14,7 +14,7 @@
         "elysiajs-helmet": "^1.0.4",
         "firebase-admin": "^13.7.0",
         "@limpora/common": "file:../common",
-        "elysia": "file:../common/node_modules/elysia"
+        "elysia": "1.4.27"
     },
     "devDependencies": {
         "bun-types": "latest"
