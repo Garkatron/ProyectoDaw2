@@ -1,5 +1,5 @@
 import { db } from '../../libs/db';
-import { Service, User } from '../../types/user';
+import type { User } from '@limpora/common/types/user'
 
 export const UserQueries = {
     findById: db.query<User, { $id: number }>(`SELECT * FROM Users WHERE id = $id`),

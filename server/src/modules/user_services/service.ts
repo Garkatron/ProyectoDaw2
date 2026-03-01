@@ -1,7 +1,7 @@
 import { status } from 'elysia';
 import { ProviderServicesModel } from './model';
 import { ProviderQueries } from './queries';
-import { UserService } from '../../types/user';
+import type { UserService } from '@limpora/common/types/user'
 import { AuthQueries } from '../auth/queries';
 
 interface UserServiceResponse extends Omit<UserService, 'is_active'> {

@@ -1,6 +1,5 @@
 import Elysia from 'elysia';
 import { AuthGuard } from '../auth/guard';
-import { UserRole } from '../../enums/Role.enum';
 import { EarningModel } from './model';
 import { EarningService } from './service';
 

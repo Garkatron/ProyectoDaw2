@@ -1,5 +1,5 @@
 import { db } from "../../libs/db"
-import { User } from "../../types/user"
+import type { User } from '@limpora/common/types/user'
 
 export const AuthQueries = {
     findByFirebaseUid: db.query<User, { $firebase_uid: string }>(`

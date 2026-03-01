@@ -1,5 +1,5 @@
 import { db } from '../../libs/db';
-import { Review } from '../../types/user';
+import type { Review } from '@limpora/common/types/user'
 
 export const ReviewsQueries = {
 

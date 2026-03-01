@@ -17,7 +17,7 @@ export const authController = new Elysia({ prefix: "/auth" })
         }
     )
 
-    .post('/sign-in',
+    .post('/login',
         async ({ body, cookie: { session } }) => {
             const response = await AuthService.login(body);
             session.value = response.token;
@@ -33,7 +33,7 @@ export const authController = new Elysia({ prefix: "/auth" })
         }
     )
 
-    .post('/sign-out',
+    .post('/logout',
         async ({ user, cookie: { session } }) => {
             await AuthService.revokeTokens(user.uid);
             session.value = undefined;

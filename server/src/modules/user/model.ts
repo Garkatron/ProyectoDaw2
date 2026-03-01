@@ -16,6 +16,7 @@ export const UserModel = {
     getAllUsers:  t.Array(UserObject),
     getUserById:  UserObject,
     getUserByName: UserObject,
+    getMe:        UserObject,
 
     notFound: t.Literal('User not found'),
 } as const

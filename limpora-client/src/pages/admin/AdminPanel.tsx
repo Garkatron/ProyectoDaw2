@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AdminUserCard from "../../components/admin/AdminUserCard";
 import Alert from "../../components/Alert";
-import { deleteUser } from "../../services/user.service";
+
 import { UserPlus, Search } from "lucide-react";
 import {
   Box,

@@ -1,5 +1,5 @@
 import { db } from '../../libs/db';
-import { UserService } from '../../types/user';
+import type { UserService } from '@limpora/common/types/user'
 
 export const ProviderQueries = {
 

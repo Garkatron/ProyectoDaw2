@@ -2,7 +2,7 @@ import Elysia from "elysia";
 import { ServicesModel } from "./model";
 import { ServicesService } from "./service";
 import { AuthGuard } from "../auth/guard";
-import { UserRole } from "../../enums/Role.enum";
+import { UserRole } from '@limpora/common/enums/Role.enum'
 
 export const servicesController = new Elysia({ prefix: '/services' })
     .use(AuthGuard)

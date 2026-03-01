@@ -1,5 +1,5 @@
 import { t, type UnwrapSchema } from 'elysia';
-import { UserRole } from '../../enums/Role.enum';
+import { UserRole } from '@limpora/common/enums/Role.enum'
 
 export const EarningModel = {
     getUserEarningsParams: t.Object({

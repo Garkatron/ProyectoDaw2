@@ -1,6 +1,6 @@
 import { Elysia, type Context } from 'elysia'
 import { AuthService } from './service';
-import { UserRole } from '../../enums/Role.enum';
+import { UserRole } from '@limpora/common/enums/Role.enum'
 
 export const AuthGuard = new Elysia({ name: 'Auth.Guard' }).macro({
     isAuthenticated: {

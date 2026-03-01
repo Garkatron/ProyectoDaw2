@@ -1,5 +1,5 @@
 import { db } from '../../libs/db';
-import { Service } from '../../types/user';
+import type { Service } from '@limpora/common/types/user'
 
 export const ServicesQueries = {
     insert: db.query<

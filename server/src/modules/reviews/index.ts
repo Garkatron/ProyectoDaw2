@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia';
 import { AuthGuard } from '../auth/guard';
-import { UserRole } from '../../enums/Role.enum';
+import { UserRole } from '@limpora/common/enums/Role.enum'
 import { ReviewsService } from './service';
 import { ReviewsModel } from './model';
 

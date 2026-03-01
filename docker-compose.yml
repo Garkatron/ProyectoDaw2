@@ -1,11 +1,10 @@
-
 services:
   limpora-client:
     build:
       context: ./limpora-client
       dockerfile: Dockerfile.prod
     ports:
-      - "127.0.0.1:3002:3000"  
+      - "127.0.0.1:3002:3000"
     environment:
       - NODE_ENV=production
     restart: unless-stopped
@@ -14,44 +13,20 @@ services:
 
   limpora-server:
     build:
-      context: ./limpora-server
-      dockerfile: Dockerfile.prod
+      context: ./server
+      dockerfile: Dockerfile
     ports:
-      - "127.0.0.1:3001:3000" 
+      - "127.0.0.1:3001:3000"
     env_file:
-      - ./limpora-server/.env
+      - ./server/.env
     environment:
       - NODE_ENV=production
       - FRONTEND_URL=https://www.limpora.xyz
-    depends_on:
-      mysql:
-        condition: service_healthy
+    volumes:
+      - ./server/data:/usr/src/app/data
     restart: unless-stopped
     networks:
       - limpora-network
-
-  mysql:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASS}
-      MYSQL_DATABASE: ${DB_NAME}
-    #ports:
-    #  - "127.0.0.1:3306:3306"  
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./limpora-server/src/dbscripts:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    networks:
-      - limpora-network
-
-volumes:
-  mysql_data:
-  node_modules:
 
 networks:
   limpora-network:
