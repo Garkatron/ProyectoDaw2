@@ -36,4 +36,14 @@ export abstract class ServicesService {
 
         return service;
     }
+
+    static async deleteById({
+        id,
+    }: ServicesModel['serviceIdParam']): Promise<ServicesModel['getByIdResponse']> {
+        const existing = await ServicesService.getById({ id });
+
+        ServicesQueries.delete.run({ $id: Number(id) });
+
+        return existing;
+    }
 }

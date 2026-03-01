@@ -20,4 +20,6 @@ export const ServicesQueries = {
     findByName: db.query<Service, { $name: string }>(`SELECT * FROM Services WHERE name = $name`),
 
     getAll: db.query<Service, null>(`SELECT * FROM Services`),
+
+    delete: db.query<void, { $id: number }>(`DELETE FROM Services WHERE id = $id`),
 };

@@ -50,7 +50,7 @@ export abstract class ProviderServicesService {
         const provider = AuthQueries.findByFirebaseUid.get({ $firebase_uid: provider_uid })
         if (!provider) throw status(404, 'User not found' satisfies ProviderServicesModel['userNotFound'])
 
-        return ProviderServicesService.assign(body, provider.id)
+        return await ProviderServicesService.assign(body, provider.id)
     }
 
     static async unassign(
@@ -78,7 +78,7 @@ export abstract class ProviderServicesService {
         const provider = AuthQueries.findByFirebaseUid.get({ $firebase_uid: provider_uid })
         if (!provider) throw status(404, 'User not found' satisfies ProviderServicesModel['userNotFound'])
 
-        return ProviderServicesService.unassign(body, provider.id)
+        return await ProviderServicesService.unassign(body, provider.id)
     }
 
     static async getAll(): Promise<ProviderServicesModel['getAllResponse']> {

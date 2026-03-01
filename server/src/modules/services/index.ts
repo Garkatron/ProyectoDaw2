@@ -19,6 +19,18 @@ export const servicesController = new Elysia({ prefix: '/services' })
         }
     )
 
+    .delete('/:id',
+        async ({ params }) => ServicesService.deleteById(params),
+        {
+            params: ServicesModel.serviceIdParam,
+            response: {
+                200: ServicesModel.getByIdResponse,
+                404: ServicesModel.notFound,
+            },
+            hasRole: UserRole.Admin,
+        }
+    )
+
     .get('/',
         async () => ServicesService.getAll(),
     )

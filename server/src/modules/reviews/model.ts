@@ -30,6 +30,7 @@ export const ReviewsModel = {
     userNotFound: t.Literal('User not found'),
     alreadyExists: t.Literal('You already reviewed this user'),
     forbidden: t.Literal('You cannot review yourself'),
+    forbiddenNotOwner: t.Literal('You can only delete your own reviews'),
 } as const;
 
 export type ReviewsModel = {

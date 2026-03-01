@@ -38,6 +38,36 @@ export abstract class ReviewsService {
         return review;
     }
 
+    static async deleteById({
+        id,
+    }: ReviewsModel['reviewIdParam']): Promise<ReviewsModel['getReviewByIdResponse']> {
+        const existing = await ReviewsService.getById({ id });
+
+        ReviewsQueries.delete.run({ $id: Number(id) });
+
+        return existing;
+    }
+
+    static async deleteByUid(
+        { id }: ReviewsModel['reviewIdParam'],
+        uid: string
+    ): Promise<ReviewsModel['getReviewByIdResponse']> {
+        const existing = await ReviewsService.getById({ id });
+
+        const reviewer = AuthQueries.findByFirebaseUid.get({ $firebase_uid: uid });
+        if (!reviewer) throw status(404, 'User not found' satisfies ReviewsModel['userNotFound']);
+
+        if (existing.reviewer_id !== reviewer.id)
+            throw status(
+                403,
+                'You can only delete your own reviews' satisfies ReviewsModel['forbiddenNotOwner']
+            );
+
+        ReviewsQueries.delete.run({ $id: Number(id) });
+
+        return existing;
+    }
+
     static async getById({
         id,
     }: ReviewsModel['reviewIdParam']): Promise<ReviewsModel['getReviewByIdResponse']> {

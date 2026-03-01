@@ -16,6 +16,27 @@ export const reviewsController = new Elysia({ prefix: '/reviews' })
         hasRole: UserRole.Client,
     })
 
+    .delete('/:id', async ({ params }) => ReviewsService.deleteById(params), {
+        params: ReviewsModel.reviewIdParam,
+        response: {
+            200: ReviewsModel.getReviewByIdResponse,
+            404: ReviewsModel.notFound,
+            400: ReviewsModel.userNotFound,
+        },
+        hasRole: UserRole.Admin,
+    })
+
+    .delete('/me/:id', async ({ params, user }) => ReviewsService.deleteByUid(params, user.uid), {
+        params: ReviewsModel.reviewIdParam,
+        response: {
+            200: ReviewsModel.getReviewByIdResponse,
+            400: ReviewsModel.forbiddenNotOwner,
+            403: ReviewsModel.forbidden,
+            404: ReviewsModel.notFound,
+        },
+        hasRole: UserRole.Client,
+    })
+
     .get('/:id', async ({ params }) => ReviewsService.getById(params), {
         params: ReviewsModel.reviewIdParam,
         response: {
