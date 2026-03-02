@@ -44,3 +44,6 @@ package-lock.json
 limpora.db
 limpora.db-shm
 limpora-wal
+
+/db
+/data

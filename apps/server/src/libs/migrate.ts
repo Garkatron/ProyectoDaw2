@@ -37,7 +37,7 @@ export function migrate(db: Database) {
     db.run(`
         CREATE TABLE IF NOT EXISTS Services (
             id       INTEGER PRIMARY KEY AUTOINCREMENT,
-            name     TEXT NOT NULL,
+            name     TEXT NOT NULL UNIQUE,
             duration INTEGER NOT NULL
         )
     `);

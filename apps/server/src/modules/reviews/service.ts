@@ -9,15 +9,15 @@ export abstract class ReviewsService {
         body: ReviewsModel['publishReviewBody'],
         reviewer_uid: string
     ): Promise<ReviewsModel['publishReviewResponse']> {
-        const reviewer = AuthQueries.findByFirebaseUid.get({ $firebase_uid: reviewer_uid });
+        const reviewer = AuthQueries.findByFirebaseUid.get({ firebase_uid: reviewer_uid });
         if (!reviewer) throw status(404, 'User not found' satisfies ReviewsModel['userNotFound']);
 
         if (reviewer.id === body.reviewed_id)
             throw status(400, 'You cannot review yourself' satisfies ReviewsModel['forbidden']);
 
         const existing = ReviewsQueries.findExisting.get({
-            $reviewer_id: reviewer.id,
-            $reviewed_id: body.reviewed_id,
+            reviewer_id: reviewer.id,
+            reviewed_id: body.reviewed_id,
         });
         if (existing)
             throw status(
@@ -26,13 +26,13 @@ export abstract class ReviewsService {
             );
 
         const { lastInsertRowid } = ReviewsQueries.insert.run({
-            $content: body.content,
-            $rating: body.rating,
-            $reviewer_id: reviewer.id,
-            $reviewed_id: body.reviewed_id,
+            content: body.content,
+            rating: body.rating,
+            reviewer_id: reviewer.id,
+            reviewed_id: body.reviewed_id,
         });
 
-        const review = ReviewsQueries.findById.get({ $id: Number(lastInsertRowid) });
+        const review = ReviewsQueries.findById.get({ id: Number(lastInsertRowid) });
         if (!review) throw status(500, 'Error creating review');
 
         return review;
@@ -43,7 +43,7 @@ export abstract class ReviewsService {
     }: ReviewsModel['reviewIdParam']): Promise<ReviewsModel['getReviewByIdResponse']> {
         const existing = await ReviewsService.getById({ id });
 
-        ReviewsQueries.delete.run({ $id: Number(id) });
+        ReviewsQueries.delete.run({ id: Number(id) });
 
         return existing;
     }
@@ -54,7 +54,7 @@ export abstract class ReviewsService {
     ): Promise<ReviewsModel['getReviewByIdResponse']> {
         const existing = await ReviewsService.getById({ id });
 
-        const reviewer = AuthQueries.findByFirebaseUid.get({ $firebase_uid: uid });
+        const reviewer = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
         if (!reviewer) throw status(404, 'User not found' satisfies ReviewsModel['userNotFound']);
 
         if (existing.reviewer_id !== reviewer.id)
@@ -63,7 +63,7 @@ export abstract class ReviewsService {
                 'You can only delete your own reviews' satisfies ReviewsModel['forbiddenNotOwner']
             );
 
-        ReviewsQueries.delete.run({ $id: Number(id) });
+        ReviewsQueries.delete.run({ id: Number(id) });
 
         return existing;
     }
@@ -71,7 +71,7 @@ export abstract class ReviewsService {
     static async getById({
         id,
     }: ReviewsModel['reviewIdParam']): Promise<ReviewsModel['getReviewByIdResponse']> {
-        const review = ReviewsQueries.findById.get({ $id: Number(id) });
+        const review = ReviewsQueries.findById.get({ id: Number(id) });
         if (!review) throw status(404, 'Review not found' satisfies ReviewsModel['notFound']);
 
         return review;
@@ -80,18 +80,18 @@ export abstract class ReviewsService {
     static async getByClientId({
         client_id,
     }: ReviewsModel['clientIdParam']): Promise<ReviewsModel['getReviewByClientIdResponse']> {
-        const user = UserQueries.findById.get({ $id: Number(client_id) });
+        const user = UserQueries.findById.get({ id: Number(client_id) });
         if (!user) throw status(404, 'User not found' satisfies ReviewsModel['userNotFound']);
 
-        return ReviewsQueries.findByReviewerId.all({ $reviewer_id: Number(client_id) });
+        return ReviewsQueries.findByReviewerId.all({ reviewer_id: Number(client_id) });
     }
 
     static async getByProviderId({
         provider_id,
     }: ReviewsModel['providerIdParam']): Promise<ReviewsModel['getReviewByProviderIdResponse']> {
-        const user = UserQueries.findById.get({ $id: Number(provider_id) });
+        const user = UserQueries.findById.get({ id: Number(provider_id) });
         if (!user) throw status(404, 'User not found' satisfies ReviewsModel['userNotFound']);
 
-        return ReviewsQueries.findByReviewedId.all({ $reviewed_id: Number(provider_id) });
+        return ReviewsQueries.findByReviewedId.all({ reviewed_id: Number(provider_id) });
     }
 }

@@ -55,6 +55,7 @@ export interface UserService {
     is_active:  number  // 0 | 1
     created_at: string
     updated_at: string
+    service_name: string
 }
 
 export interface EmailVerificationCode {

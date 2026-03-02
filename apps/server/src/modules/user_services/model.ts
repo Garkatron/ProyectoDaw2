@@ -7,6 +7,7 @@ const ProviderServiceObject = t.Object({
     is_active: t.Boolean(),
     created_at: t.String(),
     updated_at: t.String(),
+    service_name: t.String(),
 });
 
 export const ProviderServicesModel = {

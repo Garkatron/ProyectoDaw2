@@ -9,7 +9,7 @@ export abstract class UserService {
     }
 
     static async getById({ id }: UserModel['userIdParam']): Promise<UserModel['getUserById']> {
-        const user = UserQueries.findById.get({ $id: Number(id) });
+        const user = UserQueries.findById.get({ id: Number(id) });
 
         if (!user) throw status(404, 'User not found' satisfies UserModel['notFound']);
 
@@ -17,7 +17,7 @@ export abstract class UserService {
     }
 
     static async getMe({ uid }: { uid: string }): Promise<UserModel['getUserById']> {
-        const user = AuthQueries.findByFirebaseUid.get({ $firebase_uid: uid });
+        const user = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
         if (!user)
             throw status(404, 'User not found' satisfies UserModel['notFound']);
 
@@ -27,7 +27,7 @@ export abstract class UserService {
     static async getByName({
         name,
     }: UserModel['userNameParam']): Promise<UserModel['getUserByName']> {
-        const user = UserQueries.findByName.get({ $name: name });
+        const user = UserQueries.findByName.get({ name: name });
 
         if (!user) throw status(404, 'User not found' satisfies UserModel['notFound']);
 

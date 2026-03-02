@@ -2,7 +2,7 @@ import { status } from "elysia";
 import type { AuthModel } from "./model";
 import { sql } from "bun";
 import { firebaseAuth } from "../../libs/firebase";
-import type { DecodedIdToken } from "firebase-admin/auth";
+import type { DecodedIdToken, UserRecord } from "firebase-admin/auth";
 import { AuthQueries } from "./queries";
 
 export abstract class AuthService {
@@ -27,9 +27,9 @@ export abstract class AuthService {
                 password,
                 displayName: username,
             });
-    
+
             await firebaseAuth.setCustomUserClaims(firebaseUser.uid, { role });
-    
+
             AuthQueries.insert.run({
                 firebase_uid: firebaseUser.uid,
                 username: username,
@@ -48,29 +48,107 @@ export abstract class AuthService {
         email,
         password,
     }: AuthModel["loginBody"]): Promise<AuthModel["loginResponse"]> {
-        const existing = AuthQueries.findByEmail.get({ email: email });
-
-        if (!existing) {
-            throw status(
-                400,
-                "User not exists" satisfies AuthModel["loginUserNotExists"],
-            );
+        if (!email || !password) {
+            throw status(400, "Email and password are required");
         }
 
-        const firebaseToken = await firebaseAuth.createCustomToken(
-            existing.name,
-            {
-                email: existing!.email,
-                role: existing!.role,
-            },
-        );
+        try {
+            // Fetch Firebase Identity Toolkit
+            const firebaseResponse = await fetch(
+                `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        returnSecureToken: true,
+                    }),
+                },
+            ).then((res) => res.json());
 
-        return {
-            username: existing.name,
-            token: firebaseToken,
-        };
+            // Handling firebase stuff
+            if (firebaseResponse.error) {
+                const message = firebaseResponse.error.message;
+
+                // Firebase log
+                console.warn(`[AuthService] Firebase Auth Error: ${message}`);
+
+                switch (message) {
+                    case "EMAIL_NOT_FOUND":
+                    case "INVALID_EMAIL":
+                        throw status(404, "User not found");
+                    case "INVALID_PASSWORD":
+                        throw status(401, "Incorrect password");
+                    case "USER_DISABLED":
+                        throw status(403, "Account disabled");
+                    case "TOO_MANY_ATTEMPTS_TRY_LATER":
+                        throw status(
+                            429,
+                            "Too many attempts. Try again later.",
+                        );
+                    default:
+                        throw status(500, `Auth error: ${message}`);
+                }
+            }
+
+            const { localId: firebase_uid, idToken } = firebaseResponse;
+
+            // Search local
+            let userRecord = AuthQueries.findByFirebaseUid.get({
+                firebase_uid,
+            });
+
+            // ! Syncronization
+            if (!userRecord) {
+                try {
+                    const firebaseUser =
+                        await firebaseAuth.getUser(firebase_uid);
+
+                    if (!firebaseUser.email) {
+                        throw status(500, "Firebase user has no email");
+                    }
+
+                    await AuthQueries.insert.run({
+                        firebase_uid,
+                        username:
+                            firebaseUser.displayName || email.split("@")[0],
+                        email: firebaseUser.email,
+                        role: firebaseUser.customClaims?.role || "client",
+                    });
+
+                    userRecord = AuthQueries.findByFirebaseUid.get({
+                        firebase_uid,
+                    });
+                } catch (dbErr) {
+                    console.error(
+                        "[AuthService] Error syncing user to DB:",
+                        dbErr,
+                    );
+                    throw status(500, "Error syncing user with database");
+                }
+            }
+
+            if (!userRecord) {
+                throw status(500, "Failed to retrieve user record after sync");
+            }
+
+            return {
+                id: userRecord.id,
+                username: userRecord.name,
+                role: userRecord.role,
+                token: idToken,
+            };
+        } catch (err: any) {
+            if (err.code && err.response) {
+                throw err;
+            }
+
+            // Si es un error de red o inesperado
+            console.error("[AuthService][login] Unexpected System Error:", err);
+            throw status(500, "Internal Server Connection Error");
+        }
     }
-
     static async verifyToken(token: string): Promise<DecodedIdToken> {
         try {
             return await firebaseAuth.verifyIdToken(token);

@@ -15,7 +15,9 @@ export const AuthModel = {
     }),
 
     loginResponse: t.Object({
+        id: t.Number(),
         username: t.String(),
+        role: t.String(),
         token: t.String(),
     }),
     registerResponse: t.Object({
