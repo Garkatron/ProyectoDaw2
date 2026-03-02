@@ -13,6 +13,7 @@ export const UserModel = {
     userIdParam:   t.Object({ id: t.String() }),
     userNameParam: t.Object({ name: t.String() }),
 
+    getRoleResponse: t.Enum(UserRole),
     getAllUsers:  t.Array(UserObject),
     getUserById:  UserObject,
     getUserByName: UserObject,

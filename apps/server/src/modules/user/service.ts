@@ -16,6 +16,17 @@ export abstract class UserService {
         return user;
     }
 
+      static async getRoleById({ id }: UserModel['userIdParam']): Promise<UserModel['getRoleResponse']> {
+        const role = UserQueries.findRoleById.get({ id: Number(id) });
+
+        if (!role) throw status(404, 'User not found' satisfies UserModel['notFound']);
+
+        return role;
+    }
+
+    
+    
+
     static async getMe({ uid }: { uid: string }): Promise<UserModel['getUserById']> {
         const user = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
         if (!user)

@@ -48,7 +48,6 @@ export function migrate(db: Database) {
             date_time      TEXT NOT NULL,
             status         TEXT NOT NULL DEFAULT 'Pending' CHECK (status IN ('Completed', 'Pending', 'In Process', 'Cancelled')),
             price          REAL NOT NULL,
-            total_amount   REAL,
             app_commission REAL,
             payment_method TEXT NOT NULL CHECK (payment_method IN ('Bizum', 'Bank Transfer', 'Paypal')),
             user_id        INTEGER NOT NULL,

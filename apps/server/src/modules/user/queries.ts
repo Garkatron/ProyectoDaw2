@@ -1,20 +1,22 @@
-import { db } from '../../libs/db';
-import type { User } from '@limpora/common/src/types/user'
+import { db } from "../../libs/db";
+import type { User, UserRole } from "@limpora/common/src/types/user";
 
 export const UserQueries = {
     findById: db.query<User, { id: number }>(
-        `SELECT * FROM Users WHERE id = :id`
+        `SELECT * FROM Users WHERE id = :id`,
     ),
 
     findByName: db.query<User, { name: string }>(
-        `SELECT * FROM Users WHERE name = :name`
+        `SELECT * FROM Users WHERE name = :name`,
+    ),
+
+    findRoleById: db.query<UserRole, { id: number }>(
+        `SELECT role FROM Users WHERE id = :id`,
     ),
 
     findByRole: db.query<User, { role: string }>(
-        `SELECT * FROM Users WHERE role = :role`
+        `SELECT * FROM Users WHERE role = :role`,
     ),
 
-    getAll: db.query<User, null>(
-        `SELECT * FROM Users`
-    ),
+    getAll: db.query<User, null>(`SELECT * FROM Users`),
 };

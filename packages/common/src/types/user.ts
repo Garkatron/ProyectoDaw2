@@ -1,4 +1,6 @@
+import { AppointmentStatus } from "../enums/AppointmentStatus.enum"
 import { UserRole } from "../enums/Role.enum"
+import { PaymentMethod } from '@limpora/common';
 
 export interface User {
     id:                    number
@@ -28,11 +30,10 @@ export interface Service {
 export interface Appointment {
     id:             number
     date_time:      string
-    status:         'Completed' | 'Pending' | 'In Process' | 'Cancelled'
+    status:         AppointmentStatus,
     price:          number
-    total_amount:   number | null
-    app_commission: number | null
-    payment_method: 'Bizum' | 'Bank Transfer' | 'Paypal'
+    app_commission: number
+    payment_method: PaymentMethod,
     user_id:        number
     provider_id:    number
     service_id:     number
