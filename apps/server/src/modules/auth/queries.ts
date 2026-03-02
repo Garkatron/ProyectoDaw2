@@ -2,31 +2,31 @@ import { db } from "../../libs/db"
 import type { User } from '@limpora/common/src/types/user'
 
 export const AuthQueries = {
-    findByFirebaseUid: db.query<User, { $firebase_uid: string }>(`
+    findByFirebaseUid: db.query<User, { firebase_uid: string }>(`
         SELECT * FROM Users
-        WHERE firebase_uid = $firebase_uid
+        WHERE firebase_uid = :firebase_uid
         LIMIT 1
     `),
 
-    findByEmail: db.query<User, { $email: string }>(`
+    findByEmail: db.query<User, { email: string }>(`
         SELECT * FROM Users
-        WHERE email = $email
+        WHERE email = :email
         LIMIT 1
     `),
 
     insert: db.query<void, {
-        $firebase_uid:  string
-        $name:          string
-        $email:         string
-        $role:          string
+        firebase_uid: string
+        username:     string
+        email:        string
+        role:         string
     }>(`
         INSERT INTO Users (firebase_uid, name, email, role)
-        VALUES ($firebase_uid, $name, $email, $role)
+        VALUES (:firebase_uid, :username, :email, :role)
     `),
 
-    updateEmailVerified: db.query<void, { $firebase_uid: string }>(`
+    updateEmailVerified: db.query<void, { firebase_uid: string }>(`
         UPDATE Users
         SET email_verified = 1
-        WHERE firebase_uid = $firebase_uid
+        WHERE firebase_uid = :firebase_uid
     `),
 }

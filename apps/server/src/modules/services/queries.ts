@@ -5,21 +5,23 @@ export const ServicesQueries = {
     insert: db.query<
         void,
         {
-            $name: string;
-            $duration: number;
+            name: string;
+            duration: number;
         }
-    >(`INSERT INTO Services (name, duration) VALUES ($name, $duration)`),
+    >(`INSERT INTO Services (name, duration) VALUES (:name, :duration)`),
 
     findById: db.query<
-        void,
+        Service,
         {
-            $id: number;
+            id: number;
         }
-    >(`SELECT * FROM Services WHERE id = $id`),
+    >(`SELECT * FROM Services WHERE id = :id`),
 
-    findByName: db.query<Service, { $name: string }>(`SELECT * FROM Services WHERE name = $name`),
+    findByName: db.query<Service, { name: string }>(
+        `SELECT * FROM Services WHERE name = :name`
+    ),
 
     getAll: db.query<Service, null>(`SELECT * FROM Services`),
 
-    delete: db.query<void, { $id: number }>(`DELETE FROM Services WHERE id = $id`),
+    delete: db.query<void, { id: number }>(`DELETE FROM Services WHERE id = :id`),
 };

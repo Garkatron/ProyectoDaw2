@@ -38,7 +38,7 @@ export function migrate(db: Database) {
         CREATE TABLE IF NOT EXISTS Services (
             id       INTEGER PRIMARY KEY AUTOINCREMENT,
             name     TEXT NOT NULL,
-            duration TEXT NOT NULL
+            duration INTEGER NOT NULL
         )
     `);
 

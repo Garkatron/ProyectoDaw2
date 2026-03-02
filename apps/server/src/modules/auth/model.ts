@@ -5,7 +5,7 @@ export const AuthModel = {
     registerBody: t.Object({
         username: t.String(),
         password: t.String(),
-        email: t.String({ format: 'email' }),
+        email: t.String({ format: 'email', error: 'Invalid email format' }),
         role: t.Enum(UserRole),
     }),
 

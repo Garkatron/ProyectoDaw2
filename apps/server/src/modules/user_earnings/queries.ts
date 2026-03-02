@@ -8,7 +8,7 @@ export const EarningsQueries = {
             total_money: number;
             retained_money: number;
         },
-        { $provider_id: number }
+        { provider_id: number }
     >(`
         SELECT
             COUNT(CASE WHEN status = 'Completed' THEN 1 END)                                      AS closed_appointments,
@@ -16,6 +16,6 @@ export const EarningsQueries = {
             COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_amount END), 0)                AS total_money,
             COALESCE(SUM(CASE WHEN status IN ('Pending', 'In Process') THEN total_amount END), 0) AS retained_money
         FROM Appointments
-        WHERE provider_id = $provider_id
+        WHERE provider_id = :provider_id
     `),
 };

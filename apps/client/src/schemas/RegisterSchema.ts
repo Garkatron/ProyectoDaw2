@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const RegisterSchema = z.object({
-  name: z
+  username: z
     .string()
     .min(2, "Name is too short")
     .regex(/^[A-Za-z\s]+$/, "Name cannot contain special characters or numbers"),

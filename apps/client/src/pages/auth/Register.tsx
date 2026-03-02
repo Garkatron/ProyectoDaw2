@@ -22,7 +22,7 @@ export default function Register() {
     const register = useAuthStore((state) => state.register);
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [name, setName] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
     const [role, setRole] = useState<string>('client');
 
     const [success, setSuccess] = useState<boolean>(false);
@@ -33,17 +33,17 @@ export default function Register() {
 
     const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
-        const result = RegisterSchema.safeParse({ name, email, password });
+        const result = RegisterSchema.safeParse({ username, email, password });
 
         if (!result.success) {
             setModalTitle('Validation Error');
             setModalMessage(result.error.issues[0]?.message ?? 'Validation error')
-            setModalOpen(true);
+            setModalOpen(true);            
             return;
         }
 
         const data = await register(
-            result.data.name,
+            result.data.username,
             result.data.email,
             result.data.password,
             role
@@ -82,8 +82,8 @@ export default function Register() {
                         <TextInput
                             required
                             placeholder="Nombre completo"
-                            value={name}
-                            onChange={(e) => setName(e.currentTarget.value)}
+                            value={username}
+                            onChange={(e) => setUsername(e.currentTarget.value)}
                             size="md"
                         />
                         <TextInput

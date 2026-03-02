@@ -7,7 +7,7 @@ import { UserRole } from '@limpora/common/src/enums/Role.enum'
 export const servicesController = new Elysia({ prefix: '/services' })
     .use(AuthGuard)
 
-    .post('/create',
+    .post('/',
         async ({ body }) => ServicesService.create(body),
         {
             body: ServicesModel.createBody,
@@ -15,7 +15,6 @@ export const servicesController = new Elysia({ prefix: '/services' })
                 200: ServicesModel.createResponse,
                 400: ServicesModel.alreadyExists,
             },
-            hasRole: UserRole.Admin,
         }
     )
 

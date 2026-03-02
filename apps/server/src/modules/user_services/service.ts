@@ -22,21 +22,21 @@ export abstract class ProviderServicesService {
         provider_id: number
     ): Promise<ProviderServicesModel['assignResponse']> {
         const existing = ProviderQueries.findByProviderAndService.get({
-            $user_id:    provider_id,
-            $service_id: service_id,
+            user_id:    provider_id,
+            service_id: service_id,
         })
         if (existing)
             throw status(400, 'Service already assigned to this provider' satisfies ProviderServicesModel['alreadyExists'])
 
         ProviderQueries.insert.run({
-            $user_id:    provider_id,
-            $service_id: service_id,
-            $price:      price,
+            user_id:    provider_id,
+            service_id: service_id,
+            price:      price,
         })
 
         const assigned = ProviderQueries.findByProviderAndService.get({
-            $user_id:    provider_id,
-            $service_id: service_id,
+            user_id:    provider_id,
+            service_id: service_id,
         })
         if (!assigned) throw status(500, 'Error assigning service')
 
@@ -47,7 +47,7 @@ export abstract class ProviderServicesService {
         body: ProviderServicesModel['assignServiceBody'],
         provider_uid: string
     ): Promise<ProviderServicesModel['assignResponse']> {
-        const provider = AuthQueries.findByFirebaseUid.get({ $firebase_uid: provider_uid })
+        const provider = AuthQueries.findByFirebaseUid.get({ firebase_uid: provider_uid })
         if (!provider) throw status(404, 'User not found' satisfies ProviderServicesModel['userNotFound'])
 
         return await ProviderServicesService.assign(body, provider.id)
@@ -58,14 +58,14 @@ export abstract class ProviderServicesService {
         provider_id: number
     ): Promise<ProviderServicesModel['unassignResponse']> {
         const existing = ProviderQueries.findByProviderAndService.get({
-            $user_id:    provider_id,
-            $service_id: service_id,
+            user_id:    provider_id,
+            service_id: service_id,
         })
         if (!existing) throw status(404, 'Service not found' satisfies ProviderServicesModel['notFound'])
 
         ProviderQueries.delete.run({
-            $user_id:    provider_id,
-            $service_id: service_id,
+            user_id:    provider_id,
+            service_id: service_id,
         })
 
         return transform([existing])[0]
@@ -75,7 +75,7 @@ export abstract class ProviderServicesService {
         body: ProviderServicesModel['unassingServiceBody'],
         provider_uid: string
     ): Promise<ProviderServicesModel['unassignResponse']> {
-        const provider = AuthQueries.findByFirebaseUid.get({ $firebase_uid: provider_uid })
+        const provider = AuthQueries.findByFirebaseUid.get({ firebase_uid: provider_uid })
         if (!provider) throw status(404, 'User not found' satisfies ProviderServicesModel['userNotFound'])
 
         return await ProviderServicesService.unassign(body, provider.id)
@@ -88,7 +88,7 @@ export abstract class ProviderServicesService {
     static async getByProviderId({
         provider_id,
     }: ProviderServicesModel['providerIdParam']): Promise<ProviderServicesModel['getAllResponse']> {
-        const services = ProviderQueries.findByProviderId.all({ $user_id: Number(provider_id) })  // ← .all() no .get()
+        const services = ProviderQueries.findByProviderId.all({ user_id: Number(provider_id) }) 
 
         return transform(services)
     }
@@ -98,8 +98,8 @@ export abstract class ProviderServicesService {
         service_id,
     }: ProviderServicesModel['providerAndServiceIdParam']): Promise<ProviderServicesModel['getByProviderIdResponse']> {
         const service = ProviderQueries.findByProviderAndService.get({
-            $user_id:    Number(provider_id),
-            $service_id: Number(service_id),
+            user_id:    Number(provider_id),
+            service_id: Number(service_id),
         })
         if (!service) throw status(404, 'Service not found' satisfies ProviderServicesModel['notFound'])
 

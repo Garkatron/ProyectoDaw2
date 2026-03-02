@@ -2,10 +2,8 @@ import { Elysia } from 'elysia';
 import { AuthService } from './service';
 import { AuthModel } from './model';
 import { AuthGuard } from './guard';
-
 export const authController = new Elysia({ prefix: "/auth" })
-    .use(AuthGuard)
-
+    
     .post('/register',
         async ({ body }) => AuthService.register(body),
         {
@@ -14,7 +12,7 @@ export const authController = new Elysia({ prefix: "/auth" })
                 200: AuthModel.registerResponse,
                 400: AuthModel.registerInvalid,
             }
-        }
+        },
     )
 
     .post('/login',
@@ -25,21 +23,18 @@ export const authController = new Elysia({ prefix: "/auth" })
         },
         {
             body: AuthModel.loginBody,
-            response: {
-                200: AuthModel.loginResponse,
-                400: AuthModel.loginInvalid,
-                404: AuthModel.loginUserNotExists,
-            }
         }
     )
 
+    .use(AuthGuard) 
+    
     .post('/logout',
         async ({ user, cookie: { session } }) => {
             await AuthService.revokeTokens(user.uid);
             session.value = undefined;
             return { success: true };
         },
-        { isAuthenticated: true }
+        { isAuthenticated: true } 
     )
 
     .get('/me',

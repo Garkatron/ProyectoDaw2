@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoginSchema from '../../schemas/NewSessionSchema';
 import lang from '../../utils/LangManager';
+import { UserRole } from '@limpora/common';
 import {
     TextInput,
     PasswordInput,
@@ -17,7 +18,6 @@ import {
     Modal,
     Text,
 } from '@mantine/core';
-import { UserRole } from '../../../../common/enums/Role.enum';
 
 export default function Login() {
     const login = useAuthStore((state) => state.login);

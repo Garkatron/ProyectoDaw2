@@ -7,13 +7,13 @@ export abstract class ServicesService {
         name,
         duration,
     }: ServicesModel['createBody']): Promise<ServicesModel['createResponse']> {
-        const existing = ServicesQueries.findByName.get({ $name: name });
+        const existing = ServicesQueries.findByName.get({ name });
         if (existing)
             throw status(400, 'Service already exists' satisfies ServicesModel['alreadyExists']);
 
         const { lastInsertRowid } = ServicesQueries.insert.run({
-            $name: name,
-            $duration: Number(duration),
+            name,
+            duration,
         });
 
         return {
@@ -30,7 +30,7 @@ export abstract class ServicesService {
     static async getById({
         id,
     }: ServicesModel['serviceIdParam']): Promise<ServicesModel['getByIdResponse']> {
-        const service = ServicesQueries.findById.get({ $id: Number(id) });
+        const service = ServicesQueries.findById.get({ id: Number(id) });
 
         if (!service) throw status(404, 'Service not found' satisfies ServicesModel['notFound']);
 
@@ -42,7 +42,7 @@ export abstract class ServicesService {
     }: ServicesModel['serviceIdParam']): Promise<ServicesModel['getByIdResponse']> {
         const existing = await ServicesService.getById({ id });
 
-        ServicesQueries.delete.run({ $id: Number(id) });
+        ServicesQueries.delete.run({ id: Number(id) });
 
         return existing;
     }

@@ -1,9 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import axios from 'axios';
 import { API } from '../lib/api';
 import Login from '../pages/auth/Login';
-import { UserRole } from '../../../common/enums/Role.enum';
+import { UserRole } from '@limpora/common';
 
 interface User {
     id: number;
@@ -76,21 +75,23 @@ export const useAuthStore = create<AuthStore>()(
                 return { success: true };
             },
 
-            register: async (name, email, password, role = 'client'): Promise<AuthResult> => {
+            register: async (username, email, password, role = 'client'): Promise<AuthResult> => {
                 set({ error: null });
-
+                
+                
                 const { data, error } = await API.auth.register.post({
-                    username: name,
-                    email,
+                    username,
                     password,
+                    email,
                     role: toUserRole(role),
                 });
-
+                
                 if (error) {
                     const msg = errorToString(error.value);
                     set({ error: msg });
                     return { success: false, error: msg };
                 }
+
 
                 return { success: true };
             },
