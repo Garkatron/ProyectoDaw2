@@ -10,6 +10,7 @@ export const userController = new Elysia({ prefix: '/user' })
     .get('/',
         async () => UserService.getAllUsers(),
         {
+            body: UserModel.getAllUsers,
             response: {
                 200: UserModel.getAllUsers,
                 404: UserModel.notFound,
