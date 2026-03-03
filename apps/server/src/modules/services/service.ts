@@ -5,7 +5,7 @@ import { ServicesQueries } from './queries';
 export abstract class ServicesService {
     static async create({
         name,
-        duration,
+        category,
     }: ServicesModel['createBody']): Promise<ServicesModel['createResponse']> {
         const existing = ServicesQueries.findByName.get({ name });
         if (existing)
@@ -13,13 +13,13 @@ export abstract class ServicesService {
 
         const { lastInsertRowid } = ServicesQueries.insert.run({
             name,
-            duration,
+            category,
         });
 
         return {
             id: Number(lastInsertRowid),
             name,
-            duration,
+            category,
         };
     }
 

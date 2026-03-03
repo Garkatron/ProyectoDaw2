@@ -7,27 +7,26 @@ export const ServicesModel = {
 
     createBody: t.Object({
         name: t.String(),
-        duration: t.Number(),
+        category: t.String(),
     }),
 
     getAllResponse: t.Array(
         t.Object({
             id: t.Number(),
             name: t.String(),
-            duration: t.String(),
         })
     ),
 
     getByIdResponse: t.Object({
         id: t.Number(),
         name: t.String(),
-        duration: t.String(),
+        category: t.String(),
     }),
 
     createResponse: t.Object({
         id: t.Number(),
         name: t.String(),
-        duration: t.Number(),
+        category: t.String(),
     }),
 
     notFound: t.Literal('Service not found'),

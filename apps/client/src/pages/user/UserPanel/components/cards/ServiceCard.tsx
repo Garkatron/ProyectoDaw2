@@ -7,7 +7,7 @@ export default function ServiceCard({ service, isSelf, onDelete }) {
             <Group justify="space-between">
                 <Text size="sm" fw={500}>{service.service_name}</Text>
                 <Group gap="sm">
-                    <Text size="sm" fw={600} c="dimmed">{service.price}€</Text>
+                    <Text size="sm" fw={600} c="dimmed">{service.price_per_h}€ hour</Text>
                     {isSelf && (
                         <ActionIcon
                             variant="subtle"

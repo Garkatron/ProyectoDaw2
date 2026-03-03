@@ -6,9 +6,9 @@ export const ServicesQueries = {
         void,
         {
             name: string;
-            duration: number;
+            category: string;
         }
-    >(`INSERT INTO Services (name, duration) VALUES (:name, :duration)`),
+    >(`INSERT INTO Services (name, category) VALUES (:name, :category)`),
 
     findById: db.query<
         Service,

@@ -192,13 +192,13 @@ export default function BookingConfirmation() {
       const dateTime = new Date(selectedDate);
       dateTime.setHours(hours, minutes, 0, 0);
 
-      await API.booking.me.post({
-        provider_id: providerId,
+      await API.bookings.me.post({
+                provider_id: providerId,
         service_id: selectedService.service_id,
-        date: dateTime.toISOString(),
-        price: selectedService.price ?? 0,
+        start_time: dateTime.toISOString(),
         payment_method: paymentMethod as PaymentMethod,
-      });
+        duration_hours: 30,
+      })
 
       setSuccess(true);
       setTimeout(() => navigate(-1), 2000);

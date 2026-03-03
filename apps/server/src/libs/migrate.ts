@@ -9,6 +9,7 @@ export function migrate(db: Database) {
             name                   TEXT,
             email                  TEXT UNIQUE,
             role                   TEXT DEFAULT 'client' CHECK (role IN ('admin', 'provider', 'client')),
+            email_verified         INTEGER NOT NULL DEFAULT 0,
             
             -- Location
             address                TEXT,
@@ -71,6 +72,7 @@ export function migrate(db: Database) {
             service_id   INTEGER NOT NULL,
             price_per_h  REAL NOT NULL,
             is_active    INTEGER NOT NULL DEFAULT 1,
+            updated_at   TEXT DEFAULT (datetime('now')),
             PRIMARY KEY (user_id, service_id),
             FOREIGN KEY (user_id)    REFERENCES Users(id) ON DELETE CASCADE,
             FOREIGN KEY (service_id) REFERENCES Services(id) ON DELETE CASCADE

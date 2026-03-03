@@ -6,7 +6,6 @@ const ProviderServiceObject = t.Object({
     service_id: t.Number(),
     price_per_h: t.Number({ minimum: 0 }),
     is_active: t.Boolean(),
-    created_at: t.String(),
     updated_at: t.String(),
 
     // Join Services

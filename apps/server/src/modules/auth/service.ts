@@ -32,7 +32,7 @@ export abstract class AuthService {
 
             AuthQueries.insert.run({
                 firebase_uid: firebaseUser.uid,
-                username: username,
+                name: username,
                 email: email,
                 role: role,
             });
@@ -111,7 +111,7 @@ export abstract class AuthService {
 
                     await AuthQueries.insert.run({
                         firebase_uid,
-                        username:
+                        name:
                             firebaseUser.displayName || email.split("@")[0],
                         email: firebaseUser.email,
                         role: firebaseUser.customClaims?.role || "client",

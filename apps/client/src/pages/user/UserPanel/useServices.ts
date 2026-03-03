@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { API } from "../../../lib/api";
+import { status } from 'elysia';
 
 interface UserService {
     service_id: number;
     user_id: number;
-    price: number;
+    price_per_h: number;
     is_active: boolean;
-    created_at: string;
     updated_at: string;
+    category?: string;
 }
 
 interface Service {
@@ -27,9 +28,8 @@ export function useServices(
     const [error, setError] = useState<string | null>(null);
 
     const fetchUserServices = async (id: number) => {
-        const { data, error } = await API.providers({
-            provider_id: String(id),
-        }).services.get();
+        const { data, error } = await API.providers({provider_id: id}).services.get();
+        
         if (!error && data) setUserServices(data);
     };
 
@@ -55,7 +55,7 @@ export function useServices(
 
         const { error } = await API.providers.me.services.assign.post({
             service_id: Number(selectedServiceId),
-            price: Number(selectedServicePrice),
+            price_per_h: Number(selectedServicePrice),
         });
 
         if (error) {
@@ -73,16 +73,14 @@ export function useServices(
         setSubmitting(false);
     };
 
-    const handleDelete = async (serviceId: number) => {
+    const handleDelete = async (service_id: number) => {
         if (!targetUser) return;
 
-        const { error } = await API.providers.me.services.unassign.delete({
-            service_id: serviceId,
-        });
+        const { error } = await API.providers.me.services({service_id}).unassign.delete();
 
         if (!error)
             setUserServices((prev) =>
-                prev.filter((s) => s.service_id !== serviceId),
+                prev.filter((s) => s.service_id !== service_id),
             );
         else console.error("Error al eliminar servicio:", error.value);
     };

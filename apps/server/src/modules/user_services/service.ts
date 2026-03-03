@@ -159,7 +159,7 @@ export abstract class ProviderServicesService {
         ProviderServicesModel["getAllResponse"]
     > {
         const services = ProviderQueries.findByProviderId.all({
-            user_id: Number(provider_id),
+            user_id: provider_id,
         });
 
         return transform(services);
