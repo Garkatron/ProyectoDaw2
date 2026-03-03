@@ -1,70 +1,85 @@
+import { ProviderService } from "@limpora/common";
 import { db } from "../../libs/db";
-import type { UserService } from "@limpora/common/src/types/user";
 
 export const ProviderQueries = {
-    getAll: db.query<UserService & { service_name: string }, null>(
+    getAll: db.query<ProviderService, null>(
         `
-    SELECT 
-        us.*,
-        s.name AS service_name
-    FROM UserServices us
-    JOIN Services s ON us.service_id = s.id
-    `,
+        SELECT 
+            us.*,
+            s.name AS service_name,
+            s.category
+        FROM UserServices us
+        JOIN Services s ON us.service_id = s.id
+        `,
     ),
 
     findByProviderId: db.query<
-        UserService & { service_name: string },
+        ProviderService,
         { user_id: number }
     >(
         `
-    SELECT 
-        us.*,
-        s.name AS service_name
-    FROM UserServices us
-    JOIN Services s ON us.service_id = s.id
-    WHERE us.user_id = :user_id
-    `,
+        SELECT 
+            us.*,
+            s.name AS service_name,
+            s.category
+        FROM UserServices us
+        JOIN Services s ON us.service_id = s.id
+        WHERE us.user_id = :user_id
+        `,
     ),
 
     findByProviderAndService: db.query<
-        UserService & { service_name: string },
+        ProviderService,
         { user_id: number; service_id: number }
     >(
         `
-    SELECT 
-        us.*,
-        s.name AS service_name
-    FROM UserServices us
-    JOIN Services s ON us.service_id = s.id
-    WHERE us.user_id = :user_id AND us.service_id = :service_id
-    LIMIT 1
-    `,
+        SELECT 
+            us.*,
+            s.name AS service_name,
+            s.category
+        FROM UserServices us
+        JOIN Services s ON us.service_id = s.id
+        WHERE us.user_id = :user_id AND us.service_id = :service_id
+        LIMIT 1
+        `,
     ),
 
     insert: db.query<
         void,
-        { user_id: number; service_id: number; price: number }
+        { user_id: number; service_id: number; price_per_h: number }
     >(
         `
-    INSERT INTO UserServices (user_id, service_id, price)
-    VALUES (:user_id, :service_id, :price)
-    `,
+        INSERT INTO UserServices (user_id, service_id, price_per_h)
+        VALUES (:user_id, :service_id, :price_per_h)
+        `,
     ),
 
     updatePrice: db.query<
         void,
-        { user_id: number; service_id: number; price: number }
+        { user_id: number; service_id: number; price_per_h: number }
     >(
         `
-    UPDATE UserServices SET price = :price
-    WHERE user_id = :user_id AND service_id = :service_id
-    `,
+        UPDATE UserServices 
+        SET price_per_h = :price_per_h, 
+            updated_at = datetime('now')
+        WHERE user_id = :user_id AND service_id = :service_id
+        `,
+    ),
+
+    toggleActive: db.query<
+        void, 
+        { user_id: number; service_id: number; is_active: number }
+    >(
+        `
+        UPDATE UserServices SET is_active = :is_active
+        WHERE user_id = :user_id AND service_id = :service_id
+        `
     ),
 
     delete: db.query<void, { user_id: number; service_id: number }>(
         `
-    DELETE FROM UserServices
-    WHERE user_id = :user_id AND service_id = :service_id
-    `,
+        DELETE FROM UserServices
+        WHERE user_id = :user_id AND service_id = :service_id
+        `,
     ),
 };

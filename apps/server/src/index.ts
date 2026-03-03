@@ -14,7 +14,6 @@ import { rateLimit } from "elysia-rate-limit";
 // ? Documentation
 import openapi from "@elysiajs/openapi";
 import { providerServicesController } from "./modules/user_services";
-import { AppContext, Logger } from "./utils/Logger";
 import { logger } from "@bogeychan/elysia-logger";
 import { bookingController } from "./modules/booking";
 
