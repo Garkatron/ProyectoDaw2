@@ -1,69 +1,70 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { AuthGuard } from "../auth/guard";
-import { UserRole } from "@limpora/common/src/enums/Role.enum";
+import { UserRole } from "@limpora/common"; 
 import { BookingService } from "./service";
 import { BookingModel } from "./model";
 
-export const bookingController = new Elysia({ prefix: "/booking" })
+export const bookingController = new Elysia({ prefix: "/bookings" }) 
     .use(AuthGuard)
-    .post("/", async ({ body }) => BookingService.assign(body), {
-        body: BookingModel.assignBody,
+
+    
+    .post("/me", ({ user, body }) => BookingService.assignByUid(body, user.uid), {
+        body: BookingModel.assignMeBody,
         response: {
+            201: BookingModel.assignResponse,
             403: BookingModel.forbidden,
             404: BookingModel.notFound,
             409: BookingModel.dateOccupied,
         },
-        hasRole: [UserRole.Admin],
+        isAuthenticated: true,
     })
-    .post(
-        "/me",
-        async ({ user, body }) => BookingService.assignByUid(body, user.uid),
-        {
-            body: BookingModel.assignMeBody,
-            response: {
-                403: BookingModel.forbidden,
-                404: BookingModel.notFound,
-                409: BookingModel.dateOccupied,
-            },
-            isAuthenticated: true,
-        },
-    )
-    .get("/me", async ({ user }) => BookingService.getMe(user.uid), {
+
+    .get("/me", ({ user }) => BookingService.getMe(user.uid), {
         response: {
+            200: BookingModel.listResponse,
             404: BookingModel.notFound,
-            403: BookingModel.forbidden,
         },
         isAuthenticated: true,
     })
 
-    .put("/status", async ({ body }) => BookingService.updateStatus(body), {
+    // Status
+
+    .patch("/:id/status", ({ params, body }) => BookingService.updateStatus(body, params), {
+        params: t.Object({ id: t.Numeric() }),
         body: BookingModel.updateStatusBody,
         response: {
+            200: BookingModel.updateResponse,
             404: BookingModel.notFound,
         },
         hasRole: [UserRole.Admin, UserRole.Provider],
     })
-    .get(
-        "/provider/:provider_id",
-        async ({ params }) => BookingService.getByProviderId(params),
-        {
-            params: BookingModel["providerIdParam"],
-            response: {
-                404: BookingModel.notFound,
-                403: BookingModel.forbidden,
-            },
-            hasRole: [UserRole.Admin],
+
+    // * Admin
+
+    /*
+    .get("/", () => BookingService.getAll(), {
+        response: { 200: BookingModel.listResponse },
+        hasRole: [UserRole.Admin],
+    })*/
+
+    .post("/", ({ body }) => BookingService.assign(body), {
+        body: BookingModel.assignBody,
+        response: {
+            201: BookingModel.assignResponse,
+            403: BookingModel.forbidden,
+            409: BookingModel.dateOccupied,
         },
-    )
-    .get(
-        "/client/:client_id",
-        async ({ params }) => BookingService.getByClientId(params),
-        {
-            params: BookingModel["clientIdParam"],
-            response: {
-                404: BookingModel.notFound,
-                403: BookingModel.forbidden,
-            },
-            hasRole: [UserRole.Admin],
-        },
-    );
+        hasRole: [UserRole.Admin],
+    })
+
+    .get("/provider/:provider_id", ({ params }) => BookingService.getByProviderId(params), {
+        params: BookingModel.providerIdParam,
+        response: { 200: BookingModel.getByProviderResponse },
+        hasRole: [UserRole.Admin],
+    })
+
+    .get("/client/:client_id", ({ params }) => BookingService.getByClientId(params), {
+        params: BookingModel.clientIdParam,
+        response: { 200: BookingModel.listResponse },
+        hasRole: [UserRole.Admin],
+    });

@@ -1,0 +1,1 @@
+export const APP_COMMISSION_PERCENT = 0.2;

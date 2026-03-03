@@ -2,76 +2,108 @@ import { status } from "elysia";
 import { BookingModel } from "./model";
 import { BookingQueries } from "./queries";
 import { UserService } from "../user/service";
-import { ServicesService } from "../services/service";
 import { AppointmentStatus, UserRole } from "@limpora/common";
 import { AuthQueries } from "../auth/queries";
-import { AuthService } from "../auth/service";
+import { ProviderQueries } from "../user_services/queries";
+import { APP_COMMISSION_PERCENT } from "../../constants";
 
 export abstract class BookingService {
     static async assign({
         service_id,
         provider_id,
         client_id,
-        price,
-        date,
+        duration_hours,
+        start_time,
         payment_method,
     }: BookingModel["assignBody"]): Promise<BookingModel["assignResponse"]> {
+        // ? Avoid self contract
         if (provider_id === client_id)
             throw status(
                 403,
-                "You cannot contrat yourself" satisfies BookingModel["forbidden"],
+                "You cannot contract yourself" satisfies BookingModel["forbidden"],
             );
 
+        // ? Find users
         const provider = await UserService.getById({ id: String(provider_id) });
         const client = await UserService.getById({ id: String(client_id) });
 
+        // ? Prevent stupid stuff
         if (provider.role !== UserRole.Provider)
             throw status(
                 403,
-                "You cannot contrat a non provider user" satisfies BookingModel["forbidden"],
+                "User is not a provider" satisfies BookingModel["forbidden"],
             );
 
         if (client.role !== UserRole.Client)
             throw status(
                 403,
-                "You cannot contrat a non provider user" satisfies BookingModel["forbidden"],
+                "User is not a provider" satisfies BookingModel["forbidden"],
             );
 
-        const service = await ServicesService.getById({
-            id: String(service_id),
+        // ? Find service
+        const providerService = ProviderQueries.findByProviderAndService.get({
+            user_id: provider_id,
+            service_id,
         });
+
+        if (!providerService || !providerService.is_active) {
+            throw status(
+                403,
+                "User does not offer this service" satisfies BookingModel["forbidden"],
+            );
+        }
+
+        // ? Calc time
+        const startDate = new Date(start_time);
+        const endDate = new Date(
+            startDate.getTime() + duration_hours * 60 * 60 * 1000,
+        );
+
+        const new_start = startDate.toISOString();
+        const new_end = endDate.toISOString();
 
         const conflict = BookingQueries.findConflict.get({
             provider_id,
-            date_time: date,
+            new_start,
+            new_end,
         });
 
+        // ? Avoid service time overlaps
         if (conflict)
             throw status(
                 409,
-                "Date occupied" satisfies BookingModel["dateOccupied"],
+                "Provider is not available in this timeframe" satisfies BookingModel["dateOccupied"],
             );
 
-        const app_commission = 20 * 0.2; // TODO
+        // ? Economic stuff
+        const provider_net = providerService.price_per_h * duration_hours;
+        const app_commission = provider_net * APP_COMMISSION_PERCENT;
+        const total_price = provider_net + app_commission;
 
+        // ? Insert
         const { lastInsertRowid } = BookingQueries.insert.run({
-            date_time: date,
+            start_time: new_start,
+            end_time: new_end,
+            travel_buffer_min: 30,
             status: AppointmentStatus.Pending,
-            price,
+            total_price,
+            provider_net,
             app_commission,
             payment_method,
-            client_id: client.id,
-            provider_id: provider.id,
-            service_id: service.id,
+            client_id,
+            provider_id,
+            service_id,
         });
 
-        const appointment = BookingQueries.findById.get({
+        const created = BookingQueries.findById.get({
             id: Number(lastInsertRowid),
         });
 
-        if (!appointment) throw new Error("Appointment not found after insert");
+        if (!created) {
+            throw status(500, "Failed to retrieve the created appointment");
+        }
 
-        return appointment;
+        return created;
     }
 
     static async getMe(uid: string): Promise<BookingModel["listResponse"]> {
@@ -80,7 +112,7 @@ export abstract class BookingService {
         if (!user)
             throw status(
                 404,
-                'User not found' satisfies BookingModel["notFound"],
+                "User not found" satisfies BookingModel["notFound"],
             );
 
         if (user.role === UserRole.Client) {
@@ -95,16 +127,14 @@ export abstract class BookingService {
 
         throw status(
             403,
-            'You cannot have appointments' satisfies BookingModel["forbidden"],
+            "Admins can't have appointments" satisfies BookingModel["forbidden"],
         );
     }
 
-    static async updateStatus({
-        id,
-        status: appointment_status,
-    }: BookingModel["updateStatusBody"]): Promise<
-        BookingModel["updateResponse"]
-    > {
+    static async updateStatus(
+        { status: appointment_status }: BookingModel["updateStatusBody"],
+        { id }: BookingModel["appointmentIdParam"],
+    ): Promise<BookingModel["updateResponse"]> {
         const appointment = BookingQueries.findById.get({ id });
 
         if (!appointment)
@@ -164,7 +194,7 @@ export abstract class BookingService {
     static async getByClientId({
         client_id,
     }: BookingModel["clientIdParam"]): Promise<BookingModel["listResponse"]> {
-        const client = await UserService.getById({ id: client_id });
+        const client = await UserService.getById({ id: String(client_id) });
 
         if (client.role !== UserRole.Client)
             throw status(
