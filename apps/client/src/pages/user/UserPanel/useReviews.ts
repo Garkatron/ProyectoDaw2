@@ -1,93 +1,61 @@
-import { useEffect, useState } from "react";
-import { useAuthStore } from "../../../stores/auth.store";
+import { useState } from "react";
 import { API } from "../../../lib/api";
-import { UserRole } from "@limpora/common";
 
-interface Review {
+export interface Review {
     id: number;
-    reviewer: string;
+    reviewer_name: string;
     rating: number;
-    text: string | null;
+    content: string | null;
+    created_at: string;
 }
 
-export function useReviews(
-    targetUser: { id: number; role: string } | null,
-    isSelf: boolean,
-) {
-    const currentUser = useAuthStore((state) => state.user);
-
+export function useReviews(targetProviderId?: number) {
     const [userReviews, setUserReviews] = useState<Review[]>([]);
-    const [reviewContent, setReviewContent] = useState("");
-    const [reviewRating, setReviewRating] = useState(5);
     const [submitting, setSubmitting] = useState(false);
-    const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const canReview =
-        !isSelf &&
-        currentUser?.role === UserRole.Client &&
-        targetUser?.role === UserRole.Provider;
-
-    const fetchReviews = async (id: number) => {
+    const fetchProviderReviews = async (id: number) => {
         const { data, error } = await API.reviews
-            .provider({ provider_id: String(id) })
+            .provider({ provider_id: id })
             .get();
         if (error || !data) return;
-
-        setUserReviews(
-            data.map((r) => ({
-                id: r.id,
-                reviewer: "Anónimo", // TODO
-                rating: r.rating,
-                text: r.content,
-            })),
-        );
+        setUserReviews(data as Review[]);
     };
 
-    useEffect(() => {
-        if (!targetUser?.id) return;
-        fetchReviews(targetUser.id);
-    }, [targetUser?.id]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!canReview || !targetUser) return;
-
+    const handlePublishReview = async (
+        appointment_id: number,
+        content: string,
+        rating: number,
+    ) => {
         setSubmitting(true);
         setError(null);
 
-        const { error } = await API.reviews.publish.post({
-            content: reviewContent,
-            rating: reviewRating,
-            reviewed_id: targetUser.id,
+        const { data, error } = await API.reviews.me.post({
+            appointment_id,
+            content: content || null,
+            rating,
         });
 
         if (error) {
-            setError(
+            const msg =
                 typeof error.value === "string"
                     ? error.value
-                    : "Error al enviar la reseña.",
-            );
-        } else {
-            setSuccess(true);
-            setReviewContent("");
-            setReviewRating(5);
-            await fetchReviews(targetUser.id);
+                    : "Error al publicar";
+            setError(msg);
+            setSubmitting(false);
+            return { error: msg };
         }
 
         setSubmitting(false);
+        return { data };
     };
 
     return {
         userReviews,
-        canReview,
-        reviewContent,
-        setReviewContent,
-        reviewRating,
-        setReviewRating,
+        fetchProviderReviews,
+        handlePublishReview,
         reviewSubmitting: submitting,
-        reviewSuccess: success,
         reviewError: error,
-        onSubmit: handleSubmit,
+        setReviewError: setError,
     };
 }

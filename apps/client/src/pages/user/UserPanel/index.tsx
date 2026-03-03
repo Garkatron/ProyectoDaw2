@@ -50,7 +50,6 @@ export default function UserPanel() {
                             <ServicesSection isSelf={isSelf} {...services} />
                         )}
 
-                        <ReviewsSection isSelf={isSelf} {...reviews} />
                     </Stack>
                 </Paper>
             </Box>
