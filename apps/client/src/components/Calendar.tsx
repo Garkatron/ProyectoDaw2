@@ -10,18 +10,31 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { AppointmentStatus } from "@limpora/common";
 
 const MONTHS = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
 ];
 const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-const statusColorMap = {
+const statusColorMap: Partial<Record<AppointmentStatus, string>> = {
   Completed: "green",
   Pending: "yellow",
   "In Process": "blue",
 };
+
+export type MarkedDate = { date: Date; status: AppointmentStatus };
 
 /**
  * Calendar Component
@@ -30,10 +43,19 @@ const statusColorMap = {
  * @param {Function} onDateClick  - Callback (date: Date) => void
  * @param {Date}     selectedDate - Fecha seleccionada externamente
  */
-export default function Calendar({ markedDates = [], onDateClick, selectedDate }) {
+
+export default function Calendar({
+  markedDates = [],
+  onDateClick,
+  selectedDate,
+}: {
+  markedDates?: MarkedDate[];
+  onDateClick: (date: Date) => void;
+  selectedDate: Date;
+}) {
   const [current, setCurrent] = useState(new Date());
 
-  const changeMonth = (offset) =>
+  const changeMonth = (offset: number) =>
     setCurrent(new Date(current.getFullYear(), current.getMonth() + offset, 1));
 
   const normalizedMarks = markedDates.map((m) => ({
@@ -54,7 +76,7 @@ export default function Calendar({ markedDates = [], onDateClick, selectedDate }
     date.setDate(startDate.getDate() + i);
 
     const mark = normalizedMarks.find(
-      (m) => m.date.toDateString() === date.toDateString()
+      (m) => m.date.toDateString() === date.toDateString(),
     );
     const isCurrentMonth = date.getMonth() === month;
     const isSelected = selectedDate
@@ -72,10 +94,20 @@ export default function Calendar({ markedDates = [], onDateClick, selectedDate }
           {MONTHS[month]} {year}
         </Text>
         <Group gap="xs">
-          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
+          <ActionIcon
+            variant="default"
+            radius="md"
+            onClick={() => changeMonth(-1)}
+            aria-label="Mes anterior"
+          >
             <ChevronLeft size={16} />
           </ActionIcon>
-          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(1)} aria-label="Mes siguiente">
+          <ActionIcon
+            variant="default"
+            radius="md"
+            onClick={() => changeMonth(1)}
+            aria-label="Mes siguiente"
+          >
             <ChevronRight size={16} />
           </ActionIcon>
         </Group>
@@ -84,7 +116,14 @@ export default function Calendar({ markedDates = [], onDateClick, selectedDate }
       {/* Weekday headers */}
       <SimpleGrid cols={7} spacing={4} mb="xs">
         {WEEKDAYS.map((w) => (
-          <Text key={w} size="xs" c="dimmed" fw={600} tt="uppercase" ta="center">
+          <Text
+            key={w}
+            size="xs"
+            c="dimmed"
+            fw={600}
+            tt="uppercase"
+            ta="center"
+          >
             {w}
           </Text>
         ))}
@@ -113,13 +152,13 @@ export default function Calendar({ markedDates = [], onDateClick, selectedDate }
                   backgroundColor: isSelected
                     ? "var(--mantine-color-default-color)"
                     : mark && isCurrentMonth
-                    ? `var(--mantine-color-${mark.color}-0)`
-                    : undefined,
+                      ? `var(--mantine-color-${mark.color}-0)`
+                      : undefined,
                   border: isSelected
                     ? undefined
                     : mark && isCurrentMonth
-                    ? `1px solid var(--mantine-color-${mark.color}-3)`
-                    : "1px solid transparent",
+                      ? `1px solid var(--mantine-color-${mark.color}-3)`
+                      : "1px solid transparent",
                   transition: "background 0.15s",
                   opacity: isCurrentMonth ? 1 : 0.3,
                 }}
@@ -131,8 +170,8 @@ export default function Calendar({ markedDates = [], onDateClick, selectedDate }
                     isSelected
                       ? "var(--mantine-color-body)"
                       : mark && isCurrentMonth
-                      ? `${mark.color}.7`
-                      : undefined
+                        ? `${mark.color}.7`
+                        : "dimmed"
                   }
                 >
                   {date.getDate()}
@@ -143,7 +182,12 @@ export default function Calendar({ markedDates = [], onDateClick, selectedDate }
 
           if (mark && isCurrentMonth && !isSelected) {
             return (
-              <Indicator key={date.toISOString()} size={5} color={mark.color} offset={4}>
+              <Indicator
+                key={date.toISOString()}
+                size={5}
+                color={mark.color}
+                offset={4}
+              >
                 {dayContent}
               </Indicator>
             );

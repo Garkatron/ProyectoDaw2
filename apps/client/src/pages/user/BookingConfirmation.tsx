@@ -57,7 +57,7 @@ export default function BookingConfirmation() {
 
   const providerId = location.state?.userId;
 
-  const [markedDates, setMarkedDates] = useState([]);
+  const [markedDates, setMarkedDates] = useState<>([]);
   const [blockedDates, setBlockedDates] = useState(new Set());
   const [selectedDate, setSelectedDate] = useState(null);
   const [loadingAppts, setLoadingAppts] = useState(false);

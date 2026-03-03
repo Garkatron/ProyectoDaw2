@@ -5,6 +5,7 @@ import { UserService } from "../user/service";
 import { ServicesService } from "../services/service";
 import { AppointmentStatus, UserRole } from "@limpora/common";
 import { AuthQueries } from "../auth/queries";
+import { AuthService } from "../auth/service";
 
 export abstract class BookingService {
     static async assign({
@@ -73,6 +74,31 @@ export abstract class BookingService {
         return appointment;
     }
 
+    static async getMe(uid: string): Promise<BookingModel["listResponse"]> {
+        const user = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
+
+        if (!user)
+            throw status(
+                404,
+                'User not found' satisfies BookingModel["notFound"],
+            );
+
+        if (user.role === UserRole.Client) {
+            return BookingQueries.findByClientId.all({ id: user.id });
+        }
+
+        if (user.role === UserRole.Provider) {
+            return BookingQueries.findByProviderId.all({
+                provider_id: user.id,
+            });
+        }
+
+        throw status(
+            403,
+            'You cannot have appointments' satisfies BookingModel["forbidden"],
+        );
+    }
+
     static async updateStatus({
         id,
         status: appointment_status,
@@ -100,7 +126,7 @@ export abstract class BookingService {
 
         return updated;
     }
-    
+
     static async assignByUid(
         body: BookingModel["assignBody"],
         client_uid: string,
@@ -115,5 +141,41 @@ export abstract class BookingService {
             );
 
         return await BookingService.assign({ ...body, client_id: client.id });
+    }
+
+    static async getByProviderId({
+        provider_id,
+    }: BookingModel["providerIdParam"]): Promise<BookingModel["listResponse"]> {
+        const provider = await UserService.getById({ id: String(provider_id) });
+
+        if (provider.role !== UserRole.Provider)
+            throw status(
+                403,
+                "User is not a provider" satisfies BookingModel["forbidden"],
+            );
+
+        const appointments = BookingQueries.findByProviderId.all({
+            provider_id: Number(provider_id),
+        });
+
+        return appointments;
+    }
+
+    static async getByClientId({
+        client_id,
+    }: BookingModel["clientIdParam"]): Promise<BookingModel["listResponse"]> {
+        const client = await UserService.getById({ id: client_id });
+
+        if (client.role !== UserRole.Client)
+            throw status(
+                403,
+                "User is not a client" satisfies BookingModel["forbidden"],
+            );
+
+        const appointments = BookingQueries.findByClientId.all({
+            id: Number(client_id),
+        });
+
+        return appointments;
     }
 }

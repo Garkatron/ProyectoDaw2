@@ -12,6 +12,7 @@ const BookingSchema = t.Object({
     provider_id: t.Number(),
     service_id: t.Number(),
     created_at: t.String(),
+    service_name: t.String(),
 });
 
 const BookingErrors = {
@@ -22,6 +23,9 @@ const BookingErrors = {
 
     forbidden: t.Union([
         t.Literal("You cannot contrat yourself"),
+        t.Literal("User is not a provider"),
+        t.Literal("User is not a client"),
+        t.Literal("You cannot have appointments"),
         t.Literal("You cannot contrat a non provider user"),
         t.Literal("You can only delete your own appointments"),
     ]), // 403
@@ -29,6 +33,9 @@ const BookingErrors = {
     dateOccupied: t.Literal("Date occupied"), // 409
 };
 export const BookingModel = {
+    clientIdParam: t.Object({ client_id: t.String() }),
+    providerIdParam: t.Object({ provider_id: t.String() }),
+
     assignBody: t.Object({
         service_id: t.Number(),
         provider_id: t.Number(),
@@ -45,7 +52,7 @@ export const BookingModel = {
 
     assignResponse: BookingSchema,
     updateResponse: BookingSchema,
-    getAllResponse: t.Array(BookingSchema),
+    listResponse: t.Array(BookingSchema),
     getByProviderResponse: t.Array(BookingSchema),
 
     ...BookingErrors,

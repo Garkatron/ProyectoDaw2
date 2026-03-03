@@ -16,6 +16,7 @@ import openapi from "@elysiajs/openapi";
 import { providerServicesController } from "./modules/user_services";
 import { AppContext, Logger } from "./utils/Logger";
 import { logger } from "@bogeychan/elysia-logger";
+import { bookingController } from "./modules/booking";
 
 // import { elysiaHelmet, permission } from 'elysiajs-helmet';
 
@@ -80,6 +81,7 @@ const app = new Elysia()
     .use(servicesController)
     .use(reviewsController)
     .use(providerServicesController)
+    .use(bookingController)
     .listen(3000);
 
 console.log(

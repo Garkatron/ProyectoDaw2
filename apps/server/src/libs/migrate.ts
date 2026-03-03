@@ -50,11 +50,11 @@ export function migrate(db: Database) {
             price          REAL NOT NULL,
             app_commission REAL,
             payment_method TEXT NOT NULL CHECK (payment_method IN ('Bizum', 'Bank Transfer', 'Paypal')),
-            user_id        INTEGER NOT NULL,
+            client_id        INTEGER NOT NULL,
             provider_id    INTEGER NOT NULL,
             service_id     INTEGER NOT NULL,
             created_at     TEXT DEFAULT (datetime('now')),
-            FOREIGN KEY (user_id)     REFERENCES Users(id),
+            FOREIGN KEY (client_id)     REFERENCES Users(id),
             FOREIGN KEY (provider_id) REFERENCES Users(id),
             FOREIGN KEY (service_id)  REFERENCES Services(id)
         )

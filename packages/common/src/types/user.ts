@@ -34,6 +34,7 @@ export interface Appointment {
     price:          number
     app_commission: number
     payment_method: PaymentMethod,
+    service_name:   string
     user_id:        number
     provider_id:    number
     service_id:     number

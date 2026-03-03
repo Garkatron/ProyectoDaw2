@@ -6,25 +6,27 @@ import type {
 } from "@limpora/common";
 
 export const BookingQueries = {
-    findByUserId: db.query<Appointment, { id: number }>(
-        `SELECT *
-         FROM Appointments
-         WHERE user_id = :id
-         ORDER BY date_time DESC`,
+    findByClientId: db.query<Appointment, { id: number }>(
+        `SELECT a.*, s.name AS service_name
+     FROM Appointments a
+     JOIN Services s ON a.service_id = s.id
+     WHERE a.user_id = :id
+     ORDER BY a.date_time DESC`,
     ),
 
     findById: db.query<Appointment, { id: number }>(
-        `SELECT *
-         FROM Appointments
-         WHERE id = :id
-         ORDER BY date_time DESC`,
+        `SELECT a.*, s.name AS service_name
+     FROM Appointments a
+     JOIN Services s ON a.service_id = s.id
+     WHERE a.id = :id`,
     ),
 
     findByProviderId: db.query<Appointment, { provider_id: number }>(
-        `SELECT *
-         FROM Appointments
-         WHERE provider_id = :provider_id
-         ORDER BY date_time DESC`,
+        `SELECT a.*, s.name AS service_name
+     FROM Appointments a
+     JOIN Services s ON a.service_id = s.id
+     WHERE a.provider_id = :provider_id
+     ORDER BY a.date_time DESC`,
     ),
 
     deleteById: db.query<void, { id: number }>(
