@@ -19,7 +19,7 @@ export const bookingController = new Elysia({ prefix: "/booking" })
         "/me",
         async ({ user, body }) => BookingService.assignByUid(body, user.uid),
         {
-            body: BookingModel.assignBody,
+            body: BookingModel.assignMeBody,
             response: {
                 403: BookingModel.forbidden,
                 404: BookingModel.notFound,

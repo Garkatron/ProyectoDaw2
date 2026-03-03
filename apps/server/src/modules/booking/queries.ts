@@ -6,11 +6,11 @@ import type {
 } from "@limpora/common";
 
 export const BookingQueries = {
-    findByClientId: db.query<Appointment, { id: number }>(
+    findByClientId: db.query<Appointment, { client_id: number }>(
         `SELECT a.*, s.name AS service_name
      FROM Appointments a
      JOIN Services s ON a.service_id = s.id
-     WHERE a.user_id = :id
+     WHERE client_id = :client_id
      ORDER BY a.date_time DESC`,
     ),
 
@@ -51,23 +51,6 @@ export const BookingQueries = {
          VALUES (:date_time, :status, :price, :app_commission, :payment_method, :client_id, :provider_id, :service_id)`,
     ),
 
-    getEarnings: db.query<
-        {
-            closed_appointments: number;
-            cancelled_appointments: number;
-            total_money: number;
-            retained_money: number;
-        },
-        { provider_id: number }
-    >(
-        `SELECT
-           COUNT(CASE WHEN status = 'Completed' THEN 1 END)                              AS closed_appointments,
-           COUNT(CASE WHEN status = 'Cancelled' THEN 1 END)                              AS cancelled_appointments,
-           COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_amount END), 0)        AS total_money,
-           COALESCE(SUM(CASE WHEN status IN ('Pending', 'In Process') THEN total_amount END), 0) AS retained_money
-         FROM Appointments
-         WHERE provider_id = :provider_id`,
-    ),
 
     updateStatus: db.query<void, { id: number; status: AppointmentStatus }>(
         `UPDATE Appointments SET status = :status WHERE id = :id`,
@@ -85,11 +68,10 @@ export const BookingQueries = {
         `SELECT
            a.id,
            a.date_time,
-           a.total_amount,
            a.status,
            u.name AS requester_name
          FROM Appointments a
-         JOIN Users u ON a.user_id = u.id
+         JOIN Users u ON a.client_id = u.id
          WHERE a.provider_id = :provider_id
          ORDER BY a.date_time DESC`,
     ),

@@ -15,7 +15,7 @@ export const userController = new Elysia({ prefix: '/user' })
                 200: UserModel.getAllUsers,
                 404: UserModel.notFound,
             },
-            hasRole: UserRole.Admin,
+            isAuthenticated: true
         }
     )
 

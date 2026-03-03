@@ -45,6 +45,14 @@ export const BookingModel = {
         payment_method: t.Enum(PaymentMethod),
     }),
 
+    assignMeBody: t.Object({
+        service_id: t.Number(),
+        provider_id: t.Number(),
+        price: t.Number(),
+        date: t.String(),
+        payment_method: t.Enum(PaymentMethod),
+    }),
+
     updateStatusBody: t.Object({
         id: t.Number(),
         status: t.Enum(AppointmentStatus),
@@ -59,7 +67,5 @@ export const BookingModel = {
 } as const;
 
 export type BookingModel = {
-    [k in keyof typeof BookingModel]: UnwrapSchema<
-        (typeof BookingModel)[k]
-    >;
+    [k in keyof typeof BookingModel]: UnwrapSchema<(typeof BookingModel)[k]>;
 };

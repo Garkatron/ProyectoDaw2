@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Calendar from "../../components/Calendar";
+import Calendar, { type MarkedDate } from "../../components/Calendar";
 import Base from "../../layouts/Base";
 import { useAuthStore } from "../../stores/auth.store";
-import { useEffect, useState } from "react";
 import {
   Alert,
   Box,
@@ -16,22 +16,54 @@ import {
   Title,
   UnstyledButton,
 } from "@mantine/core";
+import { API } from "../../lib/api";
+import { PaymentMethod, type Appointment } from "@limpora/common";
+
+interface ProviderService {
+  service_id: number;
+  user_id: number;
+  price: number;
+  is_active: boolean;
+  service_name?: string;
+  name?: string;
+}
 
 const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal"];
 
 const TIME_SLOTS = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30", "16:00", "16:30",
-  "17:00", "17:30", "18:00", "18:30", "19:00",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "12:00",
+  "12:30",
+  "13:00",
+  "13:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
+  "18:30",
+  "19:00",
 ];
 
-const statusColorMap = {
+const statusColorMap: Record<string, string> = {
   Completed: "green",
   Pending: "yellow",
   "In Process": "blue",
 };
-
-const ToggleButton = ({ selected, onClick, children }) => (
+const ToggleButton = ({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) => (
   <UnstyledButton onClick={onClick} style={{ width: "100%" }}>
     <Paper
       withBorder
@@ -43,7 +75,7 @@ const ToggleButton = ({ selected, onClick, children }) => (
         transition: "all 0.15s",
       }}
     >
-      <Text size="sm" fw={500} c={selected ? "var(--mantine-color-body)" : undefined}>
+      <Text component="div" size="sm" fw={500} c={selected ? "var(--mantine-color-body)" : "dimmed"}>
         {children}
       </Text>
     </Paper>
@@ -57,20 +89,25 @@ export default function BookingConfirmation() {
 
   const providerId = location.state?.userId;
 
-  const [markedDates, setMarkedDates] = useState<>([]);
-  const [blockedDates, setBlockedDates] = useState(new Set());
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [markedDates, setMarkedDates] = useState<MarkedDate[]>([]);
+  const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
 
-  const [providerServices, setProviderServices] = useState([]);
+  const [providerServices, setProviderServices] = useState<ProviderService[]>(
+    [],
+  );
   const [loadingServices, setLoadingServices] = useState(false);
 
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [selectedService, setSelectedService] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedService, setSelectedService] =
+    useState<ProviderService | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PaymentMethod.BankTransfer,
+  );
 
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -78,24 +115,32 @@ export default function BookingConfirmation() {
     const fetchAppointments = async () => {
       setLoadingAppts(true);
       try {
-        const appointments = await getAppointments(providerId);
-        const dateMap = {};
+        const { data, error } = await API.booking.me.get();
+
+        const appointments: Appointment[] = data ?? [];
+
+        const dateMap: Record<string, Appointment[]> = {};
         appointments.forEach((appt) => {
           const key = new Date(appt.date_time).toDateString();
           if (!dateMap[key]) dateMap[key] = [];
           dateMap[key].push(appt);
         });
 
-        const marks = [];
-        const blocked = new Set();
+        const marks: MarkedDate[] = [];
+        const blocked = new Set<string>();
 
         Object.entries(dateMap).forEach(([key, appts]) => {
           const statuses = appts.map((a) => a.status?.toLowerCase());
           let status = "Pending";
-          if (statuses.every((s) => s === "completed" || s === "cancelled")) status = "Completed";
-          else if (statuses.some((s) => s === "in process")) status = "In Process";
+          if (statuses.every((s) => s === "completed" || s === "cancelled"))
+            status = "Completed";
+          else if (statuses.some((s) => s === "in process"))
+            status = "In Process";
 
-          marks.push({ date: new Date(appts[0].date_time), status });
+          marks.push({
+            date: new Date(appts[0].date_time),
+            status: appts[0].status,
+          });
           if (status === "Pending" || status === "In Process") blocked.add(key);
         });
 
@@ -115,8 +160,10 @@ export default function BookingConfirmation() {
     const fetchServices = async () => {
       setLoadingServices(true);
       try {
-        const services = await getUserServices(providerId);
-        setProviderServices(services);
+        const { data } = await API.providers({
+          provider_id: String(providerId),
+        }).services.get();
+        setProviderServices(data ?? []);
       } catch (err) {
         console.error("Error fetching provider services:", err);
       } finally {
@@ -126,31 +173,33 @@ export default function BookingConfirmation() {
     fetchServices();
   }, [providerId]);
 
-  const handleDateClick = (date) => {
+  const handleDateClick = (date: Date) => {
     if (blockedDates.has(date.toDateString())) return;
+    if (date < new Date()) return;
     setSelectedDate(date);
     setSelectedTime(null);
   };
 
-  const canConfirm = selectedDate && selectedTime && selectedService && paymentMethod;
+  const canConfirm =
+    selectedDate && selectedTime && selectedService && paymentMethod;
 
   const handleConfirm = async () => {
-    if (!canConfirm) return;
+    if (!canConfirm || !currentUser) return;
     setSubmitting(true);
     setError(null);
     try {
       const [hours, minutes] = selectedTime.split(":").map(Number);
       const dateTime = new Date(selectedDate);
       dateTime.setHours(hours, minutes, 0, 0);
-      await addAppointment({
+
+      await API.booking.me.post({
+        provider_id: providerId,
+        service_id: selectedService.service_id,
         date: dateTime.toISOString(),
-        clientId: currentUser.id,
-        serviceId: selectedService.service_id,
-        providerId,
         price: selectedService.price ?? 0,
-        paymentMethod,
-        totalAmount: selectedService.price ?? 0,
+        payment_method: paymentMethod as PaymentMethod,
       });
+
       setSuccess(true);
       setTimeout(() => navigate(-1), 2000);
     } catch (err) {
@@ -164,49 +213,61 @@ export default function BookingConfirmation() {
   return (
     <Base>
       <Stack maw={768} mx="auto" p="lg" gap="lg">
-
-        {/* Header */}
         <Box>
-          <Title order={1} fz="1.5rem" fw={600}>Nueva reserva</Title>
+          <Title order={1} fz="1.5rem" fw={600}>
+            Nueva reserva
+          </Title>
           <Text size="sm" c="dimmed" mt={4}>
-            Proveedor ID: <Text span fw={500}>{providerId}</Text>
+            Proveedor ID:{" "}
+            <Text span fw={500}>
+              {providerId}
+            </Text>
           </Text>
         </Box>
 
         {/* Paso 1 — Calendario */}
         <Paper withBorder p="lg" shadow="sm">
-          <Text fw={600} mb="sm">1. Selecciona un día</Text>
+          <Text fw={600} mb="sm">
+            1. Selecciona un día
+          </Text>
 
           <Group gap="md" mb="md">
             {Object.entries(statusColorMap).map(([label, color]) => (
               <Group key={label} gap={6}>
                 <Box
-                  w={10} h={10}
+                  w={10}
+                  h={10}
                   style={{
                     borderRadius: "50%",
                     backgroundColor: `var(--mantine-color-${color}-5)`,
                   }}
                 />
-                <Text size="xs" c="dimmed">{label}</Text>
+                <Text size="xs" c="dimmed">
+                  {label}
+                </Text>
               </Group>
             ))}
           </Group>
 
           {loadingAppts && (
-            <Text size="xs" c="dimmed" mb="xs">Cargando disponibilidad...</Text>
+            <Text size="xs" c="dimmed" mb="xs">
+              Cargando disponibilidad...
+            </Text>
           )}
 
           <Calendar
             markedDates={markedDates}
             onDateClick={handleDateClick}
-            selectedDate={selectedDate}
+            selectedDate={selectedDate ?? new Date()}
           />
         </Paper>
 
         {/* Paso 2 — Hora */}
         {selectedDate && (
           <Paper withBorder p="lg">
-            <Text fw={600} mb="sm">2. Selecciona una hora</Text>
+            <Text fw={600} mb="sm">
+              2. Selecciona una hora
+            </Text>
             <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
               {TIME_SLOTS.map((slot) => (
                 <ToggleButton
@@ -224,11 +285,14 @@ export default function BookingConfirmation() {
         {/* Paso 3 — Servicio y pago */}
         {selectedDate && selectedTime && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="lg">3. Detalles de la reserva</Text>
-
+            <Text fw={600} mb="lg">
+              3. Detalles de la reserva
+            </Text>
             <Stack gap="lg">
               <Box>
-                <Text size="sm" fw={500} c="dimmed" mb="xs">Servicio</Text>
+                <Text size="sm" fw={500} c="dimmed" mb="xs">
+                  Servicio
+                </Text>
                 {loadingServices ? (
                   <Stack gap="xs">
                     <Skeleton height={48} />
@@ -243,15 +307,29 @@ export default function BookingConfirmation() {
                     {providerServices.map((svc) => (
                       <ToggleButton
                         key={svc.service_id}
-                        selected={selectedService?.service_id === svc.service_id}
+                        selected={
+                          selectedService?.service_id === svc.service_id
+                        }
                         onClick={() => setSelectedService(svc)}
                       >
                         <Group justify="space-between">
-                          <Text size="sm" fw={500} c={selectedService?.service_id === svc.service_id ? "var(--mantine-color-body)" : undefined}>
-                            {svc.name ?? svc.service_name ?? `Servicio #${svc.service_id}`}
+                          <Text
+                            size="sm"
+                            fw={500}
+                            c={
+                              selectedService?.service_id === svc.service_id
+                                ? "var(--mantine-color-body)"
+                                : "dimmed"
+                            }
+                          >
+                            {svc.service_name ??
+                              svc.name ??
+                              `Servicio #${svc.service_id}`}
                           </Text>
                           {svc.price != null && (
-                            <Text size="xs" fw={600} c="dimmed">{svc.price} €</Text>
+                            <Text size="xs" fw={600} c="dimmed">
+                              {svc.price} €
+                            </Text>
                           )}
                         </Group>
                       </ToggleButton>
@@ -261,7 +339,9 @@ export default function BookingConfirmation() {
               </Box>
 
               <Box>
-                <Text size="sm" fw={500} c="dimmed" mb="xs">Método de pago</Text>
+                <Text size="sm" fw={500} c="dimmed" mb="xs">
+                  Método de pago
+                </Text>
                 <SimpleGrid cols={3} spacing="xs">
                   {PAYMENT_METHODS.map((method) => (
                     <ToggleButton
@@ -281,29 +361,59 @@ export default function BookingConfirmation() {
         {/* Resumen + Confirmar */}
         {canConfirm && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="md">Resumen</Text>
+            <Text fw={600} mb="md">
+              Resumen
+            </Text>
             <Stack gap={6} mb="lg">
               <Text size="sm">
-                📅 <Text span fw={500}>Fecha:</Text>{" "}
+                📅{" "}
+                <Text span fw={500}>
+                  Fecha:
+                </Text>{" "}
                 {selectedDate.toLocaleDateString("es-ES", {
-                  weekday: "long", year: "numeric", month: "long", day: "numeric",
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </Text>
               <Text size="sm">
-                🕐 <Text span fw={500}>Hora:</Text> {selectedTime}
+                🕐{" "}
+                <Text span fw={500}>
+                  Hora:
+                </Text>{" "}
+                {selectedTime}
               </Text>
               <Text size="sm">
-                🛠 <Text span fw={500}>Servicio:</Text>{" "}
-                {selectedService.name ?? selectedService.service_name ?? `#${selectedService.service_id}`}
-                {selectedService.price != null && ` — ${selectedService.price} €`}
+                🛠{" "}
+                <Text span fw={500}>
+                  Servicio:
+                </Text>{" "}
+                {selectedService.service_name ??
+                  selectedService.name ??
+                  `#${selectedService.service_id}`}
+                {selectedService.price != null &&
+                  ` — ${selectedService.price} €`}
               </Text>
               <Text size="sm">
-                💳 <Text span fw={500}>Pago:</Text> {paymentMethod}
+                💳{" "}
+                <Text span fw={500}>
+                  Pago:
+                </Text>{" "}
+                {paymentMethod}
               </Text>
             </Stack>
 
-            {error && <Alert color="red" mb="md">{error}</Alert>}
-            {success && <Alert color="green" mb="md">✅ Cita confirmada. Redirigiendo...</Alert>}
+            {error && (
+              <Alert color="red" mb="md">
+                {error}
+              </Alert>
+            )}
+            {success && (
+              <Alert color="green" mb="md">
+                ✅ Cita confirmada. Redirigiendo...
+              </Alert>
+            )}
 
             <Button
               onClick={handleConfirm}
@@ -317,7 +427,6 @@ export default function BookingConfirmation() {
             </Button>
           </Paper>
         )}
-
       </Stack>
     </Base>
   );

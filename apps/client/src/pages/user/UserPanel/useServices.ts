@@ -35,11 +35,12 @@ export function useServices(
 
     useEffect(() => {
         if (!targetUser?.id || targetUser.role !== "provider") return;
-
+        
         fetchUserServices(targetUser.id);
-
+        
         if (isSelf) {
             API.services.get().then(({ data, error }) => {
+                console.log({ data, error }); 
                 if (!error && data) setAllServices(data);
             });
         }

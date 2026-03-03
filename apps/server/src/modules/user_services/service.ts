@@ -3,6 +3,7 @@ import { ProviderServicesModel } from './model';
 import { ProviderQueries } from './queries';
 import type { UserService } from '@limpora/common/src/types/user'
 import { AuthQueries } from '../auth/queries';
+import { ServicesQueries } from '../services/queries';
 
 interface UserServiceResponse extends Omit<UserService, 'is_active'> {
     is_active: boolean;
@@ -21,6 +22,10 @@ export abstract class ProviderServicesService {
         { service_id, price }: ProviderServicesModel['assignServiceBody'],
         provider_id: number
     ): Promise<ProviderServicesModel['assignResponse']> {
+
+        const service = ServicesQueries.findById.get({ id: service_id });
+        if (!service) throw status(404, 'Service not found' satisfies ProviderServicesModel['notFound']);
+
         const existing = ProviderQueries.findByProviderAndService.get({
             user_id:    provider_id,
             service_id: service_id,

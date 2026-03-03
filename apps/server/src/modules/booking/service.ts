@@ -84,7 +84,7 @@ export abstract class BookingService {
             );
 
         if (user.role === UserRole.Client) {
-            return BookingQueries.findByClientId.all({ id: user.id });
+            return BookingQueries.findByClientId.all({ client_id: user.id });
         }
 
         if (user.role === UserRole.Provider) {
@@ -128,7 +128,7 @@ export abstract class BookingService {
     }
 
     static async assignByUid(
-        body: BookingModel["assignBody"],
+        body: BookingModel["assignMeBody"],
         client_uid: string,
     ): Promise<BookingModel["assignResponse"]> {
         const client = AuthQueries.findByFirebaseUid.get({
@@ -173,7 +173,7 @@ export abstract class BookingService {
             );
 
         const appointments = BookingQueries.findByClientId.all({
-            id: Number(client_id),
+            client_id: Number(client_id),
         });
 
         return appointments;

@@ -18,4 +18,5 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["bun", "run", "--cwd", "apps/server", "src/index.ts", "--watch"]
+WORKDIR /usr/src/app/apps/server
+CMD ["bun", "--watch", "run", "src/index.ts"]
