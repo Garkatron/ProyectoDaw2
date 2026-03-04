@@ -24,7 +24,7 @@ export const authController = new Elysia({ prefix: "/auth" })
             response: {
                 400: AuthModel.loginInvalid,
                 401: AuthModel.loginInvalid,
-                403: AuthModel.loginInvalid,
+                403: AuthModel.emailNotVerified,
                 404: AuthModel.loginUserNotExists,
                 500: AuthModel.registerInvalid,
             },

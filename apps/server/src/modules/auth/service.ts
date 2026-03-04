@@ -3,12 +3,14 @@
 // * Responsible for managing sessions using Firebase.
 // * Handles register, login, logout, token refresh and useful queries.
 
-import { status } from "elysia";
-import type { AuthModel } from "./model";
+import { status, t } from "elysia";
+import { AuthModel } from "./model";
 import { sql } from "bun";
 import { firebaseAuth } from "../../libs/firebase";
 import type { DecodedIdToken, UserRecord } from "firebase-admin/auth";
 import { AuthQueries } from "./queries";
+import { NotificationService } from "../notification/service";
+import generateVefCode from "../../utils";
 
 export abstract class AuthService {
     static async register({
@@ -44,6 +46,15 @@ export abstract class AuthService {
         } catch (error) {
             console.error("[Register][Firebase]:");
             console.error(error);
+        }
+
+        if (process.env.EMAIL_VERIFICATION) {
+            const generated = await generateVefCode();
+            AuthQueries.insertVerificationCode.run({email, hashed_code: generated.hashed_code});
+            await NotificationService.verificationEmail({
+                to: email,
+                code: generated.code,
+            });
         }
 
         return { username, email };
@@ -116,8 +127,7 @@ export abstract class AuthService {
 
                     await AuthQueries.insert.run({
                         firebase_uid,
-                        name:
-                            firebaseUser.displayName || email.split("@")[0],
+                        name: firebaseUser.displayName || email.split("@")[0],
                         email: firebaseUser.email,
                         role: firebaseUser.customClaims?.role || "client",
                     });
@@ -136,6 +146,21 @@ export abstract class AuthService {
 
             if (!userRecord) {
                 throw status(500, "Failed to retrieve user record after sync");
+            }
+
+            if (process.env.EMAIL_VERIFICATION) {
+                if (userRecord.email_verified == 0) {
+                    
+                    const generated = await generateVefCode();
+                    
+                    AuthQueries.insertVerificationCode.run({email: userRecord.email, hashed_code: generated.hashed_code});
+                    
+                    await NotificationService.verificationEmail({
+                        to: email,
+                        code: generated.code,
+                    });
+                    throw status(403, "User isn't verified email.  Sending email..." satisfies AuthModel["emailNotVerified"]);
+                } 
             }
 
             return {

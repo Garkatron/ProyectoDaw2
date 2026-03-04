@@ -1,3 +1,5 @@
+import { UserRole } from "../enums/Role.enum";
+
 export interface User {
     id:                     number;
     firebase_uid:           string;

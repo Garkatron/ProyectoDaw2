@@ -32,4 +32,35 @@ export const AuthQueries = {
         SET email_verified = 1
         WHERE firebase_uid = :firebase_uid
     `),
+    
+    insertVerificationCode: db.query<
+        void,
+        { email: string; hashed_code: string }
+    >(`
+        INSERT INTO EmailVerificationCodes (user_id, code, expires_at)
+        VALUES (
+            (SELECT id FROM Users WHERE email = :email),
+            :hashed_code,
+            datetime('now', '+15 minutes')
+        )
+    `),
+
+    findVerificationCode: db.query<
+        { id: number; code: string; expires_at: string },
+        { email: string }
+    >(`
+        SELECT * FROM EmailVerificationCodes
+        WHERE user_id = (SELECT id FROM Users WHERE email = :email)
+          AND used = 0
+          AND expires_at > datetime('now')
+        ORDER BY created_at DESC
+        LIMIT 1
+    `),
+
+    markCodeAsUsed: db.query<void, { email: string }>(`
+        UPDATE EmailVerificationCodes
+        SET used = 1
+        WHERE user_id = (SELECT id FROM Users WHERE email = :email)
+          AND used = 0
+    `),
 };

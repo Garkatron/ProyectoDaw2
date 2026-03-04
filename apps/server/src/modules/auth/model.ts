@@ -27,6 +27,7 @@ export const AuthModel = {
     
     loginInvalid: t.Literal('Invalid email or password'),
     loginUserNotExists: t.Literal('User not exists'),
+    emailNotVerified: t.Literal("User isn't verified email.  Sending email..."),
     
     registerInvalid: t.Literal('Email already in use'),
 } as const;

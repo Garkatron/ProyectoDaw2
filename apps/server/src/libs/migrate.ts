@@ -135,6 +135,22 @@ export function migrate(db: Database) {
         )
     `);
 
+    /*
+    This table it's used for keep notifications saved in user inbox before get deleted.
+    created_at and read are for auditory.
+    */
+    db.run(`
+        CREATE TABLE IF NOT EXISTS Notifications (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id    INTEGER NOT NULL,
+            expires_at TEXT NOT NULL,
+            content    TEXT NOT NULL,
+            read       INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+        )
+    `);
+
     // Indexes
     db.run(
         `CREATE INDEX IF NOT EXISTS idx_email_verification_code    ON EmailVerificationCodes (code)`,

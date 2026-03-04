@@ -31,7 +31,7 @@ export abstract class BookingService {
         // ? Find users
         const provider = await UserService.getById({ id: String(provider_id) });
         const client = await UserService.getById({ id: String(client_id) });
-
+        
         // ? Prevent stupid stuff
         if (provider.role !== UserRole.Provider)
             throw status(
