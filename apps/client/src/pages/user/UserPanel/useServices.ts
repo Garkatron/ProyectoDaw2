@@ -24,6 +24,7 @@ export function useServices(
     const [allServices, setAllServices] = useState<Service[]>([]);
     const [selectedServiceId, setSelectedServiceId] = useState("");
     const [selectedServicePrice, setSelectedServicePrice] = useState("");
+    const [selectedServiceHours, setSelectedServiceHours] = useState<number>(1);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +57,7 @@ export function useServices(
         const { error } = await API.providers.me.services.assign.post({
             service_id: Number(selectedServiceId),
             price_per_h: Number(selectedServicePrice),
+            duration_hours: Number(selectedServiceHours)
         });
 
         if (error) {
@@ -92,6 +94,8 @@ export function useServices(
         setSelectedServiceId,
         selectedServicePrice,
         setSelectedServicePrice,
+        selectedServiceHours,
+        setSelectedServiceHours,
         serviceSubmitting: submitting,
         serviceError: error,
         onAdd: handleAdd,

@@ -1,3 +1,8 @@
+// ? AuthService
+// ! ------------------------
+// * Responsible for managing sessions using Firebase.
+// * Handles register, login, logout, token refresh and useful queries.
+
 import { status } from "elysia";
 import type { AuthModel } from "./model";
 import { sql } from "bun";

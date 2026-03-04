@@ -60,7 +60,6 @@ export const BookingModel = {
         provider_id: t.Number(),
         client_id: t.Number(),
         start_time: t.String(), // "2024-05-20T10:00:00Z"
-        duration_hours: t.Number({ minimum: 1 }), // Calc el end_time
         payment_method: t.Enum(PaymentMethod),
     }),
 
@@ -68,7 +67,6 @@ export const BookingModel = {
         service_id: t.Number(),
         provider_id: t.Number(),
         start_time: t.String(),
-        duration_hours: t.Number({ minimum: 1 }),
         payment_method: t.Enum(PaymentMethod),
     }),
 

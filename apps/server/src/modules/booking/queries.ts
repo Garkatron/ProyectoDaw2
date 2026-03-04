@@ -62,23 +62,18 @@ export const BookingQueries = {
          VALUES (:start_time, :end_time, :travel_buffer_min, :status, :total_price, :provider_net, :app_commission, :payment_method, :client_id, :provider_id, :service_id)`,
     ),
 
-    findConflict: db.query<
-        { id: number },
-        { provider_id: number; new_start: string; new_end: string }
-    >(
-        `SELECT id
-         FROM Appointments
-         WHERE provider_id = :provider_id
-           AND status NOT IN ('Cancelled')
-           AND (
-               -- El nuevo servicio empieza antes de que el anterior termine (+ buffer)
-               (datetime(:new_start, '-' || travel_buffer_min || ' minutes') < end_time)
-               AND
-               -- El nuevo servicio termina después de que el siguiente empiece (- buffer)
-               (datetime(:new_end, '+' || travel_buffer_min || ' minutes') > start_time)
-           )
-         LIMIT 1`,
-    ),
+        findConflict: db.query<
+            { id: number },
+            { provider_id: number; new_start: string; new_end: string }
+        >(
+            `SELECT id
+            FROM Appointments
+            WHERE provider_id = :provider_id
+            AND status NOT IN ('Cancelled')
+            AND :new_start < end_time
+            AND :new_end   > start_time
+            LIMIT 1`,
+        ),
 
     updateStatus: db.query<void, { id: number; status: AppointmentStatus }>(
         `UPDATE Appointments SET status = :status WHERE id = :id`,

@@ -71,6 +71,7 @@ export function migrate(db: Database) {
             user_id      INTEGER NOT NULL,
             service_id   INTEGER NOT NULL,
             price_per_h  REAL NOT NULL,
+            duration_hours INTEGER NOT NULL DEFAULT 1,
             is_active    INTEGER NOT NULL DEFAULT 1,
             updated_at   TEXT DEFAULT (datetime('now')),
             PRIMARY KEY (user_id, service_id),

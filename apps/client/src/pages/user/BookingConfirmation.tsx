@@ -323,7 +323,6 @@ export default function BookingConfirmation() {
         service_id: selectedService.service_id,
         start_time: dateTime.toISOString(),
         payment_method: paymentMethod as PaymentMethod,
-        duration_hours: 2,
       });
 
       setSuccess(true);

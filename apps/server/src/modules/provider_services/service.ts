@@ -1,3 +1,9 @@
+// ? ProviderServicesService
+// ! ------------------------
+// * Responsible for managing provider-service relationships.
+// * Handles assignment, unassignment, price updates, and activation status.
+// * Acts as the application layer between controllers and data queries.
+
 import { status } from "elysia";
 import { ProviderServicesModel } from "./model";
 import { ProviderQueries } from "./queries";
@@ -55,7 +61,7 @@ export abstract class ProviderServicesService {
     }
 
     static async assign(
-        { service_id, price_per_h }: ProviderServicesModel["assignServiceBody"],
+        { service_id, price_per_h, duration_hours }: ProviderServicesModel["assignServiceBody"],
         provider_id: number,
     ): Promise<ProviderServicesModel["getOneResponse"]> {
         const service = ServicesQueries.findById.get({ id: service_id });
@@ -79,6 +85,7 @@ export abstract class ProviderServicesService {
             user_id: provider_id,
             service_id,
             price_per_h,
+            duration_hours
         });
 
         const assigned = ProviderQueries.findByProviderAndService.get({

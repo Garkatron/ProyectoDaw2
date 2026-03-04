@@ -1,3 +1,8 @@
+// ? UserService
+// ! ------------------------
+// * Responsible for managing application users.
+// * A util class to get info in backend and frontend.
+
 import { status } from 'elysia';
 import type { UserModel } from './model';
 import { UserQueries } from './queries';

@@ -13,10 +13,7 @@ export const ProviderQueries = {
         `,
     ),
 
-    findByProviderId: db.query<
-        ProviderService,
-        { user_id: number }
-    >(
+    findByProviderId: db.query<ProviderService, { user_id: number }>(
         `
         SELECT 
             us.*,
@@ -46,14 +43,16 @@ export const ProviderQueries = {
 
     insert: db.query<
         void,
-        { user_id: number; service_id: number; price_per_h: number }
+        {
+            user_id: number;
+            service_id: number;
+            price_per_h: number;
+            duration_hours: number;
+        }
     >(
-        `
-        INSERT INTO UserServices (user_id, service_id, price_per_h)
-        VALUES (:user_id, :service_id, :price_per_h)
-        `,
+        `INSERT INTO UserServices (user_id, service_id, price_per_h, duration_hours)
+     VALUES (:user_id, :service_id, :price_per_h, :duration_hours)`,
     ),
-
     updatePrice: db.query<
         void,
         { user_id: number; service_id: number; price_per_h: number }
@@ -67,13 +66,13 @@ export const ProviderQueries = {
     ),
 
     toggleActive: db.query<
-        void, 
+        void,
         { user_id: number; service_id: number; is_active: number }
     >(
         `
         UPDATE UserServices SET is_active = :is_active
         WHERE user_id = :user_id AND service_id = :service_id
-        `
+        `,
     ),
 
     delete: db.query<void, { user_id: number; service_id: number }>(

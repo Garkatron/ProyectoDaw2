@@ -5,6 +5,7 @@ const ProviderServiceObject = t.Object({
     user_id: t.Number(),
     service_id: t.Number(),
     price_per_h: t.Number({ minimum: 0 }),
+    duration_hours: t.Number({ minimum: 1 }),
     is_active: t.Boolean(),
     updated_at: t.String(),
 
@@ -23,7 +24,8 @@ export const ProviderServicesModel = {
 
     assignServiceBody: t.Object({
         service_id: t.Number(),
-        price_per_h: t.Number({ minimum: 1 }),
+        duration_hours: t.Number({ minimum: 1 }),
+        price_per_h: t.Number({ minimum: 50 }),
     }),
 
     updatePriceBody: t.Object({

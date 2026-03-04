@@ -1,3 +1,7 @@
+// ? UserService
+// ! ------------------------
+// * Responsible for tracking and managing user earning data.
+
 import { status } from 'elysia';
 import { EarningModel } from './model';
 import { EarningsQueries } from './queries';

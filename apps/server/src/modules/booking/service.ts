@@ -1,10 +1,15 @@
+// ? BookingService
+// ! ------------------------
+// * Responsible for managing appointments.
+// * Handles assignment, unassignment, status updates and frametime collisions.
+
 import { status } from "elysia";
 import { BookingModel } from "./model";
 import { BookingQueries } from "./queries";
 import { UserService } from "../user/service";
 import { AppointmentStatus, UserRole } from "@limpora/common";
 import { AuthQueries } from "../auth/queries";
-import { ProviderQueries } from "../user_services/queries";
+import { ProviderQueries } from "../provider_services/queries";
 import { APP_COMMISSION_PERCENT } from "../../constants";
 import { db } from "../../libs/db";
 
@@ -13,7 +18,6 @@ export abstract class BookingService {
         service_id,
         provider_id,
         client_id,
-        duration_hours,
         start_time,
         payment_method,
     }: BookingModel["assignBody"]): Promise<BookingModel["assignResponse"]> {
@@ -55,6 +59,8 @@ export abstract class BookingService {
         }
 
         // ? Calc time
+        const duration_hours = providerService.duration_hours;
+
         const startDate = new Date(start_time);
         const endDate = new Date(
             startDate.getTime() + duration_hours * 60 * 60 * 1000,
@@ -62,7 +68,6 @@ export abstract class BookingService {
 
         const new_start = startDate.toISOString();
         const new_end = endDate.toISOString();
-
         const conflict = BookingQueries.findConflict.get({
             provider_id,
             new_start,

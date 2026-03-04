@@ -262,8 +262,7 @@ export default function Appointments() {
 
   const fetchAll = async () => {
     setLoading(true);
-    const { data, error } = await API.bookings.me.get();
-
+    const { data, error } = await API.bookings.me.get({});
     if (error) setError("Error al obtener las citas.");
     else setAppointments(data ?? []);
     setLoading(false);
@@ -275,13 +274,11 @@ export default function Appointments() {
 
   const handleStatusChange = async (id: number, status: AppointmentStatus) => {
     try {
-      await API.bookings.me({ id }).status.patch({ status });
-      // Actualiza localmente sin refetch completo
+      await API.bookings.me({ id }).status.patch({ status }); // ← añadir .me
       setAppointments((prev) =>
         prev.map((a) => (a.id === id ? { ...a, status } : a)),
       );
     } catch {
-      // Si falla, recarga desde el servidor
       await fetchAll();
     }
   };
