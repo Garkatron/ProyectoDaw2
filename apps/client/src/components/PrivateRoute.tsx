@@ -5,8 +5,8 @@ interface PrivateRouteProps {
     children?: React.ReactNode
 }
 
+// if (import.meta.env.DEV) return <Outlet />
 export default function PrivateRoute({ children }: PrivateRouteProps) {
-    if (import.meta.env.DEV) return <Outlet />
 
     const isAuthenticated = useAuthStore((state: any) => state.isAuthenticated)
     if (!isAuthenticated) return <Navigate to="/login" />

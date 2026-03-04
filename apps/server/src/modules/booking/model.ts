@@ -3,27 +3,27 @@ import { PaymentMethod, AppointmentStatus } from "@limpora/common";
 
 const BookingSchema = t.Object({
     id: t.Number(),
-    // Time
-    start_time: t.String(),         // ISO8601
-    end_time: t.String(),           // ISO8601
-    travel_buffer_min: t.Number(),  // Displacement margin
-    
-    status: t.Enum(AppointmentStatus),
-    
-    // Economy
-    total_price: t.Number(),        // What the customer pays
-    provider_net: t.Number(),       // What the self-employed person receives
-    app_commission: t.Number(),     
-    
-    payment_method: t.Enum(PaymentMethod),
-    
-
-    user_id: t.Number(),            // Client ID 
+    client_id: t.Number(), // Client ID
     provider_id: t.Number(),
     service_id: t.Number(),
     
+    // Time
+    start_time: t.String(), // ISO8601
+    end_time: t.String(), // ISO8601
+    travel_buffer_min: t.Number(), // Displacement margin
+
+    status: t.Enum(AppointmentStatus),
+
+    // Economy
+    total_price: t.Number(), // What the customer pays
+    provider_net: t.Number(), // What the self-employed person receives
+    app_commission: t.Number(),
+
+    payment_method: t.Enum(PaymentMethod),
+
+
     created_at: t.String(),
-    service_name: t.String(),       // join + Services
+    service_name: t.String(), // join + Services
 });
 
 const BookingErrors = {
@@ -31,22 +31,22 @@ const BookingErrors = {
         t.Literal("Appointment not found"),
         t.Literal("User not found"),
         t.Literal("Service not found"),
-    ]), 
+    ]),
 
     forbidden: t.Union([
         t.Literal("You cannot contract yourself"),
         t.Literal("User is not a provider"),
         t.Literal("User is not a client"),
         t.Literal("Admins can't have appointments"),
-        t.Literal("User does not offer this service"), 
+        t.Literal("User does not offer this service"),
         t.Literal("You can only manage your own appointments"),
-    ]), 
+    ]),
 
     // Agenda conflicts
     dateOccupied: t.Union([
-        t.Literal("Date occupied"), 
+        t.Literal("Date occupied"),
         t.Literal("Provider is not available in this timeframe"),
-    ]), 
+    ]),
 };
 
 export const BookingModel = {
@@ -59,7 +59,7 @@ export const BookingModel = {
         service_id: t.Number(),
         provider_id: t.Number(),
         client_id: t.Number(),
-        start_time: t.String(),     // "2024-05-20T10:00:00Z"
+        start_time: t.String(), // "2024-05-20T10:00:00Z"
         duration_hours: t.Number({ minimum: 1 }), // Calc el end_time
         payment_method: t.Enum(PaymentMethod),
     }),
@@ -70,6 +70,15 @@ export const BookingModel = {
         start_time: t.String(),
         duration_hours: t.Number({ minimum: 1 }),
         payment_method: t.Enum(PaymentMethod),
+    }),
+
+    availabilityQuery: t.Object({
+        date: t.String({ pattern: "^\\d{4}-\\d{2}-\\d{2}$" }), 
+    }),
+
+    availabilityResponse: t.Object({
+        date: t.String(),
+        occupied_slots: t.Array(t.String()),
     }),
 
     updateStatusBody: t.Object({

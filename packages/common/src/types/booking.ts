@@ -2,7 +2,7 @@ import { AppointmentStatus } from '../enums/AppointmentStatus.enum';
 import { PaymentMethod } from '../enums/PaymentMethod.enum';
 export interface Appointment {
     id:                number;
-    user_id:           number;
+    client_id:           number;
     provider_id:       number;
     service_id:        number;
     

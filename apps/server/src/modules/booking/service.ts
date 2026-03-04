@@ -6,6 +6,7 @@ import { AppointmentStatus, UserRole } from "@limpora/common";
 import { AuthQueries } from "../auth/queries";
 import { ProviderQueries } from "../user_services/queries";
 import { APP_COMMISSION_PERCENT } from "../../constants";
+import { db } from "../../libs/db";
 
 export abstract class BookingService {
     static async assign({
@@ -106,6 +107,29 @@ export abstract class BookingService {
         return created;
     }
 
+    static getAvailability(
+        { provider_id }: { provider_id: number },
+        { date }: { date: string },
+    ) {
+        const day_start = `${date}T00:00:00`;
+        const day_end = `${date}T23:59:59`;
+
+        const rows = BookingQueries.findOccupiedSlots.all({
+            provider_id,
+            day_start,
+            day_end,
+        });
+
+        const occupied_slots = rows.map((row) => {
+            const time = row.start_time.includes("T")
+                ? row.start_time.split("T")[1].substring(0, 5) // "10:00"
+                : row.start_time.substring(11, 16);
+            return time;
+        });
+
+        return { date, occupied_slots };
+    }
+
     static async getMe(uid: string): Promise<BookingModel["listResponse"]> {
         const user = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
 
@@ -131,16 +155,25 @@ export abstract class BookingService {
         );
     }
 
-    static async updateStatus(
+    static async updateStatusMe(
         { status: appointment_status }: BookingModel["updateStatusBody"],
         { id }: BookingModel["appointmentIdParam"],
+        uid: string,
     ): Promise<BookingModel["updateResponse"]> {
+        const user = await UserService.getMe({ uid });
+
         const appointment = BookingQueries.findById.get({ id });
 
         if (!appointment)
             throw status(
                 404,
                 "Appointment not found" satisfies BookingModel["notFound"],
+            );
+
+        if (appointment.provider_id != user.id)
+            throw status(
+                403,
+                "You can only manage your own appointments" satisfies BookingModel["forbidden"],
             );
 
         BookingQueries.updateStatus.run({

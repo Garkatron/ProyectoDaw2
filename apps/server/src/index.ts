@@ -57,7 +57,7 @@ const app = new Elysia()
                 Bun.env.NODE_ENV === "production"
                     ? (Bun.env.FRONTEND_URL ?? "https://www.limpora.xyz")
                     : true,
-            methods: ["GET", "POST", "PUT", "DELETE"],
+            methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
             allowedHeaders: ["Content-Type", "Authorization"],
             credentials: true,
         }),
