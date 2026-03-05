@@ -45,6 +45,17 @@ export default defineConfig({
   },
   hmr: {
     host: 'localhost',
-  }
+  },
+  test: {
+		environment: "jsdom",
+		globals: true,
+		setupFiles: "./src/setupTests.ts",
+		css: false,
+		coverage: {
+			provider: "v8", // o 'istanbul'
+			reporter: ["text", "html"],
+			reportsDirectory: "./coverage"
+		}
+	}
 })
 
