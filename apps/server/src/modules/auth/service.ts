@@ -48,7 +48,7 @@ export abstract class AuthService {
             console.error(error);
         }
 
-        if (process.env.EMAIL_VERIFICATION) {
+        if (process.env.EMAIL_VERIFICATION === "true") {
             const generated = await generateVefCode();
             
             AuthQueries.insertVerificationCode.run({email, hashed_code: generated.hashed_code});
@@ -150,7 +150,7 @@ export abstract class AuthService {
                 throw status(500, "Failed to retrieve user record after sync");
             }
 
-            if (process.env.EMAIL_VERIFICATION) {
+            if (process.env.EMAIL_VERIFICATION === "true") {
                 if (userRecord.email_verified == 0) {
                     
                     const generated = await generateVefCode();

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Base from "../../layouts/Base";
-import { UserCard } from "../../components/UserCard";
+import { ProviderCard } from "../../components/ProviderCard";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import {
@@ -170,7 +170,7 @@ export default function UserFinder() {
                       (e.currentTarget.style.transform = "scale(1)")
                     }
                   >
-                    <UserCard user={user} />
+                    <ProviderCard user={user} />
                   </Box>
                 </Link>
               ))}

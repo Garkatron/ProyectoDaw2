@@ -12,6 +12,7 @@ import UserFinder from "./pages/main/UserFinder";
 // import EmailCode from './pages/auth/EmailCode';
 import UserPanel from "./pages/user/UserPanel/index";
 import VerifyEmail from "./pages/auth/VerifyEmail";
+import ScheduleSettings from "./pages/user/ScheduleSettings";
 
 // <Route path="/emailcode" element={<EmailCode />} />
 
@@ -37,7 +38,6 @@ function App() {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />
-
         <Route path="/currency" element={<Currency />} />
         <Route path="/userfinder" element={<UserFinder />} />
         <Route path="/booking" element={<BookingConfirmation />} />

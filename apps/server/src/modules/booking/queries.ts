@@ -3,6 +3,7 @@ import type {
     Appointment,
     AppointmentStatus,
     PaymentMethod,
+    ProviderScheduleRow,
 } from "@limpora/common";
 
 export const BookingQueries = {
@@ -84,10 +85,10 @@ export const BookingQueries = {
     ),
 
     findOccupiedSlots: db.query<
-        { start_time: string },
+        Appointment,
         { provider_id: number; day_start: string; day_end: string }
     >(
-        `SELECT start_time
+        `SELECT *
      FROM Appointments
      WHERE provider_id = :provider_id
        AND status NOT IN ('Cancelled')
@@ -95,4 +96,61 @@ export const BookingQueries = {
        AND start_time <= :day_end
      ORDER BY start_time ASC`,
     ),
+
+
+    findScheduleByUserId: db.query<
+        ProviderScheduleRow,
+        { user_id: number }
+    >(
+        `SELECT * FROM ProviderSchedule
+         WHERE user_id = :user_id AND is_active = 1
+         ORDER BY day_of_week, start_time ASC`,
+    ),
+
+    findScheduleByUserAndDay: db.query<
+        ProviderScheduleRow,
+        { user_id: number; day_of_week: number }
+    >(
+        `SELECT * FROM ProviderSchedule
+         WHERE user_id = :user_id
+           AND day_of_week = :day_of_week
+           AND is_active = 1
+         ORDER BY start_time ASC`,
+    ),
+
+    insertSchedule: db.query<
+        void,
+        { user_id: number; day_of_week: number; start_time: string; end_time: string }
+    >(
+        `INSERT INTO ProviderSchedule (user_id, day_of_week, start_time, end_time)
+         VALUES (:user_id, :day_of_week, :start_time, :end_time)`,
+    ),
+
+    updateSchedule: db.query<
+        void,
+        { id: number; start_time: string; end_time: string; is_active: number }
+    >(
+        `UPDATE ProviderSchedule
+         SET start_time = :start_time,
+             end_time   = :end_time,
+             is_active  = :is_active
+         WHERE id = :id`,
+    ),
+
+    deleteSchedule: db.query<void, { id: number }>(
+        `DELETE FROM ProviderSchedule WHERE id = :id`,
+    ),
+
+    deleteScheduleByUser: db.query<void, { user_id: number }>(
+        `DELETE FROM ProviderSchedule WHERE user_id = :user_id`,
+    ),
+    
+    findProviderProfile: db.query<
+    { travel_buffer_min: number },
+    { user_id: number }
+>(
+    `SELECT COALESCE(travel_buffer_min, 30) as travel_buffer_min
+     FROM ProviderProfiles
+     WHERE user_id = :user_id`,
+),
 };

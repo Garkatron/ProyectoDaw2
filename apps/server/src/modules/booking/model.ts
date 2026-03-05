@@ -1,12 +1,27 @@
 import { t, type UnwrapSchema } from "elysia";
 import { PaymentMethod, AppointmentStatus } from "@limpora/common";
 
+const ScheduleSlotSchema = t.Object({
+    id: t.Number(),
+    user_id: t.Number(),
+    day_of_week: t.Number(), // 0=Lunes, 6=Domingo
+    start_time: t.String(), // "09:00"
+    end_time: t.String(), // "14:00"
+    is_active: t.Number(),
+});
+
+const ScheduleSlotInput = t.Object({
+    day_of_week: t.Number({ minimum: 0, maximum: 6 }),
+    start_time: t.String({ pattern: "^\\d{2}:\\d{2}$" }),
+    end_time: t.String({ pattern: "^\\d{2}:\\d{2}$" }),
+});
+
 const BookingSchema = t.Object({
     id: t.Number(),
     client_id: t.Number(), // Client ID
     provider_id: t.Number(),
     service_id: t.Number(),
-    
+
     // Time
     start_time: t.String(), // ISO8601
     end_time: t.String(), // ISO8601
@@ -21,7 +36,6 @@ const BookingSchema = t.Object({
 
     payment_method: t.Enum(PaymentMethod),
 
-
     created_at: t.String(),
     service_name: t.String(), // join + Services
 });
@@ -32,7 +46,10 @@ const BookingErrors = {
         t.Literal("User not found"),
         t.Literal("Service not found"),
     ]),
-
+    invalidTransition: t.Literal("Invalid status transition"),
+    findProviderProfileResponse: t.Object({
+        travel_buffer_min: t.Number(),
+    }),
     forbidden: t.Union([
         t.Literal("You cannot contract yourself"),
         t.Literal("User is not a provider"),
@@ -40,6 +57,7 @@ const BookingErrors = {
         t.Literal("Admins can't have appointments"),
         t.Literal("User does not offer this service"),
         t.Literal("You can only manage your own appointments"),
+        t.Literal("You can only manage your own schedule"),
     ]),
 
     // Agenda conflicts
@@ -70,17 +88,26 @@ export const BookingModel = {
         payment_method: t.Enum(PaymentMethod),
     }),
 
+    scheduleResponse: t.Array(ScheduleSlotSchema),
+    upsertScheduleBody: t.Array(ScheduleSlotInput),
+
     availabilityQuery: t.Object({
-        date: t.String({ pattern: "^\\d{4}-\\d{2}-\\d{2}$" }), 
+        date: t.String({ pattern: "^\\d{4}-\\d{2}-\\d{2}$" }),
     }),
 
     availabilityResponse: t.Object({
         date: t.String(),
+        all_slots: t.Array(t.String()),
         occupied_slots: t.Array(t.String()),
     }),
 
     updateStatusBody: t.Object({
         status: t.Enum(AppointmentStatus),
+    }),
+
+    getAvailabilityResponse: t.Object({
+        date: t.String(),
+        occupied_slots: t.Array(t.String()),
     }),
 
     assignResponse: BookingSchema,

@@ -35,10 +35,24 @@ export function migrate(db: Database) {
             transport_type    TEXT CHECK (transport_type IN ('Car', 'Public Transport', 'Bike', 'Walk')),
             service_radius_km INTEGER DEFAULT 10,
             provides_supplies  INTEGER DEFAULT 0,
+            travel_buffer_min INTEGER DEFAULT 30,
             avg_rating        REAL DEFAULT 0,
             FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
         )
     `);
+
+    db.run(`
+    CREATE TABLE IF NOT EXISTS ProviderSchedule (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id     INTEGER NOT NULL,
+        day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6), -- 0=Lunes, 6=Domingo
+        start_time  TEXT NOT NULL, -- "09:00"
+        end_time    TEXT NOT NULL, -- "14:00"
+        is_active   INTEGER NOT NULL DEFAULT 1,
+        UNIQUE (user_id, day_of_week, start_time),
+        FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+    )
+`);
 
     db.run(`
         CREATE TABLE IF NOT EXISTS Badges (
@@ -161,6 +175,10 @@ export function migrate(db: Database) {
     db.run(
         `CREATE INDEX IF NOT EXISTS idx_email_verification_expires ON EmailVerificationCodes (expires_at)`,
     );
+
+    db.run(
+    `CREATE INDEX IF NOT EXISTS idx_provider_schedule_user ON ProviderSchedule (user_id, day_of_week)`
+);
 
     console.log("✅ Migrations done");
 

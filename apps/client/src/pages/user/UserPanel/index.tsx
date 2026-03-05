@@ -8,6 +8,7 @@ import ServicesSection from './components/ServicesSection';
 import ReviewsSection from './components/ReviewsSection';
 import Base from '../../../layouts/Base';
 import { Box, Loader, Center, Text, Paper, Stack } from '@mantine/core';
+import ScheduleSettings from '../ScheduleSettings';
 
 export default function UserPanel() {
     const { targetUser, isSelf, loading, error, handleLogout } = useUserPanel();
@@ -49,7 +50,9 @@ export default function UserPanel() {
                         {targetUser.role === 'provider' && (
                             <ServicesSection isSelf={isSelf} {...services} />
                         )}
-
+                         {targetUser.role === 'provider' && (
+                            <ScheduleSettings providerId={targetUser.id} />
+                        )}
                     </Stack>
                 </Paper>
             </Box>

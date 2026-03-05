@@ -25,3 +25,12 @@ export interface Appointment {
     client_name?:      string;
     created_at:        string;
 }
+
+export interface ProviderScheduleRow {
+    id: number;
+    user_id: number;
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+    is_active: number;
+}

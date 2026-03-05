@@ -23,6 +23,7 @@ interface ProviderService {
   service_id: number;
   user_id: number;
   price: number;
+  duration_hours: number;
   is_active: boolean;
   service_name?: string;
   name?: string;
@@ -30,16 +31,7 @@ interface ProviderService {
 
 const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal"];
 
-const TIME_SLOTS = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30",
-  "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00",
-];
-
-const MORNING_SLOTS = TIME_SLOTS.filter((s) => parseInt(s) < 14);
-const AFTERNOON_SLOTS = TIME_SLOTS.filter((s) => parseInt(s) >= 14);
-
-type SlotState = "available" | "occupied" | "past";
+type SlotState = "available" | "occupied" | "overflow" | "past" | "outside";
 
 const statusColorMap: Record<string, string> = {
   Completed: "green",
@@ -47,7 +39,16 @@ const statusColorMap: Record<string, string> = {
   "In Process": "blue",
 };
 
-// ─── Toggle genérico ────────────────────────────────────────────────────────
+function addMinutes(slot: string, minutes: number): string {
+  const [h, m] = slot.split(":").map(Number);
+  const total = h * 60 + m + minutes;
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+function slotToMinutes(slot: string): number {
+  const [h, m] = slot.split(":").map(Number);
+  return h * 60 + m;
+}
 
 const ToggleButton = ({
   selected,
@@ -65,18 +66,49 @@ const ToggleButton = ({
       ta="center"
       style={{
         cursor: "pointer",
-        backgroundColor: selected ? "var(--mantine-color-default-color)" : undefined,
+        backgroundColor: selected
+          ? "var(--mantine-color-default-color)"
+          : undefined,
         transition: "all 0.15s",
       }}
     >
-      <Text component="div" size="sm" fw={500} c={selected ? "var(--mantine-color-body)" : "dimmed"}>
+      <Text
+        component="div"
+        size="sm"
+        fw={500}
+        c={selected ? "var(--mantine-color-body)" : "dimmed"}
+      >
         {children}
       </Text>
     </Paper>
   </UnstyledButton>
 );
 
-// ─── Slot de hora con estado visual ─────────────────────────────────────────
+const SLOT_STYLES: Record<
+  SlotState,
+  { bg?: string; text: string; label?: string }
+> = {
+  available: { text: "dimmed" },
+  occupied: {
+    bg: "var(--mantine-color-red-0)",
+    text: "var(--mantine-color-red-6)",
+    label: "Ocupado",
+  },
+  overflow: {
+    bg: "var(--mantine-color-orange-0)",
+    text: "var(--mantine-color-orange-6)",
+    label: "Se solapa",
+  },
+  past: {
+    bg: "var(--mantine-color-gray-1)",
+    text: "var(--mantine-color-gray-5)",
+  },
+  outside: {
+    bg: "var(--mantine-color-gray-1)",
+    text: "var(--mantine-color-gray-4)",
+    label: "Sin horario",
+  },
+};
 
 const SlotButton = ({
   slot,
@@ -89,24 +121,9 @@ const SlotButton = ({
   selected: boolean;
   onClick: () => void;
 }) => {
-  const disabled = state !== "available";
-
-  const bg = selected
-    ? "var(--mantine-color-default-color)"
-    : state === "occupied"
-    ? "var(--mantine-color-red-0)"
-    : state === "past"
-    ? "var(--mantine-color-gray-1)"
-    : undefined;
-
-  const textColor = selected
-    ? "var(--mantine-color-body)"
-    : state === "occupied"
-    ? "var(--mantine-color-red-6)"
-    : state === "past"
-    ? "var(--mantine-color-gray-5)"
-    : "dimmed";
-
+  const disabled =
+    state === "occupied" || state === "past" || state === "outside";
+  const styles = SLOT_STYLES[state];
   return (
     <UnstyledButton
       onClick={disabled ? undefined : onClick}
@@ -117,27 +134,29 @@ const SlotButton = ({
         p="xs"
         ta="center"
         style={{
-          backgroundColor: bg,
+          backgroundColor: selected
+            ? "var(--mantine-color-default-color)"
+            : styles.bg,
           transition: "all 0.15s",
-          opacity: state === "past" ? 0.5 : 1,
-          position: "relative",
-          overflow: "hidden",
+          opacity: state === "past" || state === "outside" ? 0.45 : 1,
         }}
       >
-        <Text size="sm" fw={500} c={textColor}>
+        <Text
+          size="sm"
+          fw={500}
+          c={selected ? "var(--mantine-color-body)" : styles.text}
+        >
           {slot}
         </Text>
-        {state === "occupied" && (
-          <Text size="10px" c="red.5" mt={2}>
-            Ocupado
+        {!selected && styles.label && (
+          <Text size="10px" c={styles.text} mt={2}>
+            {styles.label}
           </Text>
         )}
       </Paper>
     </UnstyledButton>
   );
 };
-
-// ─── Grupo de slots (mañana / tarde) ────────────────────────────────────────
 
 const SlotGroup = ({
   label,
@@ -151,47 +170,51 @@ const SlotGroup = ({
   slotStates: Record<string, SlotState>;
   selectedTime: string | null;
   onSelect: (slot: string) => void;
-}) => (
-  <Box>
-    <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb="xs">
-      {label}
-    </Text>
-    <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
-      {slots.map((slot) => (
-        <SlotButton
-          key={slot}
-          slot={slot}
-          state={slotStates[slot] ?? "available"}
-          selected={selectedTime === slot}
-          onClick={() => onSelect(slot)}
-        />
-      ))}
-    </SimpleGrid>
-  </Box>
-);
-
-// ─── Página principal ────────────────────────────────────────────────────────
+}) => {
+  if (slots.length === 0) return null;
+  return (
+    <Box>
+      <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb="xs">
+        {label}
+      </Text>
+      <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
+        {slots.map((slot) => (
+          <SlotButton
+            key={slot}
+            slot={slot}
+            state={slotStates[slot] ?? "outside"}
+            selected={selectedTime === slot}
+            onClick={() => onSelect(slot)}
+          />
+        ))}
+      </SimpleGrid>
+    </Box>
+  );
+};
 
 export default function BookingConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
-  const currentUser = useAuthStore((state) => state.user);
-
+  const currentUser = useAuthStore((s) => s.user);
   const providerId = location.state?.userId;
 
   const [markedDates, setMarkedDates] = useState<MarkedDate[]>([]);
-  const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
 
-  const [providerServices, setProviderServices] = useState<ProviderService[]>([]);
+  const [providerServices, setProviderServices] = useState<ProviderService[]>(
+    [],
+  );
   const [loadingServices, setLoadingServices] = useState(false);
+  const [selectedService, setSelectedService] =
+    useState<ProviderService | null>(null);
 
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [selectedService, setSelectedService] = useState<ProviderService | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.BankTransfer);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PaymentMethod.BankTransfer,
+  );
 
-  // Disponibilidad
+  const [allSlots, setAllSlots] = useState<string[]>([]);
   const [occupiedSlots, setOccupiedSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
 
@@ -199,115 +222,137 @@ export default function BookingConfirmation() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // ── Citas del usuario (para marcar calendario) ──────────────────────────
   useEffect(() => {
     if (!providerId) return;
-    const fetchAppointments = async () => {
+    (async () => {
       setLoadingAppts(true);
       try {
         const { data } = await API.bookings.me.get();
         const appointments: Appointment[] = data ?? [];
-
         const dateMap: Record<string, Appointment[]> = {};
-        appointments.forEach((appt) => {
-          const key = new Date(appt.date_time).toDateString();
-          if (!dateMap[key]) dateMap[key] = [];
-          dateMap[key].push(appt);
+        appointments.forEach((a) => {
+          const k = new Date(a.start_time).toDateString();
+          (dateMap[k] ??= []).push(a);
         });
-
         const marks: MarkedDate[] = [];
-        const blocked = new Set<string>();
-
-        Object.entries(dateMap).forEach(([key, appts]) => {
-          const statuses = appts.map((a) => a.status?.toLowerCase());
-          let status = "Pending";
-          if (statuses.every((s) => s === "completed" || s === "cancelled"))
-            status = "Completed";
-          else if (statuses.some((s) => s === "in process"))
-            status = "In Process";
-
-          marks.push({ date: new Date(appts[0].date_time), status: appts[0].status });
-          if (status === "Pending" || status === "In Process") blocked.add(key);
+        Object.values(dateMap).forEach((appts) => {
+          marks.push({
+            date: new Date(appts[0].start_time),
+            status: appts[0].status,
+          });
         });
-
         setMarkedDates(marks);
-        setBlockedDates(blocked);
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
+        // ✅ fix 4: no bloqueamos días, los slots ocupados los gestiona el backend
       } finally {
         setLoadingAppts(false);
       }
-    };
-    fetchAppointments();
+    })();
   }, [providerId]);
 
-  // ── Servicios del proveedor ──────────────────────────────────────────────
+  // ── servicios del proveedor ──────────────────────────────────────────────
   useEffect(() => {
     if (!providerId) return;
-    const fetchServices = async () => {
+    (async () => {
       setLoadingServices(true);
       try {
-        const { data } = await API.providers({ provider_id: String(providerId) }).services.get();
+        const { data } = await API.providers({
+          provider_id: String(providerId),
+        }).services.get();
         setProviderServices(data ?? []);
-      } catch (err) {
-        console.error("Error fetching provider services:", err);
       } finally {
         setLoadingServices(false);
       }
-    };
-    fetchServices();
+    })();
   }, [providerId]);
 
-  // ── Slots ocupados del proveedor para la fecha seleccionada ─────────────
+  // ── disponibilidad para la fecha ─────────────────────────────────────────
   useEffect(() => {
     if (!providerId || !selectedDate) return;
-    const fetchOccupied = async () => {
+    (async () => {
       setLoadingSlots(true);
+      setAllSlots([]);
       setOccupiedSlots(new Set());
+      setSelectedTime(null);
       try {
-        const dateStr = selectedDate.toISOString().split("T")[0]; // "YYYY-MM-DD"
+        const dateStr = selectedDate.toISOString().split("T")[0];
         const { data } = await API.bookings
           .provider({ provider_id: String(providerId) })
           .availability.get({ query: { date: dateStr } });
-
+        setAllSlots(data?.all_slots ?? []);
         setOccupiedSlots(new Set(data?.occupied_slots ?? []));
-      } catch (err) {
-        console.error("Error fetching occupied slots:", err);
       } finally {
         setLoadingSlots(false);
       }
-    };
-    fetchOccupied();
+    })();
   }, [providerId, selectedDate]);
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
+  // ── estado de cada slot ──────────────────────────────────────────────────
+  // ── estado de cada slot (Lógica Corregida) ─────────────────────────────────
+  const slotStates: Record<string, SlotState> = (() => {
+    if (!selectedDate || allSlots.length === 0) return {};
+    const now = new Date();
+    const durationMin = (selectedService?.duration_hours ?? 0) * 60;
+    const allSlotsSet = new Set(allSlots);
 
-  const getSlotState = (slot: string, date: Date): SlotState => {
-    const [h, m] = slot.split(":").map(Number);
-    const slotDate = new Date(date);
-    slotDate.setHours(h, m, 0, 0);
-    if (slotDate < new Date()) return "past";
-    if (occupiedSlots.has(slot)) return "occupied";
-    return "available";
-  };
+    return Object.fromEntries(
+      allSlots.map((slot) => {
+        // 1. Validar si es pasado
+        const [h, m] = slot.split(":").map(Number);
+        const slotDate = new Date(selectedDate);
+        slotDate.setHours(h, m, 0, 0);
+        if (slotDate < now) return [slot, "past" as SlotState];
 
-  const slotStates: Record<string, SlotState> = selectedDate
-    ? Object.fromEntries(TIME_SLOTS.map((s) => [s, getSlotState(s, selectedDate)]))
-    : {};
+        // 2. Si el slot base ya está ocupado, ni seguimos
+        if (occupiedSlots.has(slot)) return [slot, "occupied" as SlotState];
+
+        // 3. Si no hay servicio seleccionado, está disponible (o fuera de horario si no existe en allSlots)
+        if (!selectedService || durationMin === 0)
+          return [slot, "available" as SlotState];
+
+        // 4. VALIDACIÓN DE RANGO (Aquí estaba el fallo)
+        const startMin = slotToMinutes(slot);
+        const endMin = startMin + durationMin;
+
+        // Revisamos cada bloque de 30 min que ocuparía el servicio
+        // Empezamos en +30 porque el slot inicial ya sabemos que está libre
+        for (let cursor = startMin; cursor < endMin; cursor += 30) {
+          const currentCheck = `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`;
+
+          // PRIORIDAD 1: ¿El slot que necesito está ocupado por otra cita?
+          if (occupiedSlots.has(currentCheck)) {
+            return [slot, "occupied" as SlotState];
+          }
+
+          // PRIORIDAD 2: ¿El slot que necesito se sale del horario del proveedor?
+          if (!allSlotsSet.has(currentCheck)) {
+            return [slot, "overflow" as SlotState];
+          }
+        }
+
+        // Si pasa todas las pruebas, está libre para la duración completa
+        return [slot, "available" as SlotState];
+      }),
+    );
+  })();
+
+  const morningSlots = allSlots.filter((s) => slotToMinutes(s) < 14 * 60);
+  const afternoonSlots = allSlots.filter((s) => slotToMinutes(s) >= 14 * 60);
 
   const handleDateClick = (date: Date) => {
-    if (blockedDates.has(date.toDateString())) return;
+    // ✅ fix 4: solo bloqueamos fechas pasadas
     if (date < new Date()) return;
     setSelectedDate(date);
     setSelectedTime(null);
   };
 
   const handleTimeSelect = (slot: string) => {
-    if (slotStates[slot] !== "available") return;
+    const state = slotStates[slot];
+    if (state === "occupied" || state === "past" || state === "outside") return;
     setSelectedTime(slot);
   };
 
-  const canConfirm = selectedDate && selectedTime && selectedService && paymentMethod;
+  const canConfirm =
+    selectedDate && selectedTime && selectedService && paymentMethod;
 
   const handleConfirm = async () => {
     if (!canConfirm || !currentUser) return;
@@ -317,25 +362,20 @@ export default function BookingConfirmation() {
       const [hours, minutes] = selectedTime.split(":").map(Number);
       const dateTime = new Date(selectedDate);
       dateTime.setHours(hours, minutes, 0, 0);
-
       await API.bookings.me.post({
         provider_id: providerId,
         service_id: selectedService.service_id,
         start_time: dateTime.toISOString(),
         payment_method: paymentMethod as PaymentMethod,
       });
-
       setSuccess(true);
       setTimeout(() => navigate(-1), 2000);
-    } catch (err) {
-      console.error("Error al confirmar cita:", err);
+    } catch {
       setError("No se pudo confirmar la cita. Inténtalo de nuevo.");
     } finally {
       setSubmitting(false);
     }
   };
-
-  // ── Render ───────────────────────────────────────────────────────────────
 
   return (
     <Base>
@@ -357,7 +397,6 @@ export default function BookingConfirmation() {
           <Text fw={600} mb="sm">
             1. Selecciona un día
           </Text>
-
           <Group gap="md" mb="md">
             {Object.entries(statusColorMap).map(([label, color]) => (
               <Group key={label} gap={6}>
@@ -375,13 +414,11 @@ export default function BookingConfirmation() {
               </Group>
             ))}
           </Group>
-
           {loadingAppts && (
             <Text size="xs" c="dimmed" mb="xs">
-              Cargando disponibilidad...
+              Cargando citas...
             </Text>
           )}
-
           <Calendar
             markedDates={markedDates}
             onDateClick={handleDateClick}
@@ -389,17 +426,83 @@ export default function BookingConfirmation() {
           />
         </Paper>
 
-        {/* Paso 2 — Hora */}
+        {/* ✅ fix 3: Paso 2 — Servicio ANTES que la hora */}
         {selectedDate && (
           <Paper withBorder p="lg" shadow="sm">
+            <Text fw={600} mb="lg">
+              2. Selecciona un servicio
+            </Text>
+            {loadingServices ? (
+              <Stack gap="xs">
+                <Skeleton height={48} />
+                <Skeleton height={48} />
+              </Stack>
+            ) : providerServices.length === 0 ? (
+              <Text size="sm" c="dimmed" fs="italic">
+                Este proveedor no tiene servicios disponibles.
+              </Text>
+            ) : (
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
+                {providerServices.map((svc) => (
+                  <ToggleButton
+                    key={svc.service_id}
+                    selected={selectedService?.service_id === svc.service_id}
+                    onClick={() => {
+                      setSelectedService(svc);
+                      setSelectedTime(null);
+                    }}
+                  >
+                    <Group justify="space-between">
+                      <Text
+                        size="sm"
+                        fw={500}
+                        c={
+                          selectedService?.service_id === svc.service_id
+                            ? "var(--mantine-color-body)"
+                            : "dimmed"
+                        }
+                      >
+                        {svc.service_name ??
+                          svc.name ??
+                          `Servicio #${svc.service_id}`}
+                      </Text>
+                      <Group gap={6}>
+                        {svc.duration_hours && (
+                          <Text size="xs" c="dimmed">
+                            {svc.duration_hours}h
+                          </Text>
+                        )}
+                        {svc.price != null && (
+                          <Text size="xs" fw={600} c="dimmed">
+                            {svc.price} €
+                          </Text>
+                        )}
+                      </Group>
+                    </Group>
+                  </ToggleButton>
+                ))}
+              </SimpleGrid>
+            )}
+          </Paper>
+        )}
+
+        {/* Paso 3 — Hora */}
+        {selectedDate && selectedService && (
+          <Paper withBorder p="lg" shadow="sm">
             <Group justify="space-between" mb="md">
-              <Text fw={600}>2. Selecciona una hora</Text>
-              {/* Leyenda de slots */}
+              <Text fw={600}>3. Selecciona una hora</Text>
               <Group gap="md">
                 {(
                   [
-                    { label: "Disponible", color: "var(--mantine-color-default-border)" },
+                    {
+                      label: "Disponible",
+                      color: "var(--mantine-color-default-border)",
+                    },
                     { label: "Ocupado", color: "var(--mantine-color-red-4)" },
+                    {
+                      label: "Se solapa",
+                      color: "var(--mantine-color-orange-4)",
+                    },
                     { label: "Pasado", color: "var(--mantine-color-gray-4)" },
                   ] as const
                 ).map(({ label, color }) => (
@@ -417,6 +520,15 @@ export default function BookingConfirmation() {
               </Group>
             </Group>
 
+            <Text size="xs" c="dimmed" mb="md">
+              ℹ️ Servicio de{" "}
+              <Text span fw={600}>
+                {selectedService.duration_hours}h
+              </Text>
+              . Los slots en naranja están libres pero el servicio consumiría
+              horas adicionales del horario.
+            </Text>
+
             {loadingSlots ? (
               <Stack gap="xs">
                 <Skeleton height={16} width={60} />
@@ -426,18 +538,22 @@ export default function BookingConfirmation() {
                   ))}
                 </SimpleGrid>
               </Stack>
+            ) : allSlots.length === 0 ? (
+              <Text size="sm" c="dimmed" fs="italic">
+                El proveedor no tiene horario disponible este día.
+              </Text>
             ) : (
               <Stack gap="lg">
                 <SlotGroup
                   label="Mañana"
-                  slots={MORNING_SLOTS}
+                  slots={morningSlots}
                   slotStates={slotStates}
                   selectedTime={selectedTime}
                   onSelect={handleTimeSelect}
                 />
                 <SlotGroup
                   label="Tarde"
-                  slots={AFTERNOON_SLOTS}
+                  slots={afternoonSlots}
                   slotStates={slotStates}
                   selectedTime={selectedTime}
                   onSelect={handleTimeSelect}
@@ -447,75 +563,23 @@ export default function BookingConfirmation() {
           </Paper>
         )}
 
-        {/* Paso 3 — Servicio y pago */}
-        {selectedDate && selectedTime && (
+        {/* Paso 4 — Pago */}
+        {selectedDate && selectedService && selectedTime && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="lg">
-              3. Detalles de la reserva
+            <Text fw={600} mb="md">
+              4. Método de pago
             </Text>
-            <Stack gap="lg">
-              <Box>
-                <Text size="sm" fw={500} c="dimmed" mb="xs">
-                  Servicio
-                </Text>
-                {loadingServices ? (
-                  <Stack gap="xs">
-                    <Skeleton height={48} />
-                    <Skeleton height={48} />
-                  </Stack>
-                ) : providerServices.length === 0 ? (
-                  <Text size="sm" c="dimmed" fs="italic">
-                    Este proveedor no tiene servicios disponibles.
-                  </Text>
-                ) : (
-                  <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-                    {providerServices.map((svc) => (
-                      <ToggleButton
-                        key={svc.service_id}
-                        selected={selectedService?.service_id === svc.service_id}
-                        onClick={() => setSelectedService(svc)}
-                      >
-                        <Group justify="space-between">
-                          <Text
-                            size="sm"
-                            fw={500}
-                            c={
-                              selectedService?.service_id === svc.service_id
-                                ? "var(--mantine-color-body)"
-                                : "dimmed"
-                            }
-                          >
-                            {svc.service_name ?? svc.name ?? `Servicio #${svc.service_id}`}
-                          </Text>
-                          {svc.price != null && (
-                            <Text size="xs" fw={600} c="dimmed">
-                              {svc.price} €
-                            </Text>
-                          )}
-                        </Group>
-                      </ToggleButton>
-                    ))}
-                  </SimpleGrid>
-                )}
-              </Box>
-
-              <Box>
-                <Text size="sm" fw={500} c="dimmed" mb="xs">
-                  Método de pago
-                </Text>
-                <SimpleGrid cols={3} spacing="xs">
-                  {PAYMENT_METHODS.map((method) => (
-                    <ToggleButton
-                      key={method}
-                      selected={paymentMethod === method}
-                      onClick={() => setPaymentMethod(method)}
-                    >
-                      {method}
-                    </ToggleButton>
-                  ))}
-                </SimpleGrid>
-              </Box>
-            </Stack>
+            <SimpleGrid cols={3} spacing="xs">
+              {PAYMENT_METHODS.map((method) => (
+                <ToggleButton
+                  key={method}
+                  selected={paymentMethod === method}
+                  onClick={() => setPaymentMethod(method as PaymentMethod)}
+                >
+                  {method}
+                </ToggleButton>
+              ))}
+            </SimpleGrid>
           </Paper>
         )}
 
@@ -527,7 +591,10 @@ export default function BookingConfirmation() {
             </Text>
             <Stack gap={6} mb="lg">
               <Text size="sm">
-                📅 <Text span fw={500}>Fecha:</Text>{" "}
+                📅{" "}
+                <Text span fw={500}>
+                  Fecha:
+                </Text>{" "}
                 {selectedDate.toLocaleDateString("es-ES", {
                   weekday: "long",
                   year: "numeric",
@@ -536,19 +603,38 @@ export default function BookingConfirmation() {
                 })}
               </Text>
               <Text size="sm">
-                🕐 <Text span fw={500}>Hora:</Text> {selectedTime}
+                🕐{" "}
+                <Text span fw={500}>
+                  Hora:
+                </Text>{" "}
+                {selectedTime} →{" "}
+                {addMinutes(selectedTime, selectedService.duration_hours * 60)}
               </Text>
               <Text size="sm">
-                🛠 <Text span fw={500}>Servicio:</Text>{" "}
-                {selectedService.service_name ?? selectedService.name ?? `#${selectedService.service_id}`}
-                {selectedService.price != null && ` — ${selectedService.price} €`}
+                🛠{" "}
+                <Text span fw={500}>
+                  Servicio:
+                </Text>{" "}
+                {selectedService.service_name ??
+                  selectedService.name ??
+                  `#${selectedService.service_id}`}
+                {selectedService.price != null &&
+                  ` — ${selectedService.price} €`}
               </Text>
               <Text size="sm">
-                💳 <Text span fw={500}>Pago:</Text> {paymentMethod}
+                💳{" "}
+                <Text span fw={500}>
+                  Pago:
+                </Text>{" "}
+                {paymentMethod}
               </Text>
             </Stack>
 
-            {error && <Alert color="red" mb="md">{error}</Alert>}
+            {error && (
+              <Alert color="red" mb="md">
+                {error}
+              </Alert>
+            )}
             {success && (
               <Alert color="green" mb="md">
                 ✅ Cita confirmada. Redirigiendo...

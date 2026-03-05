@@ -4,9 +4,6 @@ import { UserRole } from "@limpora/common";
 import { BookingService } from "./service";
 import { BookingModel } from "./model";
 
-console.log(process.env.RESEND_AUTH_EMAIL);
-
-
 export const bookingController = new Elysia({ prefix: "/bookings" })
     .use(AuthGuard)
 
@@ -26,7 +23,6 @@ export const bookingController = new Elysia({ prefix: "/bookings" })
                     isAuthenticated: true,
                 },
             )
-
             .get("/", ({ user }) => BookingService.getMe(user.uid), {
                 response: {
                     200: BookingModel.listResponse,
@@ -34,9 +30,6 @@ export const bookingController = new Elysia({ prefix: "/bookings" })
                 },
                 isAuthenticated: true,
             })
-
-            // Status
-
             .patch(
                 "/:id/status",
                 ({ user, params, body }) =>
@@ -48,34 +41,54 @@ export const bookingController = new Elysia({ prefix: "/bookings" })
                         200: BookingModel.updateResponse,
                         403: BookingModel.forbidden,
                         404: BookingModel.notFound,
+                        409: BookingModel.invalidTransition,
                     },
                     isAuthenticated: true,
                 },
             ),
     )
 
-    .get(
-        "/provider/:provider_id/availability",
-        ({ params, query }) => BookingService.getAvailability(params, query),
-        {
-            params: BookingModel.providerIdParam,
-            query: BookingModel.availabilityQuery,
-            response: {
-                200: BookingModel.availabilityResponse,
-                404: BookingModel.notFound,
-            },
-            isAuthenticated: true,
-        },
+    .group("/provider/:provider_id", (app) =>
+        app
+            .get(
+                "/availability",
+                ({ params, query }) => BookingService.getAvailability(params, query),
+                {
+                    params: BookingModel.providerIdParam,
+                    query: BookingModel.availabilityQuery,
+                    response: {
+                        200: BookingModel.availabilityResponse,
+                    },
+                },
+            )
+            .get(
+                "/schedule",
+                ({ params }) => BookingService.getSchedule(params),
+                {
+                    params: BookingModel.providerIdParam,
+                    response: {
+                        200: BookingModel.scheduleResponse,
+                    },
+                },
+            )
+            .put(
+                "/schedule",
+                ({ params, body, user }) =>
+                    BookingService.upsertSchedule(params, body, user.uid),
+                {
+                    params: BookingModel.providerIdParam,
+                    body: BookingModel.upsertScheduleBody,
+                    response: {
+                        200: BookingModel.scheduleResponse,
+                        403: BookingModel.forbidden,
+                        404: BookingModel.notFound,
+                    },
+                    isAuthenticated: true,
+                },
+            ),
     )
 
-    // * Admin
-
-    /*
-    .get("/", () => BookingService.getAll(), {
-        response: { 200: BookingModel.listResponse },
-        hasRole: [UserRole.Admin],
-    })*/
-
+    // ── Admin ────────────────────────────────────────────────────────────
     .post("/", ({ body }) => BookingService.assign(body), {
         body: BookingModel.assignBody,
         response: {
@@ -85,9 +98,8 @@ export const bookingController = new Elysia({ prefix: "/bookings" })
         },
         hasRole: [UserRole.Admin],
     })
-
     .get(
-        "/provider/:provider_id",
+        "/provider/:provider_id/appointments",
         ({ params }) => BookingService.getByProviderId(params),
         {
             params: BookingModel.providerIdParam,
@@ -95,7 +107,6 @@ export const bookingController = new Elysia({ prefix: "/bookings" })
             hasRole: [UserRole.Admin],
         },
     )
-
     .get(
         "/client/:client_id",
         ({ params }) => BookingService.getByClientId(params),
