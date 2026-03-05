@@ -1,16 +1,21 @@
-import { t, type UnwrapSchema } from 'elysia';
-import { UserRole } from '@limpora/common/src/enums/Role.enum'
+import { t, type UnwrapSchema } from "elysia";
+import { UserRole } from "@limpora/common/src/enums/Role.enum";
 
 export const AuthModel = {
+    verifyEmailBody: t.Object({
+        code: t.String(),
+        email: t.String({ format: "email", error: "Invalid email format" }),
+    }),
+
     registerBody: t.Object({
         username: t.String(),
         password: t.String(),
-        email: t.String({ format: 'email', error: 'Invalid email format' }),
+        email: t.String({ format: "email", error: "Invalid email format" }),
         role: t.Enum(UserRole),
     }),
 
     loginBody: t.Object({
-        email: t.String({ format: 'email' }),
+        email: t.String({ format: "email" }),
         password: t.String(),
     }),
 
@@ -24,12 +29,18 @@ export const AuthModel = {
         username: t.String(),
         email: t.String(),
     }),
-    
-    loginInvalid: t.Literal('Invalid email or password'),
-    loginUserNotExists: t.Literal('User not exists'),
+
+    emailVerifiedResponse: t.Object({
+        success: t.Boolean(),
+    }),
+
+    loginInvalid: t.Literal("Invalid email or password"),
+    verificationCodeNotGenerated: t.Literal("Verification code not found"),
+    invalidCode: t.Literal("Invalid verification code."),
+    loginUserNotExists: t.Literal("User not exists"),
     emailNotVerified: t.Literal("User isn't verified email.  Sending email..."),
-    
-    registerInvalid: t.Literal('Email already in use'),
+
+    registerInvalid: t.Literal("Email already in use"),
 } as const;
 
 export type AuthModel = {

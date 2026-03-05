@@ -50,11 +50,13 @@ export abstract class AuthService {
 
         if (process.env.EMAIL_VERIFICATION) {
             const generated = await generateVefCode();
+            
             AuthQueries.insertVerificationCode.run({email, hashed_code: generated.hashed_code});
-            await NotificationService.verificationEmail({
+            const { id } = await NotificationService.sendVerificationEmail({
                 to: email,
                 code: generated.code,
             });
+            
         }
 
         return { username, email };
@@ -155,7 +157,7 @@ export abstract class AuthService {
                     
                     AuthQueries.insertVerificationCode.run({email: userRecord.email, hashed_code: generated.hashed_code});
                     
-                    await NotificationService.verificationEmail({
+                    await NotificationService.sendVerificationEmail({
                         to: email,
                         code: generated.code,
                     });
@@ -197,5 +199,22 @@ export abstract class AuthService {
 
     static async revokeTokens(uid: string): Promise<void> {
         await firebaseAuth.revokeRefreshTokens(uid);
+    }
+
+    static async verifyEmailCode({ email, code: sent_code }: AuthModel["verifyEmailBody"]): Promise<AuthModel["emailVerifiedResponse"]> {
+
+        const r = AuthQueries.findVerificationCodeByEmail.get({email});
+
+        if (!r) throw status(404, "Verification code not found" satisfies AuthModel["verificationCodeNotGenerated"]);
+
+        const isValid = await Bun.password.verify(sent_code, r.code);
+        if (!isValid) throw status(401, "Invalid verification code." satisfies AuthModel["invalidCode"]);
+
+        AuthQueries.markCodeAsUsed.run({ id: r.id });
+        const { lastInsertRowid } = AuthQueries.updateEmailVerified.run({ email });
+
+        return {
+            success:!!lastInsertRowid
+        }
     }
 }

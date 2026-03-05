@@ -5,10 +5,10 @@ COPY package.json bun.lock ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/server/package.json ./apps/server/
 
-RUN bun install --filter 'server'
+RUN bun install --frozen-lockfile
 
 COPY packages/common/ packages/common/
 COPY apps/server/ apps/server/
 
 EXPOSE 3000
-CMD ["bun", "run", "src/index.ts"]
+CMD ["bun", "run", "apps/server/src/index.ts"]

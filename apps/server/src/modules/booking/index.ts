@@ -4,6 +4,9 @@ import { UserRole } from "@limpora/common";
 import { BookingService } from "./service";
 import { BookingModel } from "./model";
 
+console.log(process.env.RESEND_AUTH_EMAIL);
+
+
 export const bookingController = new Elysia({ prefix: "/bookings" })
     .use(AuthGuard)
 

@@ -11,6 +11,7 @@ import Currency from "./pages/user/Currency";
 import UserFinder from "./pages/main/UserFinder";
 // import EmailCode from './pages/auth/EmailCode';
 import UserPanel from "./pages/user/UserPanel/index";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 
 // <Route path="/emailcode" element={<EmailCode />} />
 
@@ -33,6 +34,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/register" element={<Rergister />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />
 

@@ -27,10 +27,10 @@ export const AuthQueries = {
         VALUES (:firebase_uid, :name, :email, :role)
     `),
 
-    updateEmailVerified: db.query<void, { firebase_uid: string }>(`
+    updateEmailVerified: db.query<void, { email: string }>(`
         UPDATE Users
         SET email_verified = 1
-        WHERE firebase_uid = :firebase_uid
+        WHERE email = :email
     `),
     
     insertVerificationCode: db.query<
@@ -45,7 +45,7 @@ export const AuthQueries = {
         )
     `),
 
-    findVerificationCode: db.query<
+    findVerificationCodeByEmail: db.query<
         { id: number; code: string; expires_at: string },
         { email: string }
     >(`
@@ -57,10 +57,10 @@ export const AuthQueries = {
         LIMIT 1
     `),
 
-    markCodeAsUsed: db.query<void, { email: string }>(`
+
+    markCodeAsUsed: db.query<void, { id: number }>(`
         UPDATE EmailVerificationCodes
         SET used = 1
-        WHERE user_id = (SELECT id FROM Users WHERE email = :email)
-          AND used = 0
+        WHERE id = :id
     `),
 };

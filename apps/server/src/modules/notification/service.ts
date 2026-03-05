@@ -8,14 +8,20 @@ import { NotificationModel } from "./model";
 import { status } from "elysia";
 import { NotificationQueries } from "./queries";
 
-const VERIFICATION_TEMPLATE = await Bun.file("./templates/vec.html").text();
-export abstract class NotificationService {
-    static async verificationEmail({ to, code }: NotificationModel["authEmail"]): Promise<NotificationModel["emailResponse"]> {
-        
+const VERIFICATION_TEMPLATE = await Bun.file(
+    import.meta.dir + "/templates/vec.html",
+).text();
 
-        const html = await VERIFICATION_TEMPLATE.replace("{{code}}", code);
+export abstract class NotificationService {
+    static async sendVerificationEmail({
+        to,
+        code,
+    }: NotificationModel["authEmail"]): Promise<
+        NotificationModel["emailResponse"]
+    > {
         
-        const response = await NotificationService.email({
+        const html = VERIFICATION_TEMPLATE.replace(/\{\{code\}\}/g, code);
+        const response = await NotificationService.sendEmail({
             to,
             from: process.env.RESEND_AUTH_EMAIL!,
             subject: "Limpora Email Verification Code",
@@ -25,7 +31,7 @@ export abstract class NotificationService {
         return response;
     }
 
-    static async email({
+    static async sendEmail({
         from,
         to,
         subject,
@@ -41,13 +47,15 @@ export abstract class NotificationService {
         });
 
         if (response.error && !response.data) {
-            throw status(400, NotificationModel["error"]);
+            console.log(response.error);
+            
+            throw status(400, "Error sending Email notifiaction" satisfies NotificationModel["error"]);
         }
 
         return response.data;
     }
 
-    static async app({
+    static async sendInbox({
         user_id,
         content,
         expires_at,

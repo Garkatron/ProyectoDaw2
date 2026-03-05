@@ -51,7 +51,7 @@ export default function Register() {
 
         if (data.success) {
             setModalTitle('Registro exitoso');
-            setModalMessage('Redirigiendo a login...');
+            setModalMessage('Redirigiendo a verificacion email...');
             setSuccess(true);
         } else {
             setModalTitle('Error');
@@ -64,7 +64,7 @@ export default function Register() {
 
     const handleModalClose = () => {
         setModalOpen(false);
-        if (success) navigate('/login');
+        if (success) navigate("/verify-email", { state: { email } });
     };
 
     return (

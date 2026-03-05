@@ -4,6 +4,18 @@ import { AuthModel } from "./model";
 import { AuthGuard } from "./guard";
 export const authController = new Elysia({ prefix: "/auth" })
 
+    .post(
+        "/verify",
+        ({ body, params }) => AuthService.verifyEmailCode(body),
+        {
+            body: AuthModel["verifyEmailBody"],
+            response: {
+                404: AuthModel.verificationCodeNotGenerated,
+                401: AuthModel.invalidCode,
+            },
+        },
+    )
+
     .post("/register", async ({ body }) => AuthService.register(body), {
         body: AuthModel.registerBody,
         response: {

@@ -5,7 +5,7 @@ info.text.default = es_ES Default text
 nav.items.path.root = Inicio
 nav.items.path.currency = Ganancias
 nav.items.path.appointments = Citas
-nav.items.path.userfinder = Buscar Profesionales
+nav.items.path.userfinder = Profesionales
 nav.items.path.topusers = Top Usuarios
 
 # Top Users Page
