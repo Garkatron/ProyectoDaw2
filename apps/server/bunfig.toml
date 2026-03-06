@@ -1,0 +1,16 @@
+# https://bun.sh/docs/runtime/bunfig#test-runner
+[test]
+
+root = "./src"
+# preload = ["./src/__tests__/setup.ts"]
+coverageThreshold = { line = 0.7, function = 0.8, statement = 0.9 }
+
+# Cobertura
+coverage = false
+coverageSkipTestFiles = true
+coveragePathIgnorePatterns = [
+  "**/*.model.ts",
+  "**/*.queries.ts",
+  "**/index.ts"
+]
+
