@@ -10,8 +10,13 @@ const CONTAINER_SIZES = {
   xxl: rem("1600px"),
 };
 
+/*
+  fontFamily: "DM Sans, sans-serif",
+  headings: { fontFamily: 'Outfit, sans-serif' },
+
+*/
 export const mantineTheme = createTheme({
-  /** Put your mantine theme override here */
+
   fontSizes: {
     xs: rem("12px"),
     sm: rem("14px"),

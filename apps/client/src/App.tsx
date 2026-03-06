@@ -14,6 +14,7 @@ import UserPanel from "./pages/user/UserPanel/index";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ScheduleSettings from "./pages/user/ScheduleSettings";
 import AppointmentReviewPage from "./pages/user/AppointmentReviewPage";
+import Inbox from "./pages/user/Inbox";
 
 // <Route path="/emailcode" element={<EmailCode />} />
 
@@ -37,9 +38,11 @@ function App() {
       <Route path="/register" element={<Rergister />} />
       <Route path="/login" element={<Login />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
+      
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />
         <Route path="/review" element={<AppointmentReviewPage />} />
+        <Route path="/inbox" element={<Inbox />} />
         <Route path="/currency" element={<Currency />} />
         <Route path="/userfinder" element={<UserFinder />} />
         <Route path="/booking" element={<BookingConfirmation />} />

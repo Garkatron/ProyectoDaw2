@@ -9,7 +9,8 @@ const navItems = [
   { name: "nav.items.path.currency", to: "/currency" },
   { name: "nav.items.path.appointments", to: "/appointments" },
   { name: "nav.items.path.userfinder", to: "/userfinder" },
-  { name: "nav.items.path.topusers", to: "/top" },
+  { name: "nav.items.path.inbox", to: "/inbox" }, 
+  
 ];
 
 // Visibles siempre en la barra
@@ -17,13 +18,10 @@ const mainItems = [
   { name: "nav.items.path.root", to: "/" },
   { name: "nav.items.path.userfinder", to: "/userfinder" }, // "Buscar" es suficiente
   { name: "nav.items.path.appointments", to: "/appointments" }, // Citas
+  { name: "nav.items.path.inbox", to: "/inbox" }, // Citas
 ];
 
-// En la hamburguesa
-const menuItems = [
-  { name: "nav.items.path.currency", to: "/currency" }, // Ganancias
-  { name: "nav.items.path.topusers", to: "/top" }, // Profesionales
-];
+
 
 const NavItem = ({
   item,

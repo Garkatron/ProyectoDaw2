@@ -12,6 +12,8 @@ import { AuthQueries } from "../auth/queries";
 import { ProviderQueries } from "../provider_services/queries";
 import { APP_COMMISSION_PERCENT } from "../../constants";
 import { db } from "../../libs/db";
+import { NotificationService } from "../notification/service";
+import { UserQueries } from "../user/queries";
 
 export abstract class BookingService {
     static async assign({
@@ -134,8 +136,42 @@ export abstract class BookingService {
         const created = BookingQueries.findById.get({
             id: Number(lastInsertRowid),
         });
+
         if (!created)
             throw status(500, "Failed to retrieve the created appointment");
+
+        const expires_at = new Date(
+            Date.now() + 2 * 24 * 60 * 60 * 1000,
+        ).toISOString();
+
+        NotificationService.sendInbox({
+            user_id: client.id,
+            expires_at,
+            content: `Tu cita para "${providerService.service_name}" con ${provider.name} el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)} ha sido confirmada.`,
+        });
+
+        NotificationService.sendInbox({
+            user_id: provider.id,
+            expires_at,
+            content: `Nueva cita: ${client.name} ha reservado "${providerService.service_name}" el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)}.`,
+        });
+
+        // TODO: Avoid querie the user two times...
+        // This happens because I use the UserService that doesn't send the Email for security, but I need the Email here to send then notification.
+        const _client = UserQueries.findById.get({ id: Number(client.id) });
+
+        const { id } = await NotificationService.sendConfirmationEmail({
+            to: _client!.email,
+            booking_id: String(created.id),
+            client_name: _client!.name,
+            provider_name: provider.name,
+            service_name: providerService.service_name,
+            date: new_start,
+            time: new_start,
+            end_time: new_end,
+            payment_method,
+            total_price: String(total_price),
+        });
 
         return created;
     }

@@ -44,15 +44,14 @@ export const reviewsController = new Elysia({ prefix: '/reviews' })
         },
         isAuthenticated: true
     })
-// controller
-.get('/appointment/:appointment_id', async ({ params }) => ReviewsService.getByAppointmentId(params), {
-    params: ReviewsModel.appointmentIdParam,
-    response: {
-        200: ReviewsModel.getOneResponse,
-        404: ReviewsModel.notFound,
-    },
-    isAuthenticated: true,
-})
+    .get('/appointment/:appointment_id', async ({ params }) => ReviewsService.getByAppointmentId(params), {
+        params: ReviewsModel.appointmentIdParam,
+        response: {
+            200: ReviewsModel.getOneResponse,
+            404: ReviewsModel.notFound,
+        },
+        isAuthenticated: true,
+    });
     
 
    /*
