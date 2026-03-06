@@ -33,6 +33,7 @@ import {
 import { API } from "../../lib/api";
 import { AppointmentStatus, UserRole, type Appointment } from "@limpora/common";
 import { useReviews } from "./UserPanel/useReviews";
+import { useNavigate } from "react-router-dom";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -71,7 +72,8 @@ const AppointmentCard = ({
   const [content, setContent] = useState("");
   const [updating, setUpdating] = useState(false);
   const { handlePublishReview, reviewSubmitting, reviewError } = useReviews();
-
+  const navigate = useNavigate();
+  
   const config = statusConfig[appointment.status] ?? statusConfig.Pending;
   const Icon = config.icon;
   const date = new Date(appointment.start_time);
@@ -193,7 +195,16 @@ const AppointmentCard = ({
             ))}
           </Group>
         )}
-
+        <Button
+          fullWidth
+          size="xs"
+          variant="light"
+          color="blue"
+          leftSection={<Star size={14} />}
+          onClick={() => navigate("/review", { state: { appointmentId: appointment.id } })}
+        >
+          Ver reseñas
+        </Button>
         {!isProvider && appointment.status === AppointmentStatus.Completed && (
           <Button
             fullWidth
@@ -274,7 +285,7 @@ export default function Appointments() {
 
   const handleStatusChange = async (id: number, status: AppointmentStatus) => {
     try {
-      await API.bookings.me({ id }).status.patch({ status }); // ← añadir .me
+      await API.bookings.me({ id }).status.patch({ status });
       setAppointments((prev) =>
         prev.map((a) => (a.id === id ? { ...a, status } : a)),
       );

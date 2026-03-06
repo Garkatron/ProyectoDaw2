@@ -21,7 +21,6 @@ export abstract class ReviewsService {
 
         const existing = ReviewsQueries.findById.get({ id: appointment_id });
 
-     
         const appointment = BookingQueries.findById.get({ id: appointment_id });
 
         if (!appointment) {
@@ -36,12 +35,11 @@ export abstract class ReviewsService {
                 "You cannot review yourself" satisfies ReviewsModel["forbidden"],
             );
 
-               if (existing)
+        if (existing)
             throw status(
                 400,
                 "You have already reviewed this appointment" satisfies ReviewsModel["alreadyExists"],
             );
-
 
         if (appointment.status !== "Completed") {
             throw status(
@@ -68,9 +66,7 @@ export abstract class ReviewsService {
 
     static async deleteById({
         id,
-    }: ReviewsModel["reviewIdParam"]): Promise<
-        ReviewsModel["getOneResponse"]
-    > {
+    }: ReviewsModel["reviewIdParam"]): Promise<ReviewsModel["getOneResponse"]> {
         const existing = await ReviewsService.getById({ id });
 
         ReviewsQueries.delete.run({ id: Number(id) });
@@ -79,16 +75,21 @@ export abstract class ReviewsService {
     }
 
     static async getByProvider(provider_id: number) {
-        return ReviewsQueries.findByReviewedId.all({ reviewed_id: provider_id });
+        return ReviewsQueries.findByReviewedId.all({
+            reviewed_id: provider_id,
+        });
     }
 
     static async delete(id: number, requester_id: number, isAdmin: boolean) {
         const review = ReviewsQueries.findById.get({ id });
-        
+
         if (!review) throw status(404, "Review not found");
 
         if (review.reviewer_id !== requester_id && !isAdmin) {
-            throw status(403, "You can only manage your own reviews" satisfies ReviewsModel["forbiddenNotOwner"]);
+            throw status(
+                403,
+                "You can only manage your own reviews" satisfies ReviewsModel["forbiddenNotOwner"],
+            );
         }
 
         ReviewsQueries.delete.run({ id });
@@ -123,9 +124,7 @@ export abstract class ReviewsService {
 
     static async getById({
         id,
-    }: ReviewsModel["reviewIdParam"]): Promise<
-        ReviewsModel["getOneResponse"]
-    > {
+    }: ReviewsModel["reviewIdParam"]): Promise<ReviewsModel["getOneResponse"]> {
         const review = ReviewsQueries.findById.get({ id: Number(id) });
         if (!review)
             throw status(
@@ -138,9 +137,7 @@ export abstract class ReviewsService {
 
     static async getByClientId({
         client_id,
-    }: ReviewsModel["clientIdParam"]): Promise<
-        ReviewsModel["getAllResponse"]
-    > {
+    }: ReviewsModel["clientIdParam"]): Promise<ReviewsModel["getAllResponse"]> {
         const user = UserQueries.findById.get({ id: Number(client_id) });
         if (!user)
             throw status(
@@ -153,5 +150,15 @@ export abstract class ReviewsService {
         });
     }
 
-   
+    static async getByAppointmentId({
+        appointment_id,
+    }: {
+        appointment_id: number;
+    }) {
+        const review = ReviewsQueries.findByAppointmentId.get({
+            appointment_id,
+        });
+        if (!review) throw status(404, "Review not found");
+        return review;
+    }
 }
