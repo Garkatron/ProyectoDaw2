@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="svg"
+   version="1.1"
+   viewBox="0 0 300 300"
+   width="300"
+   height="300"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs8">
+    <linearGradient
+       xlink:href="#linearGradient12"
+       id="linearGradient13"
+       x1="111.43623"
+       y1="193.54237"
+       x2="190.76399"
+       y2="108.88392"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient12">
+      <stop
+         style="stop-color:#1589d6;stop-opacity:1;"
+         offset="0"
+         id="stop12" />
+      <stop
+         style="stop-color:#63d1ff;stop-opacity:1;"
+         offset="1"
+         id="stop13" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient10"
+       id="linearGradient11"
+       x1="136.35945"
+       y1="114.6867"
+       x2="114.9488"
+       y2="164.11769"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient10">
+      <stop
+         style="stop-color:#045aa6;stop-opacity:1;"
+         offset="0"
+         id="stop10" />
+      <stop
+         style="stop-color:#044c90;stop-opacity:0;"
+         offset="1"
+         id="stop11" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient8"
+       id="linearGradient9"
+       x1="126.04208"
+       y1="217.56923"
+       x2="183.5293"
+       y2="183.70464"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient8">
+      <stop
+         style="stop-color:#044c90;stop-opacity:1;"
+         offset="0"
+         id="stop8" />
+      <stop
+         style="stop-color:#044c90;stop-opacity:0;"
+         offset="1"
+         id="stop9" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient27"
+       id="linearGradient28"
+       x1="50.676666"
+       y1="262.80426"
+       x2="258.84854"
+       y2="262.80426"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-9.2245115,135.39471)" />
+    <linearGradient
+       id="linearGradient27">
+      <stop
+         style="stop-color:#00749d;stop-opacity:1;"
+         offset="0"
+         id="stop27" />
+      <stop
+         style="stop-color:#1bc4ff;stop-opacity:1;"
+         offset="1"
+         id="stop28" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipath_lpe_path-effect27-4">
+      <path
+         d="m 150.11133,122.58691 c 0.62109,0.26587 14.51704,20.70473 20.48584,31.78857 5.9688,11.08384 9.44166,23.67507 4.40478,36.01758 -1.32801,2.68978 -0.93026,1.89602 -2.06543,3.854 -7.82812,11.25732 -19.86035,15.2915 -33.02007,11.49023 -1.57544,-0.66211 -2.98608,-1.31396 -4.43584,-2.23242 -6.62227,-4.22168 -11.2752,-10.92334 -12.91743,-18.60352 -2.86128,-13.28613 3.25923,-25.31348 10.25596,-36.0542 7.42533,-11.39889 13.27591,-19.62386 17.29219,-26.26025 z"
+         fill="#ffffff"
+         id="path29"
+         style="display:none" />
+      <path
+         id="lpe_path-effect27-4"
+         class="powerclip"
+         d="M 86.038206,57.16534 H 214.17019 V 242.90238 H 86.038206 Z m 64.073124,65.42157 v -1e-5 c -4.01628,6.63639 -9.86686,14.86136 -17.29219,26.26025 -6.99673,10.74072 -13.11724,22.76807 -10.25596,36.0542 1.64223,7.68018 6.29516,14.38184 12.91743,18.60352 1.44976,0.91846 2.8604,1.57031 4.43584,2.23242 13.15972,3.80127 25.19195,-0.23291 33.02007,-11.49023 1.13517,-1.95798 0.73742,-1.16422 2.06543,-3.854 5.03688,-12.34251 1.56402,-24.93374 -4.40478,-36.01758 -5.9688,-11.08384 -19.86475,-31.5227 -20.48584,-31.78857 z" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipath_lpe_path-effect26-0">
+      <path
+         d="m 150.11133,122.58691 c 0.62109,0.26587 14.51704,20.70473 20.48584,31.78857 5.9688,11.08384 9.44166,23.67507 4.40478,36.01758 -1.32801,2.68978 -0.93026,1.89602 -2.06543,3.854 -7.82812,11.25732 -19.86035,15.2915 -33.02007,11.49023 -1.57544,-0.66211 -2.98608,-1.31396 -4.43584,-2.23242 -6.62227,-4.22168 -11.2752,-10.92334 -12.91743,-18.60352 -2.86128,-13.28613 3.25923,-25.31348 10.25596,-36.0542 7.42533,-11.39889 13.27591,-19.62386 17.29219,-26.26025 z"
+         fill="#ffffff"
+         id="path30"
+         style="display:none" />
+      <path
+         id="lpe_path-effect26-0"
+         class="powerclip"
+         d="m 88.838648,117.5934 h 66.270732 v 69.4318 H 88.838648 Z m 61.272682,4.99351 v -1e-5 c -4.01628,6.63639 -9.86686,14.86136 -17.29219,26.26025 -6.99673,10.74072 -13.11724,22.76807 -10.25596,36.0542 1.64223,7.68018 6.29516,14.38184 12.91743,18.60352 1.44976,0.91846 2.8604,1.57031 4.43584,2.23242 13.15972,3.80127 25.19195,-0.23291 33.02007,-11.49023 1.13517,-1.95798 0.73742,-1.16422 2.06543,-3.854 5.03688,-12.34251 1.56402,-24.93374 -4.40478,-36.01758 -5.9688,-11.08384 -19.86475,-31.5227 -20.48584,-31.78857 z" />
+    </clipPath>
+  </defs>
+  <svg
+     version="1.1"
+     id="svg8"
+     width="100%"
+     height="100%">
+    <defs
+       id="defs2">
+      <clipPath
+         id="clip-1">
+        <rect
+           x="0"
+           y="0"
+           transform="scale(0.14648)"
+           width="2048"
+           height="2048"
+           fill="none"
+           id="rect1" />
+      </clipPath>
+    </defs>
+    <g
+       clip-path="url(#clip-1)"
+       fill="none"
+       fill-rule="nonzero"
+       stroke="none"
+       stroke-width="1"
+       stroke-linecap="butt"
+       stroke-linejoin="miter"
+       stroke-miterlimit="10"
+       stroke-dasharray="none"
+       stroke-dashoffset="0"
+       font-family="none"
+       font-weight="none"
+       font-size="none"
+       text-anchor="none"
+       style="mix-blend-mode:normal"
+       id="g8">
+      <g
+         id="g31"
+         transform="translate(0,-32.316147)">
+        <g
+           id="g29"
+           transform="translate(-0.10419566,14.83466)"
+           style="mix-blend-mode:normal">
+          <path
+             d="m 132.90308,88.9377 c 5.78086,-8.84487 11.31094,-17.98037 17.15991,-26.77236 2.35254,3.07983 5.79492,8.81089 8.03174,12.31655 l 14.79932,23.19565 16.0415,24.57173 c 4.71826,7.34355 8.87695,13.44038 12.3999,21.40444 5.81836,13.15928 9.25342,27.05186 7.27002,41.49961 -3.94922,33.08057 -33.40283,56.87256 -66.85107,52.15137 -15.48267,-2.19287 -29.44541,-10.48682 -38.7791,-23.0332 -6.22163,-8.31738 -10.41021,-19.20117 -11.54517,-29.51807 -1.434492,-13.03044 0.731771,-30.09119 12.1645,-50.54634 5.99887,-9.64726 12.32504,-19.09029 18.52354,-28.61192 1.1083,-1.70391 2.75361,-4.44565 3.93779,-6.00176 2.28644,-3.549096 4.53716,-7.121775 6.84712,-10.6557 z"
+             fill="#1589d6"
+             id="path3"
+             style="fill:url(#linearGradient13)"
+             clip-path="url(#clipath_lpe_path-effect27-4)" />
+          <path
+             d="m 150.10938,122.5934 c -4.27426,7.7889 -8.37147,47.68035 -25.36604,56.83615 -22.07887,11.89496 -35.342291,-20.67151 -29.54302,-25.59552 14.95553,-12.69834 35.92302,-26.01239 54.90906,-31.24063 z"
+             fill="#044c90"
+             id="path8"
+             style="mix-blend-mode:normal;fill:url(#linearGradient11)"
+             clip-path="url(#clipath_lpe_path-effect26-0)" />
+          <path
+             d="m 172.93652,194.24707 c 1.31434,-1.83743 2.71913,-5.26699 3.40213,-7.78249 0.0782,-0.23179 0.21896,-0.88396 0.56615,-2.60701 0.25312,-1.82461 0.60612,-5.80679 0.42945,-8.36636 5.36969,-3.56499 24.56835,7.1226 29.94504,7.06103 -1.55273,1.53369 -18.83008,19.69434 -20.66406,20.86475 -7.85156,4.98633 -16.979,7.58789 -26.27783,7.49268 -4.47656,-0.0161 -17.60713,-1.83838 -20.42095,-5.17236 20.37228,5.88466 30.34544,-7.75114 33.02007,-11.49024 z"
+             fill="#044c90"
+             id="path7"
+             style="fill:url(#linearGradient9)" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:32px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;writing-mode:lr-tb;direction:ltr;mix-blend-mode:normal;fill:url(#linearGradient28);fill-opacity:1;stroke-width:10"
+           id="text27"
+           x="46.304688"
+           y="287.17917">L I M P O R A</text>
+      </g>
+    </g>
+  </svg>
+</svg>

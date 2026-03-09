@@ -11,13 +11,22 @@
 .pagemargin {bottomcenter}
     .currentpage
 
+.pagemargin {bottomrightcorner}
+    !(60px)[logo](image/limpora2.svg)
+
+
+!(100%)[Quarkdown](image/limporapng.png)
+
 .center
-    #! Limpora Docs
     ###! Limpieza, Seguridad y Claridad
 
-!(100%)[Quarkdown](image/logo.png)
+<<<
+
+.tableofcontents 
+
 
 # Sobre el proyecto (Sprint 0)
+
 
 ## Que es?
 
@@ -43,7 +52,7 @@ Limpora esta dirigido a:
 
 ## Modelo de negocio
 
-Limpora basa su modelo de negocio en la intermediacion de servicios de limpieza entre clientes y profesionales. La plataforma aplica una tarifa o comision en el momento en que se concreta una cita o contratacion entre usuarios.
+Limpora basa su modelo de negocio en la **intermediacion de servicios** de limpieza entre clientes y profesionales. La plataforma aplica una tarifa o comision en el momento en que se concreta una cita o contratacion entre usuarios.
 
 Ademas, la empresa dispone de una red propia de profesionales de limpieza, lo que permite ofrecer servicios directos dentro de la aplicacion. Esto garantiza disponibilidad, calidad controlada y una experiencia uniforme para los clientes.
 
@@ -63,8 +72,27 @@ Se ha optado por distribuir la planificación de los sprints en 8 partes, y para
 # Workflow (Sprint 3)
 https://github.com/Garkatron/ProyectoDaw2
 
+El ciclo de desarrollo parte de **Trello**, donde se gestionan y asignan las tareas. Un desarrollador toma una tarea asignada y la implementa en su rama local del repositorio. Una vez lista, hace merge y push al repositorio remoto, lo que dispara GitHub Actions, que ejecuta el pipeline de CI/CD mediante un git pull automatizado al servidor.
+
+Actions detecta cambios en la rama principal, ejecuta automáticamente los siguientes pasos en el servidor:
+- Clean local changes
+- Build
+- Pull update
+- Turn off containers
+- Turn on containers
+
+El servidor corre Docker, que levanta dos contenedores: uno para el frontend y otro para el backend. El tráfico entrante pasa por un Nginx como reverse proxy, que distribuye las requests a cada contenedor según corresponda.
+
+Acceso del cliente
+El dominio www.limpora.xyz está configurado en Hostinger DNS, que apunta a la IP del servidor. El cliente accede desde el navegador a ese dominio. El sistema también integra Resend para el envío de emails transaccionales.
+
+!(100%)[Workflow1](image/workflow1.png "Implementacion a despliegue")
+
+!(100%)[Workflow2](image/workflow2.png "Despliegue, arquitectura, integracion y acceso")
+
 
 # Base de datos (Sprint 4)
+
 ## Entidad/Relacion
 !(100%)[EntidadRelacionInicial](image/initialER.png "Modelo Entidad Relacion inicial")
 
@@ -83,146 +111,57 @@ La base de datos de Limpora esta compuesta por 8 tablas que gestionan toda la lo
 
 **EmailVerificationCodes** gestiona los codigos temporales enviados por correo para verificar la identidad del usuario, con fecha de expiracion y control de uso.
 
-!(100%)[Modelo Relacional](image/sqldiagram.png "Modelo Relacional")
+!(100%)[Modelo Relacional](image/sqldiagram.png "Modelo Relacional (Aproximado)")
 
-## Sistema Gestor de Bases de Datos (SGBD / DBMS)
-
-Actualmente, Limpora utiliza **MySQL** como sistema gestor de bases de datos relacional para almacenar informacion de usuarios, servicios, reservas y otros datos de la plataforma.
-
-Sin embargo, se planea migrar en el futuro a **MariaDB**, una alternativa compatible con MySQL que ofrece mejoras en rendimiento, escalabilidad y soporte de funciones avanzadas, manteniendo la integridad y consistencia de los datos.
+## Sistema Gestor de Bases de Datos (SGBD)
+Para este proyecto, hemos simplificado la infraestructura eliminando la necesidad de un servidor de base de datos externo, optando por una solución embebida de alto rendimiento.
+Limpora utiliza **SQLite** como motor de base de datos relacional. A diferencia de los sistemas cliente-servidor tradicionales, SQLite reside directamente en el sistema de archivos, lo que elimina la latencia de red y simplifica drásticamente el despliegue y el mantenimiento.
 
 ### Motivos
-- MySQL dejo de tener soporte de parte de Oracle
-- SGBD relacional maduro y confiable
-- Soporte de transacciones y consultas complejas
-- Compatibilidad entre MySQL y MariaDB
-- Facil escalabilidad para el crecimiento de la plataforma
-- Amplio soporte de la comunidad y documentacion
 
-
+* **Rendimiento Nativo:** Gracias al módulo `bun:sqlite`, las consultas se ejecutan a velocidad nativa, siendo ideal para aplicaciones que requieren respuestas inmediatas.
+* **Portabilidad:** La base de datos completa se almacena en un único archivo, facilitando las copias de seguridad y la consistencia entre entornos de desarrollo y producción.
+* **Cero Latencia de Red:** Al no requerir una conexión a un puerto externo (como MySQL o MariaDB), el intercambio de datos entre el backend y la base de datos es instantáneo.
+* **Confiabilidad (ACID):** Cumple estrictamente con las propiedades de atomicidad, consistencia, aislamiento y durabilidad, garantizando que las transacciones de reservas y pagos sean seguras.
+* **Simplicidad Operativa:** Elimina la sobrecarga de gestionar procesos, usuarios de base de datos y configuraciones de red complejas.
 
 # Tecnologias utilizadas (Sprint 5)
-
-Para este proyecto optamos por las siguientes herramientas:
-
 ## Frontend
 
-El frontend de Limpora ha sido desarrollado utilizando un stack moderno basado en React y herramientas del ecosistema JavaScript actual. Estas tecnologias permiten construir una interfaz rapida, mantenible y escalable.
+El frontend de Limpora utiliza **Vite** como herramienta de construcción y **React** con **TSX** para el desarrollo de la interfaz, aprovechando el tipado estricto de **TypeScript** para ofrecer una experiencia de desarrollo segura y eficiente.
 
-### Vite
+### Stack Tecnológico
 
-Vite es una herramienta de construccion y entorno de desarrollo para aplicaciones web modernas que permite una ejecucion rapida del proyecto y actualizacion instantanea durante el desarrollo.
+* **Vite & React (TSX):** Sustituyen configuraciones tradicionales para lograr compilaciones más rápidas, recarga en caliente (HMR) y tipado estricto de extremo a extremo.
+* **Mantine UI:** Biblioteca de componentes con accesibilidad y diseño profesional nativo, incluyendo hooks utilitarios y tematización centralizada.
+* **Elysia Eden:** Conector nativo de ElysiaJS que sincroniza automáticamente los tipos del backend con el frontend, eliminando inconsistencias en las peticiones.
+* **Zustand & Zod:** Gestión de estado global ligera y validación estricta de esquemas de datos en formularios y respuestas de API.
+* **Mock Service Worker (MSW):** Interceptación de peticiones de red para simular el comportamiento de la API durante desarrollo y pruebas.
 
-#### Porque?
+### Ventajas Clave
 
-- Alta velocidad de arranque y compilacion
-- Recarga en caliente (HMR) inmediata
-- Configuracion sencilla
-- Enfoque moderno para proyectos frontend
-- Integracion directa con React
-
-### React
-
-React es una biblioteca de JavaScript para construir interfaces de usuario basadas en componentes reutilizables y estado reactivo.
-
-#### Porque?
-
-- Estandar de facto en desarrollo frontend moderno
-- Gran ecosistema y comunidad
-- Arquitectura basada en componentes
-- Facil mantenimiento y escalabilidad
-- Amplia documentacion y soporte
-
-### Tailwind CSS
-
-Tailwind CSS es un framework de estilos basado en clases de utilidad que permite diseñar interfaces de forma rapida sin escribir CSS tradicional complejo.
-
-#### Porque?
-
-- Desarrollo visual rapido
-- Consistencia de estilos
-- Diseno responsive sencillo
-- Configuracion minima
-- Alta personalizacion
-
-### Axios
-
-Axios es un cliente HTTP basado en promesas que permite realizar peticiones al backend desde el navegador de forma sencilla y estructurada.
-
-#### Porque?
-
-- Simplifica las llamadas a la API
-- Manejo de respuestas y errores
-- Interceptores para autenticacion
-- Estandar ampliamente utilizado en React
-
-### Mock Service Worker (MSW)
-
-Mock Service Worker es una herramienta que permite simular respuestas de API en el navegador o en tests sin necesidad de un backend real.
-
-#### Porque?
-
-- Permite desarrollo sin backend disponible
-- Facil testing del frontend
-- Simulacion realista de API
-- Independencia entre frontend y backend
-- Facil reutilizacion de mocks
-
-### Zod
-
-Zod es una biblioteca de validacion de datos basada en esquemas que permite definir y comprobar estructuras de datos en tiempo de ejecucion.
-
-#### Porque?
-
-- Validacion segura de datos y formularios
-- Integracion con TypeScript
-- Prevencion de errores en API
-- Definicion clara de modelos
-- Libreria estable y madura
-
-### Zustand
-
-Zustand es una libreria ligera de gestion de estado para aplicaciones React que permite compartir datos entre componentes de forma simple.
-
-#### Porque?
-
-- Alternativa moderna a Redux
-- API simple y directa
-- Poco codigo y sin boilerplate
-- Alto rendimiento
-- Facil integracion con React
+1. **Seguridad de tipos:** Captura errores de lógica e interfaz durante el desarrollo, antes de llegar a producción.
+2. **Eficiencia:** Ciclo de desarrollo ágil gracias al HMR y compilaciones optimizadas con Vite.
+3. **Independencia:** El frontend puede desarrollarse y probarse sin depender del backend mediante MSW.
+4. **Consistencia:** Tematización centralizada y componentes reutilizables garantizan una UI uniforme.
 
 ## Backend
 
-El backend de Limpora ha sido desarrollado con Node.js y Express, siguiendo una arquitectura basada en API REST. Este backend gestiona la logica de negocio, autenticacion, acceso a base de datos y comunicacion con servicios externos.
+El backend de Limpora utiliza **Bun** como runtime y **ElysiaJS** como framework, aprovechando la velocidad nativa de **TypeScript** para ofrecer una API REST de alto rendimiento.
 
-Se han utilizado librerias orientadas a seguridad, validacion, rendimiento y mantenibilidad, con el objetivo de garantizar un sistema robusto y escalable.
+### Stack Tecnológico
 
-### Node.js y Express
+* **Bun & ElysiaJS:** Sustituyen a Node.js y Express para lograr una ejecución más rápida, menor consumo de memoria y tipado estricto de extremo a extremo.
+* **SQLite:** Base de datos relacional integrada mediante `bun:sqlite`, eliminando la latencia de red y simplificando el despliegue sin sacrificar la integridad de los datos.
+* **Validación con TypeBox:** Validación y sanitización automática de datos en cada endpoint, lo que reduce errores y previene inyecciones.
+* **Seguridad:** Implementación de **JWT** para sesiones, hashing de contraseñas nativo de Bun, y políticas de CORS y Rate Limiting integradas.
 
-Node.js permite ejecutar JavaScript en el servidor, mientras que Express proporciona una estructura ligera para construir APIs REST.
+### Ventajas Clave
 
-#### Porque?
-
-- Entorno unificado JavaScript en frontend y backend
-- Alto rendimiento en aplicaciones web
-- Arquitectura modular
-- Amplio ecosistema
-- Estandar en APIs REST
-
-### Base de datos MySQL
-
-El sistema utiliza MySQL como base de datos relacional para almacenar usuarios, servicios, reservas y datos de la plataforma.
-
-Se emplea el driver mysql2 para la conexion y ejecucion de consultas.
-
-#### Porque?
-
-- Base de datos relacional madura
-- Soporte de transacciones
-- Integridad de datos
-- Estandar en aplicaciones web
-- Buen rendimiento
+1. **Rendimiento:** Procesamiento de peticiones optimizado a nivel nativo.
+2. **Simplicidad:** Arquitectura unificada en un solo archivo ejecutable y base de datos embebida.
+3. **Documentación:** Generación automática de OpenAPI basada en los tipos de TypeScript.
+4. **Mantenibilidad:** Código más limpio y seguro gracias al tipado nativo sin compilaciones externas.
 
 ### Autenticacion y seguridad
 
@@ -230,14 +169,12 @@ El backend implementa autenticacion basada en tokens JWT y cifrado de contraseñ
 
 Ademas, se aplican multiples capas de seguridad:
 
-- helmet: proteccion de cabeceras HTTP
+- Elyisia-helmet: proteccion de cabeceras HTTP
 - cors: control de origenes permitidos
 - hpp: prevencion de parameter pollution
-- express-rate-limit: limitacion de peticiones
-- express-slow-down: mitigacion de ataques de fuerza bruta
-- cookie-parser: gestion segura de cookies
+- elysia-rate-limit: limitacion de peticiones
 
-#### Porque?
+#### Motivos:
 
 - Proteccion frente a ataques comunes web
 - Control de acceso seguro
@@ -248,7 +185,7 @@ Ademas, se aplican multiples capas de seguridad:
 
 Se utiliza express-validator para validar y sanitizar datos recibidos en peticiones HTTP antes de procesarlos.
 
-#### Porque?
+#### Motivos:
 
 - Prevencion de datos invalidos
 - Seguridad frente a inyecciones
@@ -259,7 +196,7 @@ Se utiliza express-validator para validar y sanitizar datos recibidos en peticio
 
 El sistema implementa logging estructurado con pino y pino-http, junto con morgan para registros de desarrollo.
 
-#### Porque?
+#### Motivos:
 
 - Registro de peticiones y errores
 - Analisis de fallos
@@ -283,7 +220,7 @@ El backend integra servicios externos para funcionalidades adicionales:
     - Notificaciones
     - Facturas
 
-#### Porque?
+#### Motivos:
 
 - Notificaciones y comunicacion con usuarios
 - Integracion con servicios cloud
@@ -292,11 +229,12 @@ El backend integra servicios externos para funcionalidades adicionales:
 
 ### Documentacion de API
 
-La API REST se documenta mediante swagger-jsdoc y swagger-ui-express, permitiendo visualizar y probar endpoints desde una interfaz web.
+La API REST se documenta mediante openapi elysiajs builtin plugin, permitiendo visualizar y probar endpoints desde una interfaz web facil, rapida y atractiva.
 
-#### Porque?
+#### Motivos:
 
 - Documentacion interactiva
+- Documentacion automatica (generada) y facil de añadir detalles.
 - Facil integracion frontend
 - Estandar OpenAPI
 - Mantenimiento de API
@@ -305,142 +243,108 @@ La API REST se documenta mediante swagger-jsdoc y swagger-ui-express, permitiend
 
 Se utilizan herramientas para mejorar el flujo de desarrollo:
 
-- dotenv: gestion de variables de entorno
-- nodemon: recarga automatica en desarrollo
 - eslint-define-config: configuracion de linting
+- bun-tets: libreria testing (ya integrada)
+- bun env: para variables de entorno (ya integrada) 
 
-#### Porque?
+#### Motivos:
 
 - Configuracion segura
 - Desarrollo rapido
 - Codigo consistente
 - Buenas practicas
 
-
 # API Limpora (Sprint 5)
 
-Base URL: `api/v1`
+## Arquitectura de módulos
 
-## Auth `/auth`
+La API está organizada en **módulos independientes**. Cada módulo encapsula toda su lógica en los siguientes archivos:
+Los modulos pueden no tener Router, Queries ni Middleware especifico pero siempre tendran service y model.
+EJ: Un servicio interno de la API o el propio modulo de OAuth que no tiene queries.
 
-| Metodo | Ruta | Descripcion | Auth |
-|--------|------|-------------|------|
-| POST | `/register` | Registra un nuevo usuario | No |
-| POST | `/login` | Inicia sesion con email y contrasena | No |
-| POST | `/logout` | Cierra la sesion activa | Si |
-| GET | `/me` | Devuelve el usuario autenticado | Si |
-| GET | `/google-url` | Genera la URL para login con Google | No |
-| GET | `/callback` | Callback de OAuth con Google | No |
-| POST | `/vec` | Verifica un codigo de email | No |
-| POST | `/sevcode` | Envia un codigo de verificacion al email | No |
-| POST | `/reg_admin` | Registra un nuevo administrador | Si - Admin |
-| DELETE | `/uid/:uid` | Elimina un usuario por UID de Firebase | Si - Admin |
+*  `index.ts` — Router
+Define las rutas HTTP del módulo y conecta cada endpoint con su handler correspondiente en el servicio.
 
----
+*  `model.ts` — Modelo de datos
+Declara los tipos y esquemas de datos que reciben los endpoints del módulo. Es la **fuente de verdad** del módulo según la convención de ElysiaJS. Todos los demás archivos derivan sus tipos desde aquí.
 
-## Users `/user`
+*  `queries.ts` — Queries
+Contiene todas las consultas a la base de datos relacionadas al módulo. Centraliza el acceso a datos.
 
-| Metodo | Ruta | Descripcion | Auth |
-|--------|------|-------------|------|
-| GET | `/` | Devuelve todos los usuarios | No |
-| GET | `/id/:id` | Busca un usuario por ID numerico | No |
-| GET | `/uid/:uid` | Busca un usuario por UID de Firebase | No |
-| GET | `/name/:name` | Busca un usuario por nombre | No |
+* `service.ts` — Servicio
+Clase abstracta con métodos estáticos que implementan la lógica de negocio. Sus métodos son consumidos tanto por los endpoints en `index.ts` como por otros servicios del sistema.
 
-###! Servicios del usuario `/user/services`
+* `guard.ts` — Guard / Middleware
+Middleware de autenticación. Verifica y valida el token de acceso antes de que la request llegue al handler. Se aplica a las rutas que requieren autenticación.
 
-| Metodo | Ruta | Descripcion | Auth |
-|--------|------|-------------|------|
-| GET | `/:userId` | Lista los servicios de un usuario | No |
-| GET | `/:userId/:serviceId` | Obtiene un servicio especifico del usuario | No |
-| POST | `/:userId` | Anade un servicio al perfil del usuario | Si - Admin / Provider |
-| PATCH | `/:userId/:serviceId` | Actualiza un servicio del usuario | Si - Admin / Provider |
-| DELETE | `/:userId/:serviceId` | Elimina un servicio del usuario | Si - Admin / Provider |
+* `test.ts` — Tests
+Contiene los tests de integración y unitarios para `index.ts` y `service.ts`. Cubre tanto el comportamiento de los endpoints como la lógica del servicio.
 
-###! Ganancias del usuario `/user/earnings`
+<<<
 
-| Metodo | Ruta | Descripcion | Auth |
-|--------|------|-------------|------|
-| GET | `/` | Devuelve las ganancias del usuario autenticado | Si - Admin / Provider |
+## Estructura de directorios
+```
+modules/
+└── <modulo>/
+    ├── index.ts       # Router + endpoints
+    ├── model.ts       # Tipos de datos (fuente de verdad)
+    ├── queries.ts     # Acceso a base de datos
+    ├── service.ts     # Lógica de negocio
+    ├── guard.ts       # Middleware de auth (Especifico de Auth)
+    └── test.ts        # Tests
+```
+!(100%)[API_OPENAPI_2](image/API_STRUCTURE.png)
 
-###! Citas del usuario `/user/appointments`
+### Documentacion
 
-| Metodo | Ruta | Descripcion | Auth |
-|--------|------|-------------|------|
-| GET | `/:userId` | Lista todas las citas de un usuario | Si |
-| POST | `/` | Crea una nueva cita | Si |
+La API de limpora tiene una documensacion interactiva a la que se puede acceder
+en desarrollo mediante el localhost:<puerto-definido>, dejare capturas adjuntas.
 
-###! Reseñas del usuario `/user/reviews`
+!(100%)[API_OPENAPI](image/API.png)
+!(100%)[API_OPENAPI_2](image/API2.png)
 
-| Metodo | Ruta | Descripcion | Auth |
-|--------|------|-------------|------|
-| GET | `/` | Devuelve todas las reseñas | No |
-| GET | `/reviewer/:reviewerId` | Reseñas escritas por un usuario | No |
-| GET | `/reviewed/:reviewedId` | Reseñas recibidas por un usuario | No |
-| GET | `/reviewed/:reviewedId/average-rating` | Valoracion media de un usuario | No |
-| GET | `/username/:username` | Reseñas por nombre de usuario | No |
-| POST | `/` | Crea una nueva reseña | Si - Admin / Client |
+<<<
 
+## Seguridad (Sprint 6)
 
-
-## Ranking `/ranking`
-
-| Metodo | Ruta | Descripcion | Auth |
-|--------|------|-------------|------|
-| GET | `/top` | Devuelve los usuarios con mas puntos | No |
-| GET | `/user/:userId` | Devuelve la posicion de un usuario | No |
-
-
-## Roles
-
-| Rol | Descripcion |
-|-----|-------------|
-| `admin` | Acceso total a la plataforma |
-| `provider` | Autonomo que ofrece servicios |
-| `client` | Usuario que contrata servicios |
-
-
-!(50%)[Diagrama Endpoints](image/endpointsdiagram.png "Diagrama Endpoints")
-
-
-## Notas
-
-- Los endpoints marcados con **Si** requieren una sesion activa via Firebase Auth.
-- La validacion de datos se realiza en todas las rutas mediante `express-validator`.
-- Los errores devuelven siempre un JSON con `success: false` y el mensaje correspondiente.
-
-
-# Seguridad (Sprint 6)
-
-Durante el Sprint 6, en Limpora se implementaron diversas medidas de seguridad para proteger tanto el backend como el frontend, previniendo vulnerabilidades comunes y asegurando la integridad de los datos.
+Durante el Sprint 6, se actualizaron las medidas de seguridad de Limpora para integrarlas de forma nativa con el ecosistema de **Bun** y **ElysiaJS**, optimizando la protección sin penalizar el rendimiento.
 
 ## Medidas implementadas
 
-### Helmet
-Se utilizó Helmet para configurar cabeceras HTTP seguras, protegiendo la aplicacion frente a ataques como clickjacking o XSS.  
-**Configuracion:** aplicacion de politicas de seguridad estandar en todas las rutas.  
-**Objetivo:** reforzar la proteccion de la aplicacion a nivel de cabeceras HTTP.
+### Elysia Helmet
+
+Se utiliza el plugin oficial `@elysiajs/helmet` para la gestión de cabeceras HTTP seguras.
+
+* **Función:** Configura automáticamente políticas de seguridad contra XSS, clickjacking y otras vulnerabilidades a nivel de navegador.
+* **Objetivo:** Reforzar la capa de transporte mediante estándares de industria.
 
 ### CORS
-Se configuró CORS para controlar los dominios que pueden acceder a la API, limitando el acceso solo a clientes autorizados.  
-**Configuracion:** solo se permiten solicitudes desde el dominio oficial de la aplicacion.  
-**Objetivo:** prevenir accesos no autorizados desde origenes externos.
 
-### Rate Limit y Slow Down
-Se implementaron limites de peticiones y desaceleracion progresiva para reducir el riesgo de ataques de fuerza bruta y proteger la disponibilidad del servidor.  
-**Configuracion:** limite de peticiones por IP y retraso progresivo tras cierto numero de solicitudes.  
-**Objetivo:** mantener la estabilidad del servidor y proteger la API frente a abusos.
+Implementación mediante el plugin `@elysiajs/cors` para restringir el acceso a la API.
 
-### HPP (HTTP Parameter Pollution)
-Se utilizó HPP para evitar la manipulacion de parametros HTTP con multiples valores no esperados.  
-**Configuracion:** sanitizacion de todos los parametros recibidos por las rutas del backend.  
-**Objetivo:** garantizar la integridad y coherencia de los datos procesados.
+* **Función:** Limita las solicitudes entrantes exclusivamente al dominio oficial de la aplicación.
+* **Objetivo:** Prevenir el acceso no autorizado desde orígenes externos.
 
+### Rate Limit
 
-### Express Validator y sanitizacion
-Se aplicó validacion y sanitizacion de todos los datos de entrada de los usuarios, evitando inyecciones y errores en la base de datos.  
-**Configuracion:** reglas basicas de validacion y limpieza de inputs en cada ruta sensible.  
-**Objetivo:** proteger la base de datos y mantener la seguridad de la aplicacion.
+Se aplica limitación de peticiones por IP para proteger la disponibilidad del servidor frente a abusos o ataques de denegación de servicio (DoS).
+
+* **Función:** Controla el flujo máximo de tráfico permitido por cliente en ventanas de tiempo específicas.
+* **Objetivo:** Mitigar ataques de fuerza bruta y garantizar la estabilidad del runtime.
+
+### Validación y Sanitización con TypeBox
+
+ElysiaJS utiliza **TypeBox** de forma nativa para validar esquemas de datos antes de que lleguen a la lógica de negocio.
+
+* **Función:** Valida tipos, formatos y limpia los parámetros de entrada en cada ruta. Al ser un proceso integrado, previene de forma eficiente la polución de parámetros (HPP) y las inyecciones.
+* **Objetivo:** Garantizar la integridad de los datos y la seguridad de la base de datos SQLite.
+
+### Cifrado Nativo de Bun
+
+Migración de librerías externas a los métodos nativos de `Bun.password`.
+
+* **Función:** Gestión de hashing de contraseñas (bcrypt/argon2) optimizada en C++ para una ejecución ultra rápida.
+* **Objetivo:** Proteger las credenciales de los usuarios con el máximo estándar criptográfico disponible en el entorno.
 
 # Arquitectura
 
@@ -510,7 +414,7 @@ www.limpora.xyz
 
 Hostinger es el proveedor utilizado para la gestion del dominio y servicios asociados de DNS.
 
-### Porque?
+### Motivos
 
 - Facilidad de gestion de dominios
 - Precios accesibles
@@ -524,7 +428,7 @@ Amazon Web Services (AWS) es el proveedor de infraestructura en la nube utilizad
 
 El backend y los servicios del sistema se ejecutan en una instancia virtual configurada y administrada por el equipo de desarrollo.
 
-### Porque?
+### Motivos
 
 - Infraestructura cloud escalable
 - Alta disponibilidad
@@ -538,7 +442,7 @@ Docker se utiliza para contenerizar la aplicacion y sus servicios, permitiendo e
 
 Mediante contenedores se empaquetan el backend, dependencias y configuraciones necesarias para su ejecucion.
 
-### Porque?
+### Motivos
 
 - Entornos consistentes entre desarrollo y produccion
 - Despliegue reproducible
@@ -554,7 +458,7 @@ La configuracion de contenedores se define en el archivo:
 
 ./docker-compose.yml
 
-### Porque?
+### Motivos
 
 - Orquestacion sencilla de multiples servicios
 - Ejecucion completa del sistema con un solo comando
@@ -569,7 +473,7 @@ GitHub Workflows (GitHub Actions) es el sistema de integracion y automatizacion 
 
 Mediante flujos definidos en el repositorio, el sistema puede validar cambios en cada actualizacion del codigo y automatizar procesos del ciclo de desarrollo.
 
-### Porque?
+### Motivos
 
 - Automatizacion de tareas de desarrollo
 - Integracion continua (CI)
@@ -588,7 +492,7 @@ Nginx es el servidor web y proxy inverso utilizado en el despliegue de Limpora. 
 
 Tambien gestiona aspectos clave del acceso publico, como el dominio, certificados SSL y distribucion de trafico hacia los contenedores correspondientes.
 
-### Porque?
+### Motivos
 
 - Servidor web de alto rendimiento
 - Proxy inverso para aplicaciones Node.js
@@ -602,7 +506,7 @@ Certbot es la herramienta utilizada para generar y gestionar certificados SSL gr
 
 El sistema obtiene y renueva automaticamente los certificados, garantizando que las comunicaciones entre usuarios y la plataforma se realicen de forma cifrada.
 
-### Porque?
+### Motivos
 
 - Habilita HTTPS en el dominio
 - Certificados SSL gratuitos y confiables
@@ -613,6 +517,9 @@ El sistema obtiene y renueva automaticamente los certificados, garantizando que 
 # Documentacion (Sprint 8)
 Se utilizo [Quarkdown](https://quarkdown.com/) para crear documentacion de calidad
 eficientemente de forma estetica y poderosa.
+
+!(100%)[metareferencia](image/sprint8.png "Codigo Quarkdown(Markdown con poderes) a la isquierda y preview a la derecha.")
+
 
 # De que me arrepiento...
 
@@ -637,7 +544,7 @@ eficientemente de forma estetica y poderosa.
 - Organizar el trello **Epicamente**
 - Utilizar **Quarkdown** para la documentacion (Viva markdown)
 - Inspirarme en mis compañeros (Oauth, Captcha, etc)
-- Todas las ..... que me hice reduir el ...... que me dio esta ......
+- Todas las ..... que me .... para reducir el ...... que me dio esta ......
 
 # Creditos
 
@@ -665,19 +572,19 @@ eficientemente de forma estetica y poderosa.
         - Despliegue y DevOps
         - Documentacion
             - Memoria
-            - Swagger
+            - OpenAPI
 
     .column
-        **Kevin ? ?**
+        **Kevin Alias la "k"**
         
-        Desarrollador **frontend** de Limpora
-
-        - Base de parcial
+        Ausente durante todo el proyecto.
+    
+        - Base de datos de parcial
         - Desarrollo parcial del frontend
 
         [github.com/?](https://github.com/?)
         
-        [?@gmail.com](mailto:?@gmail.com)
+        [tevens@gmail.com](mailto:tevens@gmail.com)
 
         - Nada
         - Nada
