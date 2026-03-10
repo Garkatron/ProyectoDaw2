@@ -33,14 +33,14 @@ export abstract class MediaService {
         if (!ALLOWED_TYPES.includes(file.type)) {
             throw status(
                 400,
-                `Invalid file type: ${file.type}. Allowed: ${ALLOWED_TYPES.join(", ")}`,
+                "Invalid file type. Allowed: image/jpeg, image/png, image/webp" satisfies MediaModel["invalidType"],
             );
         }
 
         if (file.size > MAX_SIZE) {
             throw status(
                 400,
-                `File too large: ${file.size} bytes. Max: ${MAX_SIZE}`,
+                "File too large. Max: 5242880 bytes" satisfies MediaModel["fileTooLarge"],
             );
         }
 
@@ -57,13 +57,13 @@ export abstract class MediaService {
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Unknown error";
-            throw status(502, `ImageKit upload failed: ${message}`);
+            throw status(502, `Upload failed: ${message}` satisfies MediaModel["uploadFailed"]);
         }
 
         if (!response.fileId || !response.url) {
             throw status(
                 502,
-                `ImageKit returned incomplete data: fileId=${response.fileId}, url=${response.url}`,
+                `Incomplete data: fileId=${response.fileId}, url=${response.url}` satisfies MediaModel["incompleteResponse"],
             );
         }
 
@@ -73,75 +73,76 @@ export abstract class MediaService {
         };
     }
 
+    static async getProfileImage(
+        { id }: MediaModel["profileParams"],
+    ): Promise<MediaModel["getImageResponse"]> {
+        return MediaService.getImage({ src: `user/${id}/profile` });
+    }
+
+    static async setProfileImage(
+        { file }: MediaModel["fileBody"],
+        id: number,
+    ): Promise<MediaModel["postImageResponse"]> {
+        try {
+            await ImageKitClient.files.delete(`user/${id}/profile`);
+        } catch (_) { }
+
+        return MediaService.postImage({
+            file,
+            name: "profile",
+            folder: `user/${id}`,
+        });
+    }
+
+    static async getProfileImageMe(
+        uid: string,
+    ): Promise<MediaModel["getImageResponse"]> {
+        const user = await UserService.getMe({ uid });
+        return MediaService.getProfileImage({ id: user.id });
+    }
+
     static async setProfileImageMe(
         { file }: MediaModel["fileBody"],
         uid: string,
     ): Promise<MediaModel["postImageResponse"]> {
-        const user = await UserService.getMe({ uid }); // Avoid not existent user.
-
-        try {
-            await ImageKitClient.files.delete(`user/${uid}/profile`);
-        } catch (_) {
-            // Ignore if not exists.
-        }
-
-        const response = await MediaService.postImage({
-            file,
-            name: `profile`,
-            folder: `user/${uid}`,
-        });
-
-        return {
-            public_url: response.public_url,
-            id: response.id,
-        };
+        const user = await UserService.getMe({ uid });
+        return MediaService.setProfileImage({ file }, user.id);
     }
-    static async getProfileImageMe(
+
+
+    static async getBannerImage(
+        { id }: MediaModel["bannerParams"],
+    ): Promise<MediaModel["getImageResponse"]> {
+        return MediaService.getImage({ src: `user/${id}/banner` });
+    }
+
+    static async setBannerImage(
+        { file }: MediaModel["fileBody"],
+        id: number,
+    ): Promise<MediaModel["postImageResponse"]> {
+        try {
+            await ImageKitClient.files.delete(`user/${id}/banner`);
+        } catch (_) { }
+
+        return MediaService.postImage({
+            file,
+            name: "banner",
+            folder: `user/${id}`,
+        });
+    }
+
+    static async getBannerImageMe(
         uid: string,
     ): Promise<MediaModel["getImageResponse"]> {
-        await UserService.getMe({ uid }); // Avoid no existent user
-
-        const response = await MediaService.getImage({
-            src: `user/${uid}/profile`,
-        });
-        return {
-            url: response.url,
-        };
+        const user = await UserService.getMe({ uid });
+        return MediaService.getBannerImage({ id: user.id });
     }
 
     static async setBannerImageMe(
         { file }: MediaModel["fileBody"],
         uid: string,
     ): Promise<MediaModel["postImageResponse"]> {
-        const user = await UserService.getMe({ uid }); // Avoid not existent user.
-
-        try {
-            await ImageKitClient.files.delete(`user/${uid}/banner`);
-        } catch (_) {
-            // Ignore if not exists.
-        }
-
-        const response = await MediaService.postImage({
-            file,
-            name: `banner`,
-            folder: `user/${uid}`,
-        });
-
-        return {
-            public_url: response.public_url,
-            id: response.id,
-        };
-    }
-    static async getBanerImageMe(
-        uid: string,
-    ): Promise<MediaModel["getImageResponse"]> {
-        await UserService.getMe({ uid }); // Avoid no existent user
-
-        const response = await MediaService.getImage({
-            src: `user/${uid}/banner`,
-        });
-        return {
-            url: response.url,
-        };
+        const user = await UserService.getMe({ uid });
+        return MediaService.setBannerImage({ file }, user.id);
     }
 }

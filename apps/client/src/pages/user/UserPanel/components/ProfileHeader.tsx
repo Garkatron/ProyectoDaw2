@@ -2,12 +2,12 @@ import { ActionIcon, Avatar, Box, Button, Group, Text, Overlay } from '@mantine/
 import { LogOut, Pencil, Camera } from 'lucide-react';
 import { EditProfileImageModal } from '../../../../components/EditProfileImageModal';
 import { useState } from 'react';
-import { useProfileImage } from '../../../../hooks/useProfileImage';
-import { useBannerImage } from '../../../../hooks/useBannerImage';
+import { useProfileImageMe } from '../../../../hooks/useProfileImage';
+import { useBannerImageMe } from '../../../../hooks/useBannerImage';
 
 export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
-    const { image, submitting, handleAdd } = useProfileImage();
-    const { image: banner, submitting: bannerSubmitting, handleAdd: handleBannerAdd } = useBannerImage();
+    const { image, submitting, handleAdd } = useProfileImageMe();
+    const { image: banner, submitting: bannerSubmitting, handleAdd: handleBannerAdd } = useBannerImageMe();
 
     const [avatarModalOpen, setAvatarModalOpen] = useState(false);
     const [bannerModalOpen, setBannerModalOpen] = useState(false);

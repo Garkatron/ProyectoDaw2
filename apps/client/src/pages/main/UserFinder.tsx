@@ -40,7 +40,7 @@ export default function UserFinder() {
 
   useEffect(() => {
     fetchUsers();
-    fetchServices();
+    fetchServices();    
   }, []);
 
   useEffect(() => {
@@ -74,16 +74,21 @@ export default function UserFinder() {
   };
 
   const filterUsers = () => {
-    let filtered = users;
-    if (debouncedSearch)
-      filtered = filtered.filter((u) =>
-        u.name.toLowerCase().includes(debouncedSearch.toLowerCase()),
-      );
-    if (activeServices.length > 0)
-      filtered = filtered.filter((u) =>
-        u.services?.some((s) => activeServices.includes(s.name)),
-      );
-    setFilteredUsers(filtered);
+      if (!users) return; // 👈 guard para null
+
+      let filtered = [...users];
+
+      if (debouncedSearch)
+          filtered = filtered.filter((u) =>
+              u.name.toLowerCase().includes(debouncedSearch.toLowerCase()),
+          );
+
+      if (activeServices.length > 0)
+          filtered = filtered.filter((u) =>
+              u.services?.some((s) => activeServices.includes(s.name)),
+          );
+
+      setFilteredUsers(filtered);
   };
 
   const toggleService = (serviceName: string) => {

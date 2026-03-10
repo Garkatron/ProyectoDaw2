@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 
 import type { User } from "@limpora/common";
-import { Group, Text, Box, Paper, Stack, Badge, Divider } from '@mantine/core';
+import { Group, Text, Box, Paper, Stack, Badge, Divider, Avatar } from '@mantine/core';
+import { useProfileImage } from "../hooks/useProfileImage";
 
 type UserSummary = Pick<User, "name" | "role" | "id" | "total_points" | "member_since"> & {
   services?: { name: string }[];
@@ -39,40 +40,17 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function Avatar({ name }: { name: string }) {
-  const initials = name
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-
-  // Genera un color determinista a partir del nombre
-  const hue = [...name].reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
-
-  return (
-    <Box
-      w={48}
-      h={48}
-      style={{
-        borderRadius: "50%",
-        background: `hsl(${hue}, 60%, 50%)`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-      }}
-    >
-      <Text size="sm" fw={700} c="white" style={{ letterSpacing: 1 }}>
-        {initials || "?"}
-      </Text>
-    </Box>
-  );
-}
 
 export function ProviderCard({ user }: { user: UserSummary }) {
+  const { image, error, submitting } = useProfileImage(user.id);
+  const imageUrl = image ? URL.createObjectURL(image) : undefined;
+
+
   const memberYear = user.member_since
     ? new Date(user.member_since).getFullYear()
     : null;
+
+
 
   return (
     <Paper
@@ -96,7 +74,17 @@ export function ProviderCard({ user }: { user: UserSummary }) {
       <Stack gap="sm">
         {/* Header */}
         <Group gap="sm" wrap="nowrap">
-          <Avatar name={user.name ?? "?"} />
+          <Avatar
+            size={65}
+            radius="50%"
+            src={imageUrl}
+            alt={user.name}
+            style={{
+              border: '3px solid var(--mantine-color-body)',
+            }}
+          >
+            {user.name[0].toUpperCase()}
+          </Avatar>
           <Box style={{ minWidth: 0 }}>
             <Text fw={600} size="sm" truncate>
               {user.name ?? "Sin nombre"}

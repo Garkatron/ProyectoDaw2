@@ -286,8 +286,6 @@ export default function BookingConfirmation() {
     })();
   }, [providerId, selectedDate]);
 
-  // ── estado de cada slot ──────────────────────────────────────────────────
-  // ── estado de cada slot (Lógica Corregida) ─────────────────────────────────
   const slotStates: Record<string, SlotState> = (() => {
     if (!selectedDate || allSlots.length === 0) return {};
     const now = new Date();
@@ -296,40 +294,31 @@ export default function BookingConfirmation() {
 
     return Object.fromEntries(
       allSlots.map((slot) => {
-        // 1. Validar si es pasado
         const [h, m] = slot.split(":").map(Number);
         const slotDate = new Date(selectedDate);
         slotDate.setHours(h, m, 0, 0);
         if (slotDate < now) return [slot, "past" as SlotState];
 
-        // 2. Si el slot base ya está ocupado, ni seguimos
         if (occupiedSlots.has(slot)) return [slot, "occupied" as SlotState];
 
-        // 3. Si no hay servicio seleccionado, está disponible (o fuera de horario si no existe en allSlots)
         if (!selectedService || durationMin === 0)
           return [slot, "available" as SlotState];
 
-        // 4. VALIDACIÓN DE RANGO (Aquí estaba el fallo)
         const startMin = slotToMinutes(slot);
         const endMin = startMin + durationMin;
 
-        // Revisamos cada bloque de 30 min que ocuparía el servicio
-        // Empezamos en +30 porque el slot inicial ya sabemos que está libre
         for (let cursor = startMin; cursor < endMin; cursor += 30) {
           const currentCheck = `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`;
 
-          // PRIORIDAD 1: ¿El slot que necesito está ocupado por otra cita?
           if (occupiedSlots.has(currentCheck)) {
             return [slot, "occupied" as SlotState];
           }
 
-          // PRIORIDAD 2: ¿El slot que necesito se sale del horario del proveedor?
           if (!allSlotsSet.has(currentCheck)) {
             return [slot, "overflow" as SlotState];
           }
         }
 
-        // Si pasa todas las pruebas, está libre para la duración completa
         return [slot, "available" as SlotState];
       }),
     );
@@ -339,7 +328,6 @@ export default function BookingConfirmation() {
   const afternoonSlots = allSlots.filter((s) => slotToMinutes(s) >= 14 * 60);
 
   const handleDateClick = (date: Date) => {
-    // ✅ fix 4: solo bloqueamos fechas pasadas
     if (date < new Date()) return;
     setSelectedDate(date);
     setSelectedTime(null);
@@ -384,12 +372,6 @@ export default function BookingConfirmation() {
           <Title order={1} fz="1.5rem" fw={600}>
             Nueva reserva
           </Title>
-          <Text size="sm" c="dimmed" mt={4}>
-            Proveedor ID:{" "}
-            <Text span fw={500}>
-              {providerId}
-            </Text>
-          </Text>
         </Box>
 
         {/* Paso 1 — Calendario */}
