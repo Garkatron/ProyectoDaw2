@@ -1,47 +1,134 @@
-import { Avatar, Box, Button, Center, Text } from '@mantine/core';
-import { LogOut } from 'lucide-react';
+import { ActionIcon, Avatar, Box, Button, Group, Text, Overlay } from '@mantine/core';
+import { LogOut, Pencil, Camera } from 'lucide-react';
+import { EditProfileImageModal } from '../../../../components/EditProfileImageModal';
+import { useState } from 'react';
+import { useProfileImage } from '../../../../hooks/useProfileImage';
+import { useBannerImage } from '../../../../hooks/useBannerImage';
 
 export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
+    const { image, submitting, handleAdd } = useProfileImage();
+    const { image: banner, submitting: bannerSubmitting, handleAdd: handleBannerAdd } = useBannerImage();
+
+    const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+    const [bannerModalOpen, setBannerModalOpen] = useState(false);
+
+    const imageUrl = image ? URL.createObjectURL(image) : undefined;
+    const bannerUrl = banner ? URL.createObjectURL(banner) : undefined;
+
     return (
-        <Box style={{ position: 'relative' }}>
+        <>
             {/* Banner */}
             <Box
-                h={224}
+                h={300}
                 style={{
+                    position: 'relative',
                     borderRadius: 'var(--mantine-radius-md) var(--mantine-radius-md) 0 0',
-                    background: 'var(--mantine-color-default-hover)',
+                    overflow: 'hidden',
+                    background: bannerUrl
+                        ? `url(${bannerUrl}) center/cover no-repeat`
+                        : 'var(--mantine-color-default-hover)',
+                    cursor: isSelf ? 'pointer' : 'default',
+                }}
+                onClick={isSelf ? () => setBannerModalOpen(true) : undefined}
+            >
+                {!bannerUrl && (
+                    <Box
+                        style={{
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Text c="dimmed" size="sm">Fondo de usuario</Text>
+                    </Box>
+                )}
+
+                {isSelf && (
+                    <Box
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            opacity: 0,
+                            transition: 'opacity 0.2s',
+                            background: 'rgba(0,0,0,0.35)',
+                        }}
+                        className="banner-overlay"
+                        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+                    >
+                        <Group gap="xs">
+                            <Camera size={18} color="white" />
+                            <Text c="white" size="sm" fw={500}>Cambiar portada</Text>
+                        </Group>
+                    </Box>
+                )}
+            </Box>
+
+            {/* Avatar row */}
+            <Box
+                px="lg"
+                pb="xs"
+                style={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                    marginTop: -48,
                 }}
             >
-                <Center h="100%">
-                    <Text c="dimmed">Fondo de usuario</Text>
-                </Center>
-            </Box>
+                <Box style={{ position: 'relative', display: 'inline-block' }}>
+                    <Avatar
+                        size={96}
+                        radius="50%"
+                        src={imageUrl}
+                        alt={targetUser.name}
+                        style={{
+                            border: '3px solid var(--mantine-color-body)',
+                        }}
+                    >
+                        {targetUser.name[0].toUpperCase()}
+                    </Avatar>
+                    {isSelf && (
+                        <ActionIcon
+                            size="sm"
+                            radius="xl"
+                            variant="filled"
+                            style={{ position: 'absolute', bottom: 2, right: 2 }}
+                            onClick={() => setAvatarModalOpen(true)}
+                        >
+                            <Pencil size={11} />
+                        </ActionIcon>
+                    )}
+                </Box>
 
-            {/* Avatar */}
-            <Box style={{ position: 'absolute', left: 24, bottom: -40 }}>
-                <Avatar
-                    size={96}
-                    radius="50%"
-                    fw={700}
-                    fz="1.875rem"
-                >
-                    {targetUser.name[0].toUpperCase()}
-                </Avatar>
-            </Box>
-
-            {/* Logout */}
-            {isSelf && (
-                <Box style={{ position: 'absolute', top: 16, right: 16 }}>
+                {isSelf && (
                     <Button
                         variant="default"
                         size="xs"
                         leftSection={<LogOut size={14} />}
                         onClick={onLogout}
+                        mb={4}
                     >
                         Logout
                     </Button>
-                </Box>
-            )}
-        </Box>
+                )}
+            </Box>
+
+            <EditProfileImageModal
+                opened={avatarModalOpen}
+                onClose={() => setAvatarModalOpen(false)}
+                onSubmit={handleAdd}
+                submitting={submitting}
+            />
+            <EditProfileImageModal
+                opened={bannerModalOpen}
+                onClose={() => setBannerModalOpen(false)}
+                onSubmit={handleBannerAdd}
+                submitting={bannerSubmitting}
+            />
+        </>
     );
 }
