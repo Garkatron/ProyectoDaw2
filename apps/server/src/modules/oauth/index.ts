@@ -1,6 +1,11 @@
 import Elysia from "elysia";
 import { OAuthService } from "./service";
 
-
-export const servicesController = new Elysia({ prefix: '/google' })
-.post("2", async ({ redirect }) => OAuthService.redirectToGoogle(redirect));
+// https://console.cloud.google.com/apis/credentials?pli=1
+export const oauthController = new Elysia({ prefix: "/google" })
+    .get("/callback", ({ query, cookie, redirect }) =>
+        OAuthService.callback({ code: query.code, cookie, redirect }),
+    )
+    .get("redirect", async ({ redirect }) =>
+        OAuthService.redirectToGoogle(redirect),
+    );

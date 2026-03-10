@@ -197,6 +197,14 @@ export abstract class AuthService {
         }
     }
 
+    static async getFirebaseUserByEmail(email: string) {
+        try {
+            return await firebaseAuth.getUserByEmail(email);
+        } catch {
+            throw status(404, "User not found in Firebase");
+        }
+    }
+
     static async revokeTokens(uid: string): Promise<void> {
         await firebaseAuth.revokeRefreshTokens(uid);
     }

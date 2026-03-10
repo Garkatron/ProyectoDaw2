@@ -18,6 +18,7 @@ import { logger } from "@bogeychan/elysia-logger";
 import { bookingController } from "./modules/booking";
 import { notificationController } from "./modules/notification";
 import { mediaController } from "./modules/media";
+import { oauthController } from "./modules/oauth";
 
 // import { elysiaHelmet, permission } from 'elysiajs-helmet';
 
@@ -77,6 +78,7 @@ const app = new Elysia()
     // Services
     .get("/", () => "Hello from Limpora!, using Elysia.js!")
     .use(authController)
+    .use(oauthController)
     .use(userController)
     .use(userEarningController)
     .use(servicesController)

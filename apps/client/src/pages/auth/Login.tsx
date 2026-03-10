@@ -19,6 +19,7 @@ import {
     Modal,
     Text,
 } from '@mantine/core';
+import { API } from "../../lib/api";
 
 export default function Login() {
     const login = useAuthStore((state) => state.login);
@@ -31,6 +32,12 @@ export default function Login() {
     const [success, setSuccess] = useState(false);
     const [isAdmin, setAdmin] = useState(false);
     const navigate = useNavigate();
+
+    const handleOAuth = () => {
+        window.location.href = `${import.meta.env.MODE === 'production'
+            ? 'https://api.limpora.xyz'
+            : 'http://localhost:3001'}/google/redirect`;
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -106,7 +113,7 @@ export default function Login() {
                             variant="default"
                             size="md"
                             fullWidth
-                            onClick={() => (window.location.href = '/api/v1/auth/google-url')}
+                            onClick={handleOAuth}
                         >
                             Google
                         </Button>
