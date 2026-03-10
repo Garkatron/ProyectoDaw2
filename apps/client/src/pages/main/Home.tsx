@@ -222,7 +222,7 @@ const Header = () => {
     <Paper ref={ref} withBorder radius="xl" px="xl" py="md" shadow="xs">
       <Group justify="space-between" align="center">
         <Group gap="sm">
-          <Image src={logo} alt="Limpora" w={48} h={48} fit="contain" style={{ flexShrink: 0 }} />
+          <Image src={logo} alt="Limpora" w={70} h={70} fit="contain" style={{ flexShrink: 0 }} />
           <Stack gap={0}>
             <Title order={1} fz="1.4rem" fw={700} style={{ letterSpacing: "-0.03em" }}>
               Limpora

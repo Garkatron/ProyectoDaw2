@@ -1,4 +1,4 @@
-import logo from '../../assets/logo-provisional.png';
+import logo from "../../assets/logo.svg";
 import { useState } from 'react';
 import { useAuthStore } from '../../stores/auth.store';
 import { Link, useNavigate } from 'react-router-dom';
@@ -71,7 +71,7 @@ export default function Register() {
         <Center mih="100vh" px="md">
             <Paper w="100%" maw={448} p={40} withBorder>
                 <Stack align="center" mb="xl" gap="xs">
-                    <Image src={logo} alt="Limpora Logo" w={112} h={112} fit="contain" />
+                    <Image src={logo} alt="Limpora Logo" w={180} h={180} fit="contain" />
                     <Title order={1} fw={300} fz="2rem">
                         Registro
                     </Title>

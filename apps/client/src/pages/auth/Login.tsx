@@ -1,9 +1,10 @@
-import logo from '../../assets/logo-provisional.png';
+import logo from "../../assets/logo.svg";
 import { useAuthStore } from '../../stores/auth.store';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LoginSchema from '../../schemas/NewSessionSchema';
 import lang from '../../utils/LangManager';
+
 import { UserRole } from '@limpora/common';
 import {
     TextInput,
@@ -67,7 +68,7 @@ export default function Login() {
         <Center mih="100vh" px="md">
             <Paper w="100%" maw={448} p={40} withBorder>
                 <Stack align="center" mb="xl" gap="xs">
-                    <Image src={logo} alt="Limpora Logo" w={112} h={112} fit="contain" />
+                    <Image src={logo} alt="Limpora Logo" w={180} h={180} fit="contain" />
                     <Title order={1} fw={300} fz="2rem">
                         {lang('login.title')}
                     </Title>
