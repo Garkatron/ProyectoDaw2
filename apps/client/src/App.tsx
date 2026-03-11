@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/main/Home";
 import PrivateRoute from "./components/PrivateRoute";
 import Rergister from "./pages/auth/Register";
@@ -15,6 +15,8 @@ import VerifyEmail from "./pages/auth/VerifyEmail";
 import ScheduleSettings from "./pages/user/ScheduleSettings";
 import AppointmentReviewPage from "./pages/user/AppointmentReviewPage";
 import Inbox from "./pages/user/Inbox";
+import { AnimatePresence, motion } from 'framer-motion';
+import { useRef } from "react";
 
 // <Route path="/emailcode" element={<EmailCode />} />
 
@@ -31,14 +33,26 @@ import Inbox from "./pages/user/Inbox";
         <Route path="/panel/admin" element={<AdminPanel />} />
       </Route>
 */
-function App() {
+
+
+const routeOrder = ["/", "/currency", "/appointments", "/userfinder", "/inbox"];
+
+const variants = {
+  initial: (dir: number) => ({ x: dir * 50, opacity: 0 }),
+  animate: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir * -50, opacity: 0 }),
+};
+
+const App = () => {
+  const location = useLocation();
+
   return (
-    <Routes>
+    <Routes location={location} key={location.pathname}>
       <Route path="/" element={<Home />} />
       <Route path="/register" element={<Rergister />} />
       <Route path="/login" element={<Login />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
-      
+
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />
         <Route path="/review" element={<AppointmentReviewPage />} />
@@ -51,6 +65,6 @@ function App() {
       </Route>
     </Routes>
   );
-}
+};
 
 export default App;

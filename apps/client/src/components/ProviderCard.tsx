@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-
 import type { User } from "@limpora/common";
-import { Group, Text, Box, Paper, Stack, Badge, Divider, Avatar } from '@mantine/core';
+import { Group, Text, Box, Paper, Stack, Badge, Divider, Avatar, Skeleton } from '@mantine/core';
 import { useProfileImage } from "../hooks/useProfileImage";
+import { motion, AnimatePresence } from "framer-motion";
 
 type UserSummary = Pick<User, "name" | "role" | "id" | "total_points" | "member_since"> & {
   services?: { name: string }[];
@@ -26,42 +26,30 @@ function Stars({ rating }: { rating: number }) {
   return (
     <Group gap={2}>
       {Array.from({ length: 5 }, (_, i) => (
-        <Text
-          key={i}
-          size="xs"
-          c={i < Math.round(rating) ? "yellow.5" : "gray.3"}
-          style={{ lineHeight: 1 }}
-        >
-          ★
-        </Text>
+        <Text key={i} size="xs" c={i < Math.round(rating) ? "yellow.5" : "gray.3"} style={{ lineHeight: 1 }}>★</Text>
       ))}
       <Text size="xs" c="dimmed" ml={2}>{rating.toFixed(1)}</Text>
     </Group>
   );
 }
 
-
 export function ProviderCard({ user }: { user: UserSummary }) {
-  const { image, error, submitting } = useProfileImage(user.id);
+  const { image, submitting } = useProfileImage(user.id);
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+
   const imageUrl = image ? URL.createObjectURL(image) : undefined;
 
+  // Reset cuando cambia la imagen
+  useEffect(() => { setAvatarLoaded(false); }, [imageUrl]);
 
   const memberYear = user.member_since
     ? new Date(user.member_since).getFullYear()
     : null;
 
-
-
   return (
     <Paper
-      withBorder
-      p="md"
-      radius="md"
-      style={{
-        cursor: "pointer",
-        transition: "box-shadow 0.15s, transform 0.15s",
-        height: "100%",
-      }}
+      withBorder p="md" radius="md"
+      style={{ cursor: "pointer", transition: "box-shadow 0.15s, transform 0.15s", height: "100%" }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)";
         e.currentTarget.style.transform = "translateY(-2px)";
@@ -72,35 +60,54 @@ export function ProviderCard({ user }: { user: UserSummary }) {
       }}
     >
       <Stack gap="sm">
-        {/* Header */}
         <Group gap="sm" wrap="nowrap">
-          <Avatar
-            size={65}
-            radius="50%"
-            src={imageUrl}
-            alt={user.name}
-            style={{
-              border: '3px solid var(--mantine-color-body)',
-            }}
-          >
-            {user.name[0].toUpperCase()}
-          </Avatar>
-          <Box style={{ minWidth: 0 }}>
-            <Text fw={600} size="sm" truncate>
-              {user.name ?? "Sin nombre"}
-            </Text>
-            <Group gap={6} mt={2}>
-              <Badge
-                size="xs"
-                color={ROLE_COLORS[user.role] ?? "gray"}
-                variant="light"
+
+          {/* Avatar con skeleton + fade-in */}
+          <Box style={{ position: "relative", width: 65, height: 65, flexShrink: 0 }}>
+
+            {/* Skeleton mientras carga */}
+            <AnimatePresence>
+              {(!imageUrl || !avatarLoaded || submitting) && (
+                <motion.div
+                  key="avatar-skeleton"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ position: "absolute", inset: 0, borderRadius: "50%", overflow: "hidden", zIndex: 1 }}
+                >
+                  <Skeleton height={65} circle animate={!!imageUrl || submitting} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Avatar real */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.88 }}
+              animate={avatarLoaded || !imageUrl ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.88 }}
+              transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+              style={{ width: "100%", height: "100%" }}
+            >
+              <Avatar
+                size={65}
+                radius="50%"
+                src={imageUrl}
+                alt={user.name}
+                style={{ border: "3px solid var(--mantine-color-body)" }}
+                onLoad={() => setAvatarLoaded(true)}
               >
+                {user.name[0].toUpperCase()}
+              </Avatar>
+            </motion.div>
+          </Box>
+
+          <Box style={{ minWidth: 0 }}>
+            <Text fw={600} size="sm" truncate>{user.name ?? "Sin nombre"}</Text>
+            <Group gap={6} mt={2}>
+              <Badge size="xs" color={ROLE_COLORS[user.role] ?? "gray"} variant="light">
                 {ROLE_LABELS[user.role] ?? user.role}
               </Badge>
               {user.city && (
-                <Text size="xs" c="dimmed" truncate>
-                  📍 {user.city}
-                </Text>
+                <Text size="xs" c="dimmed" truncate>📍 {user.city}</Text>
               )}
             </Group>
           </Box>
@@ -108,29 +115,21 @@ export function ProviderCard({ user }: { user: UserSummary }) {
 
         <Divider />
 
-        {/* Stats */}
         <Group gap="lg">
-          {user.avg_rating != null && user.avg_rating > 0 && (
-            <Stars rating={user.avg_rating} />
-          )}
+          {user.avg_rating != null && user.avg_rating > 0 && <Stars rating={user.avg_rating} />}
           {user.total_points != null && (
             <Group gap={4}>
               <Text size="xs" c="dimmed">⭐</Text>
               <Text size="xs" c="dimmed">{user.total_points} pts</Text>
             </Group>
           )}
-          {memberYear && (
-            <Text size="xs" c="dimmed">desde {memberYear}</Text>
-          )}
+          {memberYear && <Text size="xs" c="dimmed">desde {memberYear}</Text>}
         </Group>
 
-        {/* Services */}
         {user.services && user.services.length > 0 && (
           <Group gap="xs" wrap="wrap">
             {user.services.slice(0, 3).map((s) => (
-              <Badge key={s.name} size="xs" variant="dot" color="blue">
-                {s.name}
-              </Badge>
+              <Badge key={s.name} size="xs" variant="dot" color="blue">{s.name}</Badge>
             ))}
             {user.services.length > 3 && (
               <Text size="xs" c="dimmed">+{user.services.length - 3} más</Text>
