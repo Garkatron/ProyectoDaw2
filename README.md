@@ -81,6 +81,6 @@ modules/
 
 
 ## Development Tools
-- **eslint-define-config** — Linting configuration
-- **bun:test** — Testing library (built into Bun)
-- **bun env** — Environment variable management (built into Bun)
+- **eslint-define-config**: Linting configuration
+- **bun:test**: Testing library (built into Bun)
+- **bun env**: Environment variable management (built into Bun)
