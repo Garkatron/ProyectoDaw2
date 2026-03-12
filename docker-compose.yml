@@ -23,7 +23,12 @@ services:
       - NODE_ENV=production
       - FRONTEND_URL=https://www.limpora.xyz
     volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/apps/server/node_modules
+      - /usr/src/app/packages/common/node_modules
       - ./apps/server/data:/usr/src/app/apps/server/data
+
     restart: unless-stopped
     networks:
       - limpora-network
