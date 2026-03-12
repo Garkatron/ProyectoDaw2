@@ -73,7 +73,7 @@ modules/
 - **pino** + **pino-http**
 
 
-## Documentation
+## Documentation (localhost:port/docs)
 - Interactive and auto-generated API docs
 - Easy frontend integration
 - OpenAPI standard
