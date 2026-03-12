@@ -2,7 +2,7 @@ FROM oven/bun:1
 WORKDIR /usr/src/app
 
 # Copiamos el package.json de la raíz PRIMERO
-COPY package.json ./
+COPY package.json bun.lock ./
 
 # Copiamos los package.json de los paquetes manteniendo la estructura exacta
 # que definiste en tu campo "workspaces" (packages/* y apps/*)

@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 
 # 1. ¡FUNDAMENTAL! Copiar el package.json de la RAÍZ
 # Aquí es donde se definen los "workspaces"
-COPY package.json ./
+COPY package.json bun.lock ./
 
 # 2. Copiar los manifests de los paquetes
 COPY packages/common/package.json ./packages/common/
