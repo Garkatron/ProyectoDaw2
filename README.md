@@ -8,9 +8,10 @@
     </p>
 </h1>
 
+[README.ES](./README.ES.md)
+
 ## What is it?
 Limpora is a web application and service that connects clients with freelance cleaning professionals, making it easy to get in touch, hire, and manage jobs in a clear, fast, and secure way.
-
 
 ## Technologies
 
