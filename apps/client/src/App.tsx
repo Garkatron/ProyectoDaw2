@@ -17,6 +17,7 @@ import AppointmentReviewPage from "./pages/user/AppointmentReviewPage";
 import Inbox from "./pages/user/Inbox";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRef } from "react";
+import Settings from "./pages/main/settings";
 
 // <Route path="/emailcode" element={<EmailCode />} />
 
@@ -55,6 +56,7 @@ const App = () => {
 
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="/review" element={<AppointmentReviewPage />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/currency" element={<Currency />} />

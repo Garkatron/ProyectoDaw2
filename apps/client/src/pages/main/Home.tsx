@@ -1,21 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Navbar from "../../components/Navbar";
 import News from "../../components/News";
 import logo from "../../assets/logo.svg";
 import HERO_IMAGE from "./../../assets/hero2.jpg";
 import {
-  Box,
-  Grid,
-  Group,
-  Image,
-  Paper,
-  Stack,
-  Text,
-  Title,
-  Divider,
-  ThemeIcon,
-  SimpleGrid,
-  Badge,
+  Box, Grid, Group, Image, Paper, Stack,
+  Text, Title, Divider, ThemeIcon, SimpleGrid, Badge,
 } from "@mantine/core";
 import { Star, Shield, Clock, Sparkles, CheckCircle, ArrowRight } from "lucide-react";
 
@@ -69,35 +60,43 @@ const AnimatedStat = ({ value, label }) => {
 };
 
 /* ─── Features ─── */
-const features = [
-  {
-    icon: Star,
-    title: "Profesionales verificados",
-    description: "Cada autónomo pasa un proceso de verificación riguroso antes de operar.",
-  },
-  {
-    icon: Shield,
-    title: "Contratación segura",
-    description: "Tu información y pagos están protegidos en todo momento.",
-  },
-  {
-    icon: Clock,
-    title: "Disponible 24/7",
-    description: "Reserva servicios en cualquier momento, desde cualquier lugar.",
-  },
-];
+const useFeatures = () => {
+  const { t } = useTranslation();
+  return [
+    {
+      icon: Star,
+      title: t("home.info.three_section.verified.title"),
+      description: t("home.info.three_section.verified.description"),
+    },
+    {
+      icon: Shield,
+      title: t("home.info.three_section.secure.title"),
+      description: t("home.info.three_section.secure.description"),
+    },
+    {
+      icon: Clock,
+      title: t("home.info.three_section.available.title"),
+      description: t("home.info.three_section.available.description"),
+    },
+  ];
+};
 
-const serviceTypes = [
-  "Limpieza de hogar",
-  "Fachadas y exteriores",
-  "Piscinas",
-  "Vehículos",
-  "Artículos de alto valor",
-];
+const useServiceTypes = () => {
+  const { t } = useTranslation();
+  return [
+    t("home.info.services_available.home_cleaning"),
+    t("home.info.services_available.facade_exterior"),
+    t("home.info.services_available.swimingpool"),
+    t("home.info.services_available.vehicles"),
+    t("home.info.services_available.high_value_articles"),
+  ];
+};
 
 /* ─── Hero ─── */
 const HeroSection = () => {
+  const { t } = useTranslation();
   const ref = useFadeIn(0);
+
   return (
     <Box ref={ref} style={{ position: "relative", borderRadius: 16, overflow: "hidden" }}>
       <Image
@@ -108,7 +107,6 @@ const HeroSection = () => {
         fit="cover"
         style={{ objectPosition: "center 10%", display: "block" }}
       />
-      {/* Overlay con mensaje */}
       <Box
         style={{
           position: "absolute",
@@ -127,7 +125,7 @@ const HeroSection = () => {
             leftSection={<Sparkles size={11} />}
             style={{ width: "fit-content", backdropFilter: "blur(6px)" }}
           >
-            Plataforma de confianza
+            {t("home.hero.tag")}
           </Badge>
           <Text
             fz={{ base: "1.5rem", sm: "2.2rem" }}
@@ -136,8 +134,8 @@ const HeroSection = () => {
             c="white"
             style={{ letterSpacing: "-0.02em", textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
           >
-            Limpieza profesional,<br />
-            <Text span fw={300} inherit>cuando la necesitas.</Text>
+            {t("home.hero.title")}<br />
+            <Text span fw={300} inherit>{t("home.hero.subtitle")}</Text>
           </Text>
         </Stack>
       </Box>
@@ -147,34 +145,28 @@ const HeroSection = () => {
 
 /* ─── About / Features ─── */
 const AboutSection = () => {
+  const { t } = useTranslation();
   const ref = useFadeIn(100);
+  const features = useFeatures();
+  const serviceTypes = useServiceTypes();
+
   return (
     <Paper ref={ref} withBorder radius="xl" p={{ base: "lg", sm: "xl" }} h="100%">
       <Stack gap="xl" h="100%" justify="center">
 
-        {/* Intro */}
         <Stack gap="sm">
-          <Text
-            fz={{ base: "1.5rem", sm: "2rem" }}
-            fw={300}
-            lh={1.25}
-            style={{ letterSpacing: "-0.02em" }}
-          >
-            Conectamos personas con{" "}
-            <Text span fw={700} inherit>
-              profesionales de confianza
-            </Text>
+          <Text fz={{ base: "1.5rem", sm: "2rem" }} fw={300} lh={1.25} style={{ letterSpacing: "-0.02em" }}>
+            {t("home.info.title").split("profesionales de confianza")[0]}
+            <Text span fw={700} inherit>{t("home.info.title").split("con ")[1]}</Text>
           </Text>
           <Text size="sm" maw={480} lh={1.75} style={{ opacity: 0.75 }}>
-            Limpora simplifica la búsqueda, comparación y reserva de servicios de
-            limpieza profesional. Rápido, seguro y siempre disponible.
+            {t("home.info.description")}
           </Text>
         </Stack>
 
-        {/* Tipos de servicio */}
         <Stack gap="xs">
           <Text size="xs" fw={600} tt="uppercase" style={{ letterSpacing: "0.08em", opacity: 0.5 }}>
-            Servicios disponibles
+            {t("home.info.services_available.title")}
           </Text>
           <Stack gap={6}>
             {serviceTypes.map((s) => (
@@ -188,7 +180,6 @@ const AboutSection = () => {
 
         <Divider />
 
-        {/* Features */}
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
           {features.map(({ icon: Icon, title, description }) => (
             <Stack key={title} gap="xs">
@@ -201,12 +192,11 @@ const AboutSection = () => {
           ))}
         </SimpleGrid>
 
-        {/* Stats */}
         <Paper withBorder radius="lg" p="md">
           <SimpleGrid cols={3}>
-            <AnimatedStat value="2.400+" label="Profesionales" />
-            <AnimatedStat value="18.000+" label="Servicios realizados" />
-            <AnimatedStat value="4.9 ★" label="Valoración media" />
+            <AnimatedStat value="2.400+" label={t("home.info.three_section.stats.professionals")} />
+            <AnimatedStat value="18.000+" label={t("home.info.three_section.stats.services")} />
+            <AnimatedStat value="4.9 ★" label={t("home.info.three_section.stats.rating")} />
           </SimpleGrid>
         </Paper>
 
@@ -217,7 +207,9 @@ const AboutSection = () => {
 
 /* ─── Header ─── */
 const Header = () => {
+  const { t } = useTranslation();
   const ref = useFadeIn(0);
+
   return (
     <Paper ref={ref} withBorder radius="xl" px="xl" py="md" shadow="xs">
       <Group justify="space-between" align="center">
@@ -227,7 +219,7 @@ const Header = () => {
             <Title order={1} fz="1.4rem" fw={700} style={{ letterSpacing: "-0.03em" }}>
               Limpora
             </Title>
-            <Text size="xs" style={{ opacity: 0.55 }}>Servicios profesionales</Text>
+            <Text size="xs" style={{ opacity: 0.55 }}>{t("home.head.subtitle")}</Text>
           </Stack>
         </Group>
         <Group gap="xs" visibleFrom="sm" align="center">
@@ -257,7 +249,6 @@ export default function Home() {
         <Header />
         <Navbar />
         <HeroSection />
-
         <Grid gutter="lg" style={{ flex: 1 }}>
           <Grid.Col span={{ base: 12, lg: 4 }}>
             <News />

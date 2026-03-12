@@ -3,18 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Calendar, { type MarkedDate } from "../../components/Calendar";
 import Base from "../../layouts/Base";
 import { useAuthStore } from "../../stores/auth.store";
+import lang from "../../utils/LangManager";
 import {
-  Alert,
-  Box,
-  Button,
-  Group,
-  Paper,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-  UnstyledButton,
+  Alert, Box, Button, Group, Paper, SimpleGrid,
+  Skeleton, Stack, Text, Title, UnstyledButton,
 } from "@mantine/core";
 import { API } from "../../lib/api";
 import { PaymentMethod, type Appointment } from "@limpora/common";
@@ -51,53 +43,37 @@ function slotToMinutes(slot: string): number {
 }
 
 const ToggleButton = ({
-  selected,
-  onClick,
-  children,
+  selected, onClick, children,
 }: {
   selected: boolean;
   onClick: () => void;
   children: React.ReactNode;
 }) => (
   <UnstyledButton onClick={onClick} style={{ width: "100%" }}>
-    <Paper
-      withBorder
-      p="sm"
-      ta="center"
-      style={{
-        cursor: "pointer",
-        backgroundColor: selected
-          ? "var(--mantine-color-default-color)"
-          : undefined,
-        transition: "all 0.15s",
-      }}
-    >
-      <Text
-        component="div"
-        size="sm"
-        fw={500}
-        c={selected ? "var(--mantine-color-body)" : "dimmed"}
-      >
+    <Paper withBorder p="sm" ta="center" style={{
+      cursor: "pointer",
+      backgroundColor: selected ? "var(--mantine-color-default-color)" : undefined,
+      transition: "all 0.15s",
+    }}>
+      <Text component="div" size="sm" fw={500}
+        c={selected ? "var(--mantine-color-body)" : "dimmed"}>
         {children}
       </Text>
     </Paper>
   </UnstyledButton>
 );
 
-const SLOT_STYLES: Record<
-  SlotState,
-  { bg?: string; text: string; label?: string }
-> = {
+const getSlotStyles = (): Record<SlotState, { bg?: string; text: string; label?: string }> => ({
   available: { text: "dimmed" },
   occupied: {
     bg: "var(--mantine-color-red-0)",
     text: "var(--mantine-color-red-6)",
-    label: "Ocupado",
+    label: lang("booking.slot_states.occupied"),
   },
   overflow: {
     bg: "var(--mantine-color-orange-0)",
     text: "var(--mantine-color-orange-6)",
-    label: "Se solapa",
+    label: lang("booking.slot_states.overflow"),
   },
   past: {
     bg: "var(--mantine-color-gray-1)",
@@ -106,52 +82,35 @@ const SLOT_STYLES: Record<
   outside: {
     bg: "var(--mantine-color-gray-1)",
     text: "var(--mantine-color-gray-4)",
-    label: "Sin horario",
+    label: lang("booking.slot_states.outside"),
   },
-};
+});
 
 const SlotButton = ({
-  slot,
-  state,
-  selected,
-  onClick,
+  slot, state, selected, onClick,
 }: {
   slot: string;
   state: SlotState;
   selected: boolean;
   onClick: () => void;
 }) => {
-  const disabled =
-    state === "occupied" || state === "past" || state === "outside";
-  const styles = SLOT_STYLES[state];
+  const disabled = state === "occupied" || state === "past" || state === "outside";
+  const styles = getSlotStyles()[state];
   return (
     <UnstyledButton
       onClick={disabled ? undefined : onClick}
       style={{ width: "100%", cursor: disabled ? "not-allowed" : "pointer" }}
     >
-      <Paper
-        withBorder
-        p="xs"
-        ta="center"
-        style={{
-          backgroundColor: selected
-            ? "var(--mantine-color-default-color)"
-            : styles.bg,
-          transition: "all 0.15s",
-          opacity: state === "past" || state === "outside" ? 0.45 : 1,
-        }}
-      >
-        <Text
-          size="sm"
-          fw={500}
-          c={selected ? "var(--mantine-color-body)" : styles.text}
-        >
+      <Paper withBorder p="xs" ta="center" style={{
+        backgroundColor: selected ? "var(--mantine-color-default-color)" : styles.bg,
+        transition: "all 0.15s",
+        opacity: state === "past" || state === "outside" ? 0.45 : 1,
+      }}>
+        <Text size="sm" fw={500} c={selected ? "var(--mantine-color-body)" : styles.text}>
           {slot}
         </Text>
         {!selected && styles.label && (
-          <Text size="10px" c={styles.text} mt={2}>
-            {styles.label}
-          </Text>
+          <Text size="10px" c={styles.text} mt={2}>{styles.label}</Text>
         )}
       </Paper>
     </UnstyledButton>
@@ -159,11 +118,7 @@ const SlotButton = ({
 };
 
 const SlotGroup = ({
-  label,
-  slots,
-  slotStates,
-  selectedTime,
-  onSelect,
+  label, slots, slotStates, selectedTime, onSelect,
 }: {
   label: string;
   slots: string[];
@@ -174,9 +129,7 @@ const SlotGroup = ({
   if (slots.length === 0) return null;
   return (
     <Box>
-      <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb="xs">
-        {label}
-      </Text>
+      <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb="xs">{label}</Text>
       <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
         {slots.map((slot) => (
           <SlotButton
@@ -201,23 +154,14 @@ export default function BookingConfirmation() {
   const [markedDates, setMarkedDates] = useState<MarkedDate[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
-
-  const [providerServices, setProviderServices] = useState<ProviderService[]>(
-    [],
-  );
+  const [providerServices, setProviderServices] = useState<ProviderService[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
-  const [selectedService, setSelectedService] =
-    useState<ProviderService | null>(null);
-
+  const [selectedService, setSelectedService] = useState<ProviderService | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
-    PaymentMethod.BankTransfer,
-  );
-
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.BankTransfer);
   const [allSlots, setAllSlots] = useState<string[]>([]);
   const [occupiedSlots, setOccupiedSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
-
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -236,28 +180,21 @@ export default function BookingConfirmation() {
         });
         const marks: MarkedDate[] = [];
         Object.values(dateMap).forEach((appts) => {
-          marks.push({
-            date: new Date(appts[0].start_time),
-            status: appts[0].status,
-          });
+          marks.push({ date: new Date(appts[0].start_time), status: appts[0].status });
         });
         setMarkedDates(marks);
-        // ✅ fix 4: no bloqueamos días, los slots ocupados los gestiona el backend
       } finally {
         setLoadingAppts(false);
       }
     })();
   }, [providerId]);
 
-  // ── servicios del proveedor ──────────────────────────────────────────────
   useEffect(() => {
     if (!providerId) return;
     (async () => {
       setLoadingServices(true);
       try {
-        const { data } = await API.providers({
-          provider_id: String(providerId),
-        }).services.get();
+        const { data } = await API.providers({ provider_id: String(providerId) }).services.get();
         setProviderServices(data ?? []);
       } finally {
         setLoadingServices(false);
@@ -265,7 +202,6 @@ export default function BookingConfirmation() {
     })();
   }, [providerId]);
 
-  // ── disponibilidad para la fecha ─────────────────────────────────────────
   useEffect(() => {
     if (!providerId || !selectedDate) return;
     (async () => {
@@ -298,27 +234,16 @@ export default function BookingConfirmation() {
         const slotDate = new Date(selectedDate);
         slotDate.setHours(h, m, 0, 0);
         if (slotDate < now) return [slot, "past" as SlotState];
-
         if (occupiedSlots.has(slot)) return [slot, "occupied" as SlotState];
-
-        if (!selectedService || durationMin === 0)
-          return [slot, "available" as SlotState];
+        if (!selectedService || durationMin === 0) return [slot, "available" as SlotState];
 
         const startMin = slotToMinutes(slot);
         const endMin = startMin + durationMin;
-
         for (let cursor = startMin; cursor < endMin; cursor += 30) {
           const currentCheck = `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`;
-
-          if (occupiedSlots.has(currentCheck)) {
-            return [slot, "occupied" as SlotState];
-          }
-
-          if (!allSlotsSet.has(currentCheck)) {
-            return [slot, "overflow" as SlotState];
-          }
+          if (occupiedSlots.has(currentCheck)) return [slot, "occupied" as SlotState];
+          if (!allSlotsSet.has(currentCheck)) return [slot, "overflow" as SlotState];
         }
-
         return [slot, "available" as SlotState];
       }),
     );
@@ -339,8 +264,7 @@ export default function BookingConfirmation() {
     setSelectedTime(slot);
   };
 
-  const canConfirm =
-    selectedDate && selectedTime && selectedService && paymentMethod;
+  const canConfirm = selectedDate && selectedTime && selectedService && paymentMethod;
 
   const handleConfirm = async () => {
     if (!canConfirm || !currentUser) return;
@@ -359,7 +283,7 @@ export default function BookingConfirmation() {
       setSuccess(true);
       setTimeout(() => navigate(-1), 2000);
     } catch {
-      setError("No se pudo confirmar la cita. Inténtalo de nuevo.");
+      setError(lang("booking.error"));
     } finally {
       setSubmitting(false);
     }
@@ -370,36 +294,28 @@ export default function BookingConfirmation() {
       <Stack maw={768} mx="auto" p="lg" gap="lg">
         <Box>
           <Title order={1} fz="1.5rem" fw={600}>
-            Nueva reserva
+            {lang("booking.title")}
           </Title>
         </Box>
 
         {/* Paso 1 — Calendario */}
         <Paper withBorder p="lg" shadow="sm">
-          <Text fw={600} mb="sm">
-            1. Selecciona un día
-          </Text>
+          <Text fw={600} mb="sm">{lang("booking.step1")}</Text>
           <Group gap="md" mb="md">
             {Object.entries(statusColorMap).map(([label, color]) => (
               <Group key={label} gap={6}>
-                <Box
-                  w={10}
-                  h={10}
-                  style={{
-                    borderRadius: "50%",
-                    backgroundColor: `var(--mantine-color-${color}-5)`,
-                  }}
-                />
+                <Box w={10} h={10} style={{
+                  borderRadius: "50%",
+                  backgroundColor: `var(--mantine-color-${color}-5)`,
+                }} />
                 <Text size="xs" c="dimmed">
-                  {label}
+                  {lang(`booking.status.${label}`)}
                 </Text>
               </Group>
             ))}
           </Group>
           {loadingAppts && (
-            <Text size="xs" c="dimmed" mb="xs">
-              Cargando citas...
-            </Text>
+            <Text size="xs" c="dimmed" mb="xs">{lang("booking.loading_appointments")}</Text>
           )}
           <Calendar
             markedDates={markedDates}
@@ -408,56 +324,37 @@ export default function BookingConfirmation() {
           />
         </Paper>
 
-        {/* ✅ fix 3: Paso 2 — Servicio ANTES que la hora */}
+        {/* Paso 2 — Servicio */}
         {selectedDate && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="lg">
-              2. Selecciona un servicio
-            </Text>
+            <Text fw={600} mb="lg">{lang("booking.step2")}</Text>
             {loadingServices ? (
               <Stack gap="xs">
                 <Skeleton height={48} />
                 <Skeleton height={48} />
               </Stack>
             ) : providerServices.length === 0 ? (
-              <Text size="sm" c="dimmed" fs="italic">
-                Este proveedor no tiene servicios disponibles.
-              </Text>
+              <Text size="sm" c="dimmed" fs="italic">{lang("booking.no_services")}</Text>
             ) : (
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
                 {providerServices.map((svc) => (
                   <ToggleButton
                     key={svc.service_id}
                     selected={selectedService?.service_id === svc.service_id}
-                    onClick={() => {
-                      setSelectedService(svc);
-                      setSelectedTime(null);
-                    }}
+                    onClick={() => { setSelectedService(svc); setSelectedTime(null); }}
                   >
                     <Group justify="space-between">
-                      <Text
-                        size="sm"
-                        fw={500}
-                        c={
-                          selectedService?.service_id === svc.service_id
-                            ? "var(--mantine-color-body)"
-                            : "dimmed"
-                        }
-                      >
-                        {svc.service_name ??
-                          svc.name ??
-                          `Servicio #${svc.service_id}`}
+                      <Text size="sm" fw={500}
+                        c={selectedService?.service_id === svc.service_id
+                          ? "var(--mantine-color-body)" : "dimmed"}>
+                        {svc.service_name ?? svc.name ?? `Servicio #${svc.service_id}`}
                       </Text>
                       <Group gap={6}>
                         {svc.duration_hours && (
-                          <Text size="xs" c="dimmed">
-                            {svc.duration_hours}h
-                          </Text>
+                          <Text size="xs" c="dimmed">{svc.duration_hours}h</Text>
                         )}
                         {svc.price != null && (
-                          <Text size="xs" fw={600} c="dimmed">
-                            {svc.price} €
-                          </Text>
+                          <Text size="xs" fw={600} c="dimmed">{svc.price} €</Text>
                         )}
                       </Group>
                     </Group>
@@ -472,69 +369,47 @@ export default function BookingConfirmation() {
         {selectedDate && selectedService && (
           <Paper withBorder p="lg" shadow="sm">
             <Group justify="space-between" mb="md">
-              <Text fw={600}>3. Selecciona una hora</Text>
+              <Text fw={600}>{lang("booking.step3")}</Text>
               <Group gap="md">
-                {(
-                  [
-                    {
-                      label: "Disponible",
-                      color: "var(--mantine-color-default-border)",
-                    },
-                    { label: "Ocupado", color: "var(--mantine-color-red-4)" },
-                    {
-                      label: "Se solapa",
-                      color: "var(--mantine-color-orange-4)",
-                    },
-                    { label: "Pasado", color: "var(--mantine-color-gray-4)" },
-                  ] as const
-                ).map(({ label, color }) => (
-                  <Group key={label} gap={6}>
-                    <Box
-                      w={10}
-                      h={10}
-                      style={{ borderRadius: "50%", backgroundColor: color }}
-                    />
-                    <Text size="xs" c="dimmed">
-                      {label}
-                    </Text>
+                {([
+                  { key: "available", color: "var(--mantine-color-default-border)" },
+                  { key: "occupied", color: "var(--mantine-color-red-4)" },
+                  { key: "overflow", color: "var(--mantine-color-orange-4)" },
+                  { key: "past", color: "var(--mantine-color-gray-4)" },
+                ] as const).map(({ key, color }) => (
+                  <Group key={key} gap={6}>
+                    <Box w={10} h={10} style={{ borderRadius: "50%", backgroundColor: color }} />
+                    <Text size="xs" c="dimmed">{lang(`booking.slot_states.${key}`)}</Text>
                   </Group>
                 ))}
               </Group>
             </Group>
 
             <Text size="xs" c="dimmed" mb="md">
-              ℹ️ Servicio de{" "}
-              <Text span fw={600}>
-                {selectedService.duration_hours}h
-              </Text>
-              . Los slots en naranja están libres pero el servicio consumiría
-              horas adicionales del horario.
+              ℹ️{" "}
+              {lang("booking.slot_info").replace("{duration}", String(selectedService.duration_hours))}
             </Text>
 
             {loadingSlots ? (
               <Stack gap="xs">
                 <Skeleton height={16} width={60} />
                 <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <Skeleton key={i} height={48} />
-                  ))}
+                  {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} height={48} />)}
                 </SimpleGrid>
               </Stack>
             ) : allSlots.length === 0 ? (
-              <Text size="sm" c="dimmed" fs="italic">
-                El proveedor no tiene horario disponible este día.
-              </Text>
+              <Text size="sm" c="dimmed" fs="italic">{lang("booking.no_slots")}</Text>
             ) : (
               <Stack gap="lg">
                 <SlotGroup
-                  label="Mañana"
+                  label={lang("booking.morning")}
                   slots={morningSlots}
                   slotStates={slotStates}
                   selectedTime={selectedTime}
                   onSelect={handleTimeSelect}
                 />
                 <SlotGroup
-                  label="Tarde"
+                  label={lang("booking.afternoon")}
                   slots={afternoonSlots}
                   slotStates={slotStates}
                   selectedTime={selectedTime}
@@ -548,9 +423,7 @@ export default function BookingConfirmation() {
         {/* Paso 4 — Pago */}
         {selectedDate && selectedService && selectedTime && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="md">
-              4. Método de pago
-            </Text>
+            <Text fw={600} mb="md">{lang("booking.step4")}</Text>
             <SimpleGrid cols={3} spacing="xs">
               {PAYMENT_METHODS.map((method) => (
                 <ToggleButton
@@ -558,7 +431,7 @@ export default function BookingConfirmation() {
                   selected={paymentMethod === method}
                   onClick={() => setPaymentMethod(method as PaymentMethod)}
                 >
-                  {method}
+                  {lang(`booking.payment_methods.${method}`)}
                 </ToggleButton>
               ))}
             </SimpleGrid>
@@ -568,60 +441,31 @@ export default function BookingConfirmation() {
         {/* Resumen + Confirmar */}
         {canConfirm && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="md">
-              Resumen
-            </Text>
+            <Text fw={600} mb="md">{lang("booking.summary")}</Text>
             <Stack gap={6} mb="lg">
               <Text size="sm">
-                📅{" "}
-                <Text span fw={500}>
-                  Fecha:
-                </Text>{" "}
+                📅 <Text span fw={500}>{lang("booking.summary_date")}:</Text>{" "}
                 {selectedDate.toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                  weekday: "long", year: "numeric", month: "long", day: "numeric",
                 })}
               </Text>
               <Text size="sm">
-                🕐{" "}
-                <Text span fw={500}>
-                  Hora:
-                </Text>{" "}
-                {selectedTime} →{" "}
-                {addMinutes(selectedTime, selectedService.duration_hours * 60)}
+                🕐 <Text span fw={500}>{lang("booking.summary_time")}:</Text>{" "}
+                {selectedTime} → {addMinutes(selectedTime, selectedService.duration_hours * 60)}
               </Text>
               <Text size="sm">
-                🛠{" "}
-                <Text span fw={500}>
-                  Servicio:
-                </Text>{" "}
-                {selectedService.service_name ??
-                  selectedService.name ??
-                  `#${selectedService.service_id}`}
-                {selectedService.price != null &&
-                  ` — ${selectedService.price} €`}
+                🛠 <Text span fw={500}>{lang("booking.summary_service")}:</Text>{" "}
+                {selectedService.service_name ?? selectedService.name ?? `#${selectedService.service_id}`}
+                {selectedService.price != null && ` — ${selectedService.price} €`}
               </Text>
               <Text size="sm">
-                💳{" "}
-                <Text span fw={500}>
-                  Pago:
-                </Text>{" "}
-                {paymentMethod}
+                💳 <Text span fw={500}>{lang("booking.summary_payment")}:</Text>{" "}
+                {lang(`booking.payment_methods.${paymentMethod}`)}
               </Text>
             </Stack>
 
-            {error && (
-              <Alert color="red" mb="md">
-                {error}
-              </Alert>
-            )}
-            {success && (
-              <Alert color="green" mb="md">
-                ✅ Cita confirmada. Redirigiendo...
-              </Alert>
-            )}
+            {error && <Alert color="red" mb="md">{error}</Alert>}
+            {success && <Alert color="green" mb="md">{lang("booking.success")}</Alert>}
 
             <Button
               onClick={handleConfirm}
@@ -631,7 +475,7 @@ export default function BookingConfirmation() {
               size="md"
               fullWidth
             >
-              Confirmar reserva
+              {lang("booking.confirm")}
             </Button>
           </Paper>
         )}

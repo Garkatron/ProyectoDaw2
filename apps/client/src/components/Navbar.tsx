@@ -6,21 +6,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   IconHome2, IconCurrencyEuro, IconCalendarEvent,
   IconUsersGroup, IconMail, IconMenu2, IconX, IconUserCircle,
+  IconLanguage,
 } from "@tabler/icons-react";
+import i18n from "../i18n";
+import { IconSettings } from "@tabler/icons-react";
 
 const navItems = [
-  { name: "nav.items.path.root", to: "/", icon: IconHome2 },
-  { name: "nav.items.path.currency", to: "/currency", icon: IconCurrencyEuro },
-  { name: "nav.items.path.appointments", to: "/appointments", icon: IconCalendarEvent },
-  { name: "nav.items.path.userfinder", to: "/userfinder", icon: IconUsersGroup },
-  { name: "nav.items.path.inbox", to: "/inbox", icon: IconMail },
+  { name: "nav.home", to: "/", icon: IconHome2 },
+  { name: "nav.currency", to: "/currency", icon: IconCurrencyEuro },
+  { name: "nav.appointments", to: "/appointments", icon: IconCalendarEvent },
+  { name: "nav.search", to: "/userfinder", icon: IconUsersGroup },
+  { name: "nav.inbox", to: "/inbox", icon: IconMail },
+  { name: "nav.settings", to: "/settings", icon: IconSettings },
+
 ];
 
 const mainItems = [
-  { name: "nav.items.path.root", to: "/", icon: IconHome2 },
-  { name: "nav.items.path.userfinder", to: "/userfinder", icon: IconUsersGroup },
-  { name: "nav.items.path.appointments", to: "/appointments", icon: IconCalendarEvent },
-  { name: "nav.items.path.inbox", to: "/inbox", icon: IconMail },
+  { name: "nav.home", to: "/", icon: IconHome2 },
+  { name: "nav.search", to: "/userfinder", icon: IconUsersGroup },
+  { name: "nav.appointments", to: "/appointments", icon: IconCalendarEvent },
+  { name: "nav.currency", to: "/currency", icon: IconCurrencyEuro },
+  { name: "nav.inbox", to: "/inbox", icon: IconMail },
 ];
 
 const NavItem = ({
@@ -163,6 +169,8 @@ const Navbar = () => {
           {open ? <IconX size={20} stroke={1.8} /> : <IconMenu2 size={20} stroke={1.8} />}
         </ActionIcon>
 
+
+
         {/* Perfil */}
         <ActionIcon
           component={Link}
@@ -177,6 +185,7 @@ const Navbar = () => {
         >
           <IconUserCircle size={26} stroke={1.6} />
         </ActionIcon>
+        
       </Group>
 
       {/* Menú desplegable mobile */}

@@ -1,0 +1,227 @@
+{
+  "calendar": {
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
+    "prev_month": "Previous month",
+    "next_month": "Next month"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "currency": "Earnings",
+    "appointments": "Appointments",
+    "inbox": "Notifications"
+  },
+  "time": {
+    "just_now": "just now",
+    "minutes_ago_one": "{{count}} min ago",
+    "minutes_ago_other": "{{count}} min ago",
+    "hours_ago_one": "{{count}}h ago",
+    "hours_ago_other": "{{count}}h ago",
+    "days_ago_one": "{{count}}d ago",
+    "days_ago_other": "{{count}}d ago"
+  },
+  "login": {
+    "title": "Sign in",
+    "submit": "Confirm",
+    "register": "Don't have an account? Create one.",
+    "success_title": "Login successful",
+    "success_message": "Redirecting...",
+    "error_title": "Error",
+    "generic_error": "Error signing in.",
+    "validation_error": "Validation error",
+    "tooltip": {
+      "email": "Enter your email address",
+      "password": "Enter your password"
+    },
+    "placeholder": {
+      "email": "your.email@example.com"
+    }
+  },
+  "register": {
+    "title": "Register",
+    "submit": "Confirm",
+    "cancel": "Cancel",
+    "placeholder": {
+      "username": "Your full name",
+      "email": "your.email@example.com",
+      "password": "••••••••"
+    },
+    "tooltip": {
+      "username": "Enter your full name",
+      "email": "Enter your email address",
+      "password": "Enter your password"
+    },
+    "roles": {
+      "client": "Client",
+      "provider": "Provider",
+      "admin": "Admin"
+    },
+    "success_title": "Registration successful",
+    "success_message": "Redirecting to email verification...",
+    "error_title": "Error",
+    "generic_error": "Error registering user.",
+    "validation_error": "Validation error"
+  },
+  "home": {
+    "head": {
+      "subtitle": "Professional services"
+    },
+    "hero": {
+      "title": "Professional cleaning,",
+      "subtitle": "when you need it.",
+      "tag": "Trusted platform"
+    },
+    "news_bar": {
+      "title": "News",
+      "section1": "Top story of the day",
+      "section2": "Important system update",
+      "section3": "Weekly performance review"
+    },
+    "info": {
+      "title": "Connecting people with trusted professionals",
+      "description": "Limpora simplifies the search, comparison and booking of professional cleaning services. Fast, secure and always available.",
+      "services_available": {
+        "title": "Available services",
+        "home_cleaning": "Home cleaning",
+        "facade_exterior": "Facades and exteriors",
+        "swimingpool": "Swimming pools",
+        "vehicles": "Vehicles",
+        "high_value_articles": "High-value items"
+      },
+      "three_section": {
+        "verified": {
+          "title": "Verified professionals",
+          "description": "Every professional undergoes a rigorous verification process before operating."
+        },
+        "secure": {
+          "title": "Secure hiring",
+          "description": "Your information and payments are protected at all times."
+        },
+        "available": {
+          "title": "Available 24/7",
+          "description": "Book services anytime, from anywhere."
+        },
+        "stats": {
+          "professionals": "Professionals",
+          "services": "Services completed",
+          "rating": "Average rating"
+        }
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your experience",
+    "language": {
+      "title": "Language",
+      "description": "Select the interface language",
+      "es": "Spanish",
+      "en": "English"
+    }
+  },
+  "userpanel": {
+    "label": {
+      "completed_appointments": "Completed appointments",
+      "total_points": "Total points",
+      "role": "User role"
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "subtitle_one": "{{count}} notification",
+    "subtitle_other": "{{count}} notifications",
+    "mark_all_read": "Mark all as read",
+    "empty_title": "No notifications",
+    "empty_description": "Your notifications will appear here when you receive them."
+  },
+  "appointments": {
+    "title": "My appointments",
+    "provider_view": "Provider view",
+    "no_events": "No events for this day",
+    "fetch_error": "Error fetching appointments.",
+    "client": "Client",
+    "provider": "Provider",
+    "travel_buffer": "+{{count}} min travel",
+    "net": "net",
+    "mark_as": "Mark as",
+    "see_reviews": "See reviews",
+    "rate_service": "Rate service",
+    "modal_title": "Share your feedback",
+    "comment_placeholder": "Write a comment...",
+    "submit": "Submit",
+    "status": {
+      "Completed": "Completed",
+      "Pending": "Pending",
+      "In Process": "In progress",
+      "Cancelled": "Cancelled"
+    }
+  },
+  "booking": {
+    "title": "New booking",
+    "step1": "1. Select a day",
+    "step2": "2. Select a service",
+    "step3": "3. Select a time",
+    "step4": "4. Payment method",
+    "summary": "Summary",
+    "confirm": "Confirm booking",
+    "loading_appointments": "Loading appointments...",
+    "no_services": "This provider has no services available.",
+    "no_slots": "The provider has no availability on this day.",
+    "slot_info": "Service duration: {duration}h. Orange slots are free but the service would extend beyond the scheduled hours.",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "slot_states": {
+      "available": "Available",
+      "occupied": "Occupied",
+      "overflow": "Overlaps",
+      "past": "Past",
+      "outside": "No schedule"
+    },
+    "summary_date": "Date",
+    "summary_time": "Time",
+    "summary_service": "Service",
+    "summary_payment": "Payment",
+    "success": "✅ Appointment confirmed. Redirecting...",
+    "error": "Could not confirm the appointment. Please try again.",
+    "status": {
+      "Completed": "Completed",
+      "Pending": "Pending",
+      "In Process": "In Process"
+    },
+    "payment_methods": {
+      "Bizum": "Bizum",
+      "Bank Transfer": "Bank Transfer",
+      "Paypal": "PayPal"
+    }
+  },
+  "search": {
+    "title_one": "{{count}} User",
+    "title_other": "{{count}} Users",
+    "input": {
+      "placeholder": "Search by name...",
+      "tooltip": "Search by name"
+    }
+  }
+}

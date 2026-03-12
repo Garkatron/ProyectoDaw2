@@ -88,7 +88,8 @@ export default function Login() {
                             type="email"
                             required
                             label={lang('login.email')}
-                            placeholder="tu.correo@ejemplo.com"
+                            title={lang("login.tooltip.email")} 
+                            placeholder={lang("login.placeholder.email")}
                             value={email}
                             onChange={(e) => setEmail(e.currentTarget.value)}
                             size="md"
@@ -96,6 +97,7 @@ export default function Login() {
                         <PasswordInput
                             id="password"
                             required
+                            title={lang("login.tooltip.password")} 
                             label={lang('login.password')}
                             placeholder="••••••••"
                             value={password}

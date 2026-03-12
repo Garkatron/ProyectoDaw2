@@ -5,7 +5,6 @@ import ProfileHeader from './components/ProfileHeader';
 import InfoSection from './components/InfoSection';
 import MetricsBar from './components/MetricsBar';
 import ServicesSection from './components/ServicesSection';
-import ReviewsSection from './components/ReviewsSection';
 import Base from '../../../layouts/Base';
 import { Box, Loader, Center, Text, Paper, Stack } from '@mantine/core';
 import ScheduleSettings from '../ScheduleSettings';

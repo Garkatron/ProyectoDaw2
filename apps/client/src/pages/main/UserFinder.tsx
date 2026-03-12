@@ -18,6 +18,7 @@ import {
 } from "@mantine/core";
 import { API } from "../../lib/api";
 import type { User } from "@limpora/common";
+import { useTranslation } from "react-i18next";
 
 type UserSummary = Pick<
   User,
@@ -32,6 +33,8 @@ export default function UserFinder() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [activeServices, setActiveServices] = useState([]);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchTerm), 300);
@@ -112,7 +115,8 @@ export default function UserFinder() {
         <Paper withBorder p="lg">
           <Stack gap="md">
             <TextInput
-              placeholder="Buscar por nombre..."
+              placeholder={t("search.input.placeholder")}
+              title={t("search.input.tooltip")}
               leftSection={<Search size={18} />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.currentTarget.value)}
@@ -147,7 +151,7 @@ export default function UserFinder() {
 
         <Paper withBorder p="lg">
           <Title order={2} fz="1.25rem" fw={600} mb="lg">
-            Usuarios ({filteredUsers.length})
+            {t("search.title", { count: filteredUsers.length })}
           </Title>
           {loading ? (
             <Center py={64}>

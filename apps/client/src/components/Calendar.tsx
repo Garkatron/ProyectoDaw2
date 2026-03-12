@@ -6,12 +6,9 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { AppointmentStatus } from "@limpora/common";
+import { useTranslation } from "react-i18next";
 
-const MONTHS = [
-  "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-  "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre",
-];
-const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
 
 const statusColorMap: Partial<Record<AppointmentStatus, string>> = {
   Completed: "green",
@@ -32,6 +29,10 @@ export default function Calendar({
 }) {
   const [current, setCurrent] = useState(new Date());
   const [direction, setDirection] = useState(0); // 1 = forward, -1 = backward
+
+  const { t } = useTranslation();
+  const MONTHS = t("calendar.months", { returnObjects: true }) as string[];
+  const WEEKDAYS = t("calendar.weekdays", { returnObjects: true }) as string[];
 
   const changeMonth = (offset: number) => {
     setDirection(offset);
@@ -94,10 +95,10 @@ export default function Calendar({
         </AnimatePresence>
 
         <Group gap="xs">
-          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
+          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(-1)} aria-label={t("calendar.prev_month")}>
             <ChevronLeft size={16} />
           </ActionIcon>
-          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(1)} aria-label="Mes siguiente">
+          <ActionIcon variant="default" radius="md" onClick={() => changeMonth(1)} aria-label={t("calendar.next_month")}>
             <ChevronRight size={16} />
           </ActionIcon>
         </Group>

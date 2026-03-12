@@ -1,0 +1,233 @@
+{
+  "calendar": {
+    "months": [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ],
+    "weekdays": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mié",
+      "Jue",
+      "Vie",
+      "Sáb"
+    ],
+    "prev_month": "Mes anterior",
+    "next_month": "Mes siguiente"
+  },
+  "nav": {
+    "home": "Inicio",
+    "search": "Buscar",
+    "currency": "Ganancias",
+    "appointments": "Citas",
+    "inbox": "Notificaciones",
+    "settings": "Ajustes"
+  },
+  "time": {
+    "just_now": "ahora mismo",
+    "minutes_ago_one": "hace {{count}} min",
+    "minutes_ago_other": "hace {{count}} min",
+    "hours_ago_one": "hace {{count}}h",
+    "hours_ago_other": "hace {{count}}h",
+    "days_ago_one": "hace {{count}}d",
+    "days_ago_other": "hace {{count}}d"
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Confirmar",
+    "register": "¿No tiene cuenta? Cree una.",
+    "success_title": "Inicio de sesión exitoso",
+    "success_message": "Redirigiendo...",
+    "error_title": "Error",
+    "generic_error": "Error al iniciar sesión.",
+    "validation_error": "Error de validación",
+    "tooltip": {
+      "email": "Introduce tu correo electrónico",
+      "password": "Introduce tu contraseña"
+    },
+    "placeholder": {
+      "email": "tu.correo@ejemplo.com"
+    }
+  },
+  "register": {
+    "title": "Registro",
+    "username": "Nombre completo",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "role": "Rol",
+    "submit": "Confirmar",
+    "cancel": "Cancelar",
+    "placeholder": {
+      "username": "Tu nombre completo",
+      "email": "tu.correo@ejemplo.com",
+      "password": "••••••••"
+    },
+    "tooltip": {
+      "username": "Introduce tu nombre completo",
+      "email": "Introduce tu correo electrónico",
+      "password": "Introduce tu contraseña"
+    },
+    "roles": {
+      "client": "Cliente",
+      "provider": "Proveedor",
+      "admin": "Admin"
+    },
+    "success_title": "Registro exitoso",
+    "success_message": "Redirigiendo a verificación de email...",
+    "error_title": "Error",
+    "generic_error": "Error registrando usuario.",
+    "validation_error": "Error de validación"
+  },
+  "home": {
+    "head": {
+      "subtitle": "Servicios profesionales"
+    },
+    "hero": {
+      "title": "Limpieza profesional,",
+      "subtitle": "cuando lo necesitas.",
+      "tag": "Plataforma de confianza"
+    },
+    "news_bar": {
+      "title": "Noticias",
+      "section1": "Noticia principal del día",
+      "section2": "Actualización importante del sistema",
+      "section3": "Análisis de rendimiento semanal"
+    },
+    "info": {
+      "title": "Conectamos personas con profesionales de confianza",
+      "description": "Limpora simplifica la búsqueda, comparación y reserva de servicios de limpieza profesional. Rápido, seguro y siempre disponible.",
+      "services_available": {
+        "title": "Servicios disponibles",
+        "home_cleaning": "Limpieza del hogar",
+        "facade_exterior": "Fachadas y exteriores",
+        "swimingpool": "Piscinas",
+        "vehicles": "Vehículos",
+        "high_value_articles": "Artículos de alto valor"
+      },
+      "three_section": {
+        "verified": {
+          "title": "Profesionales verificados",
+          "description": "Cada autónomo pasa un proceso de verificación riguroso antes de operar."
+        },
+        "secure": {
+          "title": "Contratación segura",
+          "description": "Tu información y pagos están protegidos en todo momento."
+        },
+        "available": {
+          "title": "Disponible 24/7",
+          "description": "Reserva servicios en cualquier momento, desde cualquier lugar."
+        },
+        "stats": {
+          "professionals": "Profesionales",
+          "services": "Servicios realizados",
+          "rating": "Valoración media"
+        }
+      }
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Personaliza tu experiencia",
+    "language": {
+      "title": "Idioma",
+      "description": "Selecciona el idioma de la interfaz",
+      "es": "Español",
+      "en": "Inglés"
+    }
+  },
+  "userpanel": {
+    "label": {
+      "completed_appointments": "Citas completadas",
+      "total_points": "Puntos totales",
+      "role": "Rol de usuario"
+    }
+  },
+  "inbox": {
+    "title": "Bandeja de entrada",
+    "subtitle_one": "{{count}} notificación",
+    "subtitle_other": "{{count}} notificaciones",
+    "mark_all_read": "Marcar todas como leídas",
+    "empty_title": "Sin notificaciones",
+    "empty_description": "Aquí aparecerán tus notificaciones cuando las recibas."
+  },
+  "appointments": {
+    "title": "Mis citas",
+    "provider_view": "Vista proveedor",
+    "no_events": "No hay eventos para este día",
+    "fetch_error": "Error al obtener las citas.",
+    "client": "Cliente",
+    "provider": "Proveedor",
+    "travel_buffer": "+{{count}} min desplazamiento",
+    "net": "neto",
+    "mark_as": "Marcar como",
+    "see_reviews": "Ver reseñas",
+    "rate_service": "Valorar servicio",
+    "modal_title": "Danos tu opinión",
+    "comment_placeholder": "Escribe un comentario...",
+    "submit": "Enviar",
+    "status": {
+      "Completed": "Completada",
+      "Pending": "Pendiente",
+      "In Process": "En curso",
+      "Cancelled": "Cancelada"
+    }
+  },
+  "booking": {
+    "title": "Nueva reserva",
+    "step1": "1. Selecciona un día",
+    "step2": "2. Selecciona un servicio",
+    "step3": "3. Selecciona una hora",
+    "step4": "4. Método de pago",
+    "summary": "Resumen",
+    "confirm": "Confirmar reserva",
+    "loading_appointments": "Cargando citas...",
+    "no_services": "Este proveedor no tiene servicios disponibles.",
+    "no_slots": "El proveedor no tiene horario disponible este día.",
+    "slot_info": "Servicio de {duration}h. Los slots en naranja están libres pero el servicio consumiría horas adicionales del horario.",
+    "morning": "Mañana",
+    "afternoon": "Tarde",
+    "slot_states": {
+      "available": "Disponible",
+      "occupied": "Ocupado",
+      "overflow": "Se solapa",
+      "past": "Pasado"
+    },
+    "summary_date": "Fecha",
+    "summary_time": "Hora",
+    "summary_service": "Servicio",
+    "summary_payment": "Pago",
+    "success": "✅ Cita confirmada. Redirigiendo...",
+    "error": "No se pudo confirmar la cita. Inténtalo de nuevo.",
+    "status": {
+      "Completed": "Completada",
+      "Pending": "Pendiente",
+      "In Process": "En proceso"
+    },
+    "payment_methods": {
+      "Bizum": "Bizum",
+      "Bank Transfer": "Transferencia bancaria",
+      "Paypal": "PayPal"
+    }
+  },
+  "search": {
+    "title_one": "{{count}} Usuario",
+    "title_other": "{{count}} Usuarios",
+    "input": {
+      "placeholder": "Buscar por nombre...",
+      "tooltip": "Escribir un nombre"
+    }
+  }
+}
