@@ -2,11 +2,11 @@
     <img width="400" height="419" alt="limporapng" src="https://github.com/user-attachments/assets/c2c07497-48e6-4c02-865f-2dbd93ebc842" />
 </p> 
 
-<h1>
+<h3>
     <p align="center">
         Limpieza, Seguridad y Claridad
     </p>
-</h1>
+</h3>
 
 ## ¿Qué es?
 Limpora es una aplicación y servicio web que conecta a clientes con autónomos especializados en servicios de limpieza, facilitando el contacto, la contratación y la gestión de trabajos de forma clara, rápida y segura.
