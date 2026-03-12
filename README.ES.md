@@ -73,7 +73,7 @@ modules/
 - Diseñada para bajo mantenimiento y fácil extensión
 
 ## Herramientas de Desarrollo
-- **eslint-define-config** — Configuración de linting
-- **bun:test** — Librería de testing (integrada en Bun)
-- **bun env** — Gestión de variables de entorno (integrada en Bun)
+- **eslint-define-config**: Configuración de linting
+- **bun:test**: Librería de testing (integrada en Bun)
+- **bun env**: Gestión de variables de entorno (integrada en Bun)
 
