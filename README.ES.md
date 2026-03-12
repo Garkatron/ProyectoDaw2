@@ -1,6 +1,7 @@
-## 🇪🇸 Español
+<p align="center">
+    <img width="800" height="838" alt="limporapng" src="https://github.com/user-attachments/assets/c2c07497-48e6-4c02-865f-2dbd93ebc842" />
+</p>
 
-# Limpora
 ### Limpieza, Seguridad y Claridad
 
 ## ¿Qué es?
