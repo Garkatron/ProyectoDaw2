@@ -23,7 +23,6 @@ services:
       - NODE_ENV=production
       - FRONTEND_URL=https://www.limpora.xyz
     volumes:
-      # Asegúrate de que esta carpeta exista en tu host
       - ./apps/server/data:/usr/src/app/apps/server/data
     restart: unless-stopped
     networks:

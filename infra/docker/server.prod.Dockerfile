@@ -5,7 +5,7 @@ COPY package.json bun.lock ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/server/package.json ./apps/server/
 
-RUN bun install --frozen-lockfile
+RUN bun install --filter 'server'
 
 COPY packages/common/ packages/common/
 COPY apps/server/ apps/server/
