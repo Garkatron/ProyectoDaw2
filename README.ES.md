@@ -66,7 +66,7 @@ modules/
 ## Observabilidad & Logging
 - **pino** + **pino-http**
 
-## Documentación
+## Documentación (localhost:port/docs)
 - Documentación interactiva y automática (generada)
 - Fácil integración con el frontend
 - Estándar OpenAPI
