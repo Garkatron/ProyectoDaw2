@@ -1,5 +1,12 @@
-# Limpora
-### Cleaning, Safety and Clarity
+<p align="center">
+    <img width="800" height="838" alt="limporapng" src="https://github.com/user-attachments/assets/c2c07497-48e6-4c02-865f-2dbd93ebc842" />
+</p>
+
+<h1>
+    <p align="center">
+        Cleaning, Safety and Clarity
+    </p>
+</h1>
 
 ## What is it?
 Limpora is a web application and service that connects clients with freelance cleaning professionals, making it easy to get in touch, hire, and manage jobs in a clear, fast, and secure way.
@@ -8,9 +15,9 @@ Limpora is a web application and service that connects clients with freelance cl
 ## Technologies
 
 ### Runtime & Framework
-- **Bun** — Runtime and environment manager (env variables built-in)
-- **ElysiaJS** — High-performance TypeScript web framework
-- **TypeScript** — Primary language across the full stack
+- **Bun**: Runtime and environment manager (env variables built-in)
+- **ElysiaJS**: High-performance TypeScript web framework
+- **TypeScript**: Primary language across the full stack
 
 ### Frontend
 - Mantine UI
