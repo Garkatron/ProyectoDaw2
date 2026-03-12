@@ -2,11 +2,11 @@
     <img width="400" height="419" alt="limporapng" src="https://github.com/user-attachments/assets/c2c07497-48e6-4c02-865f-2dbd93ebc842" />
 </p> 
 
-<h1>
+<h3>
     <p align="center">
         Cleaning, Safety and Clarity
     </p>
-</h1>
+</h3>
 
 [README.ES](./README.ES.md)
 
