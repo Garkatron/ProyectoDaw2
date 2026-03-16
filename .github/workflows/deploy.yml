@@ -59,9 +59,9 @@ jobs:
             head -n 5 apps/server/.env | sed 's/=.*/=***/'
             
             docker compose down
-            docker builder prune -f
-            docker compose build client
-            docker compose build server
+            docker image prune -f
+            docker compose build limpora-client
+            docker compose build limpora-server
             docker compose up -d
             
             sleep 10
