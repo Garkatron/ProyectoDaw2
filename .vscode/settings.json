@@ -8,7 +8,7 @@
     "**/Thumbs.db": true,
     "**/*.import": true,
     "**/*.uid": true,
-    "**/node_modules": false,
+    "**/node_modules": true,
     "apps/mobile": true
   }
 }
