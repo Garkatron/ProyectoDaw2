@@ -9,6 +9,5 @@
     "**/*.import": true,
     "**/*.uid": true,
     "**/node_modules": true,
-    "apps/mobile": true
   }
 }

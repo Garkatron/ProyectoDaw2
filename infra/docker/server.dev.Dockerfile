@@ -11,7 +11,7 @@ COPY apps/server/package.json ./apps/server/
 
 # Verificamos que los archivos existan y ejecutamos la instalación
 # Agregamos verbose para ver qué está intentando hacer Bun si falla
-RUN bun install
+RUN bun install --filter 'server' --filter 'common'
 
 # Copiamos el resto del código
 COPY . .

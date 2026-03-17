@@ -3,7 +3,6 @@ import { Elysia } from "elysia";
 // ? Controllers
 import { authController } from "./modules/auth";
 import { userController } from "./modules/user";
-import { userEarningController } from "./modules/user_earnings";
 import { servicesController } from "./modules/services";
 import { reviewsController } from "./modules/reviews";
 
@@ -19,6 +18,7 @@ import { bookingController } from "./modules/booking";
 import { notificationController } from "./modules/notification";
 import { mediaController } from "./modules/media";
 import { oauthController } from "./modules/oauth";
+import { userCurrencyController } from "./modules/currency";
 
 // import { elysiaHelmet, permission } from 'elysiajs-helmet';
 
@@ -80,7 +80,7 @@ const app = new Elysia()
     .use(authController)
     .use(oauthController)
     .use(userController)
-    .use(userEarningController)
+    .use(userCurrencyController)
     .use(servicesController)
     .use(reviewsController)
     .use(providerServicesController)
