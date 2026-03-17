@@ -14,4 +14,5 @@ RUN bun run --cwd apps/client build
 
 FROM nginx:alpine
 COPY --from=builder /usr/src/app/apps/client/dist /usr/share/nginx/html
+COPY infra/nginx/default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
