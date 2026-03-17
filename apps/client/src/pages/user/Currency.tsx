@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Base from "../../layouts/Base";
 import {
   Avatar,
@@ -33,6 +33,8 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { API } from "../../lib/api";
+import { AppointmentStatus, type Appointment } from "@limpora/common";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -43,13 +45,10 @@ interface Earnings {
   retained_money: number;
 }
 
-interface Appointment {
-  id: string | number;
-  date_time: string;
-  requester_name: string;
-  total_amount: number;
-  status: "Completed" | "Cancelled" | string;
-}
+type CurrencyMeResponse = {
+  user: { id: number; name: string; role: string };
+  earnings: Earnings;
+};
 
 // ─── StatCard ────────────────────────────────────────────────────────────────
 
@@ -100,8 +99,8 @@ function RetentionBar({ total, retained }: { total: number; retained: number }) 
         </Group>
         <Progress value={pct} color="red.4" size="sm" radius="xl" />
         <Group justify="space-between">
-          <Text size="xs" c="dimmed">${retained} retenido</Text>
-          <Text size="xs" c="dimmed">${total} total</Text>
+          <Text size="xs" c="dimmed">€{retained.toFixed(2)} retenido</Text>
+          <Text size="xs" c="dimmed">€{total.toFixed(2)} total</Text>
         </Group>
       </Stack>
     </Paper>
@@ -114,13 +113,13 @@ function EarningsChart({ appointments }: { appointments: Appointment[] }) {
   const monthlyData = useMemo(() => {
     const map: Record<string, { month: string; total: number; count: number }> = {};
     appointments
-      .filter((a) => a.status === "Completed")
+      .filter((a) => a.status === AppointmentStatus.Completed)
       .forEach((a) => {
-        const d = new Date(a.date_time);
+        const d = new Date(a.start_time);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
         const label = d.toLocaleDateString("es", { month: "short", year: "2-digit" });
         if (!map[key]) map[key] = { month: label, total: 0, count: 0 };
-        map[key].total += a.total_amount;
+        map[key].total += a.provider_net;
         map[key].count += 1;
       });
     return Object.entries(map)
@@ -144,7 +143,7 @@ function EarningsChart({ appointments }: { appointments: Appointment[] }) {
   return (
     <Paper withBorder p="md" radius="md" shadow="xs">
       <Text size="xs" c="dimmed" tt="uppercase" fw={600} lts={0.5} mb="sm">
-        Ingresos últimos 6 meses
+        Ingresos netos últimos 6 meses
       </Text>
       <ResponsiveContainer width="100%" height={120}>
         <BarChart data={monthlyData} barSize={24}>
@@ -156,7 +155,7 @@ function EarningsChart({ appointments }: { appointments: Appointment[] }) {
           />
           <YAxis hide />
           <Tooltip
-            formatter={(v: number) => [`$${v}`, "Total"]}
+            formatter={(v: number) => [`€${v.toFixed(2)}`, "Neto"]}
             contentStyle={{
               fontSize: 12,
               borderRadius: 8,
@@ -180,9 +179,11 @@ function EarningsChart({ appointments }: { appointments: Appointment[] }) {
 // ─── UserInfoDisplay ─────────────────────────────────────────────────────────
 
 function UserInfoDisplay({
+  user,
   earnings,
   appointments,
 }: {
+  user: CurrencyMeResponse["user"] | null;
   earnings: Earnings | null;
   appointments: Appointment[];
 }) {
@@ -197,6 +198,17 @@ function UserInfoDisplay({
             radius="50%"
           />
         </Group>
+
+        <Center>
+          <Stack gap={0} align="center">
+            <Title order={4} fw={800}>
+              {user?.name ?? "Mi panel"}
+            </Title>
+            <Text size="xs" c="dimmed">
+              {user?.role ?? "—"}
+            </Text>
+          </Stack>
+        </Center>
 
         <Divider />
 
@@ -215,13 +227,15 @@ function UserInfoDisplay({
           />
           <StatCard
             label="Total"
-            value={`$${earnings?.total_money ?? 0}`}
+            value={`€${(earnings?.total_money ?? 0).toFixed(2)}`}
             icon={<IconCurrencyDollar size={18} />}
             color="blue"
           />
           <StatCard
             label="Neto"
-            value={`$${(earnings?.total_money ?? 0) - (earnings?.retained_money ?? 0)}`}
+            value={`€${(
+              (earnings?.total_money ?? 0) - (earnings?.retained_money ?? 0)
+            ).toFixed(2)}`}
             icon={<IconTrendingUp size={18} />}
             color="teal"
           />
@@ -240,14 +254,22 @@ function UserInfoDisplay({
 
 // ─── AppointmentItem ─────────────────────────────────────────────────────────
 
-function AppointmentItem({ date, requesterName, totalPrice, status }: {
-  date: string;
-  requesterName: string;
+function AppointmentItem({
+  startTime,
+  serviceName,
+  totalPrice,
+  net,
+  status,
+}: {
+  startTime: string;
+  serviceName: string;
   totalPrice: number;
-  status: string;
+  net: number;
+  status: AppointmentStatus | string;
 }) {
-  const isCompleted = status === "Completed";
-  const formattedDate = new Date(date).toLocaleDateString("es", {
+  const isCompleted = status === AppointmentStatus.Completed;
+  const isCancelled = status === AppointmentStatus.Cancelled;
+  const formattedDate = new Date(startTime).toLocaleDateString("es", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -260,7 +282,7 @@ function AppointmentItem({ date, requesterName, totalPrice, status }: {
           <ThemeIcon
             size={32}
             radius="xl"
-            color={isCompleted ? "green" : "yellow"}
+            color={isCompleted ? "green" : isCancelled ? "red" : "yellow"}
             variant="light"
           >
             {isCompleted ? (
@@ -271,7 +293,7 @@ function AppointmentItem({ date, requesterName, totalPrice, status }: {
           </ThemeIcon>
           <Stack gap={1}>
             <Text fw={600} size="sm" lh={1.2}>
-              {requesterName}
+              {serviceName}
             </Text>
             <Text size="xs" c="dimmed">
               {formattedDate}
@@ -280,14 +302,17 @@ function AppointmentItem({ date, requesterName, totalPrice, status }: {
         </Group>
         <Stack gap={4} align="flex-end">
           <Text fw={700} size="sm">
-            ${totalPrice}
+            €{totalPrice.toFixed(2)}
+          </Text>
+          <Text size="xs" c="dimmed">
+            Neto: €{net.toFixed(2)}
           </Text>
           <Badge
             size="xs"
-            color={isCompleted ? "green" : "yellow"}
+            color={isCompleted ? "green" : isCancelled ? "red" : "yellow"}
             variant="light"
           >
-            {isCompleted ? "Completada" : "Cancelada"}
+            {isCompleted ? "Completada" : isCancelled ? "Cancelada" : String(status)}
           </Badge>
         </Stack>
       </Group>
@@ -297,7 +322,7 @@ function AppointmentItem({ date, requesterName, totalPrice, status }: {
 
 // ─── AppointmentsList ─────────────────────────────────────────────────────────
 
-type FilterValue = "all" | "Completed" | "Cancelled";
+type FilterValue = "all" | AppointmentStatus.Completed | AppointmentStatus.Cancelled;
 
 function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
   const [filter, setFilter] = useState<FilterValue>("all");
@@ -308,8 +333,8 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
     if (filter !== "all") list = list.filter((a) => a.status === filter);
     list.sort((a, b) =>
       sort === "date"
-        ? new Date(b.date_time).getTime() - new Date(a.date_time).getTime()
-        : b.total_amount - a.total_amount
+        ? new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
+        : b.provider_net - a.provider_net
     );
     return list;
   }, [appointments, filter, sort]);
@@ -317,8 +342,8 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
   const counts = useMemo(
     () => ({
       all: appointments.length,
-      completed: appointments.filter((a) => a.status === "Completed").length,
-      cancelled: appointments.filter((a) => a.status === "Cancelled").length,
+      completed: appointments.filter((a) => a.status === AppointmentStatus.Completed).length,
+      cancelled: appointments.filter((a) => a.status === AppointmentStatus.Cancelled).length,
     }),
     [appointments]
   );
@@ -342,8 +367,8 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
             onChange={(v) => setFilter(v as FilterValue)}
             data={[
               { label: `Todas (${counts.all})`, value: "all" },
-              { label: `Completadas (${counts.completed})`, value: "Completed" },
-              { label: `Canceladas (${counts.cancelled})`, value: "Cancelled" },
+              { label: `Completadas (${counts.completed})`, value: AppointmentStatus.Completed },
+              { label: `Canceladas (${counts.cancelled})`, value: AppointmentStatus.Cancelled },
             ]}
           />
         </Group>
@@ -354,7 +379,7 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
           onChange={(v) => setSort(v as "date" | "amount")}
           data={[
             { label: "Por fecha", value: "date" },
-            { label: "Por importe", value: "amount" },
+            { label: "Por neto", value: "amount" },
           ]}
         />
 
@@ -364,9 +389,10 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
               filtered.map((appt) => (
                 <AppointmentItem
                   key={appt.id}
-                  date={appt.date_time}
-                  requesterName={appt.requester_name}
-                  totalPrice={appt.total_amount}
+                  startTime={appt.start_time}
+                  serviceName={appt.service_name}
+                  totalPrice={appt.total_price}
+                  net={appt.provider_net}
                   status={appt.status}
                 />
               ))
@@ -386,26 +412,41 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
 
 export default function Currency() {
   const [data, setData] = useState<{
+    user: CurrencyMeResponse["user"] | null;
     earnings: Earnings | null;
     appointments: Appointment[];
-  }>({ earnings: null, appointments: [] });
+  }>({ user: null, earnings: null, appointments: [] });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
+      setError(null);
       try {
-        const { data: result, error } = await API.currency.me.get();
-        if (error) {
-          console.error("Error fetching earnings:", error);
+        const [currencyRes, bookingsRes] = await Promise.all([
+          API.currency.me.get({}),
+          API.bookings.me.get({}),
+        ]);
+
+        if (currencyRes.error) throw currencyRes.error;
+        if (bookingsRes.error) throw bookingsRes.error;
+
+        const result = (currencyRes.data ?? null) as CurrencyMeResponse | null;
+
+        if (!result) {
+          setError("No se pudo cargar el resumen económico.");
           return;
         }
+
         setData({
+          user: result.user,
           earnings: result.earnings,
-          appointments: result.appointments,
+          appointments: bookingsRes.data ?? [],
         });
       } catch (err) {
-        console.error("Error fetching earnings:", err);
+        console.error("Error fetching currency:", err);
+        setError("Error al cargar la información económica.");
       } finally {
         setLoading(false);
       }
@@ -432,8 +473,30 @@ export default function Currency() {
         p="lg"
         h="100%"
       >
-        <UserInfoDisplay earnings={data.earnings} appointments={data.appointments} />
-        <AppointmentsList appointments={data.appointments} />
+        {error ? (
+          <Paper shadow="md" p="lg" radius="md" h="100%">
+            <Center h="100%">
+              <Stack gap="xs" align="center">
+                <ThemeIcon size={44} radius="xl" color="gray" variant="light">
+                  <IconLock size={20} />
+                </ThemeIcon>
+                <Text fw={700}>No disponible</Text>
+                <Text size="sm" c="dimmed" ta="center">
+                  {error}
+                </Text>
+              </Stack>
+            </Center>
+          </Paper>
+        ) : (
+          <>
+            <UserInfoDisplay
+              user={data.user}
+              earnings={data.earnings}
+              appointments={data.appointments}
+            />
+            <AppointmentsList appointments={data.appointments} />
+          </>
+        )}
       </SimpleGrid>
     </Base>
   );
