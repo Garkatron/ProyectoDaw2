@@ -9,7 +9,7 @@
   "type": "module",
   "dependencies": {
     "@elysiajs/eden": "^1.4.8",
-    "elysia": "^1.4.27",
+    "elysia": "^1.4.28",
     "proyectodaw2": "."
   },
   "devDependencies": {
