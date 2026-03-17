@@ -3,14 +3,14 @@ WORKDIR /usr/src/app
 
 COPY package.json bun.lock ./
 COPY packages/common/package.json ./packages/common/
-COPY apps/server/package.json ./apps/server/
+COPY apps/client/package.json ./apps/client/
 
-RUN bun install --filter 'server'
+RUN bun install --filter 'client'
 
-COPY packages/common/ packages/common/
-COPY apps/server/ apps/server/
+COPY packages/common/ ./packages/common/
+COPY apps/client/ ./apps/client/
 
-RUN mkdir -p /usr/src/app/data
+RUN bun run --cwd apps/client build
 
 EXPOSE 3000
-CMD ["bun", "run", "apps/server/src/index.ts"]
+CMD ["bun", "run", "--cwd", "apps/client", "start"]
