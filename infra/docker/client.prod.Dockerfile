@@ -1,4 +1,4 @@
-FROM oven/bun:1
+FROM oven/bun:1 AS builder
 WORKDIR /usr/src/app
 
 COPY package.json bun.lock ./
@@ -12,5 +12,6 @@ COPY apps/client/ ./apps/client/
 
 RUN bun run --cwd apps/client build
 
-EXPOSE 3000
-CMD ["bun", "run", "--cwd", "apps/client", "start"]
+FROM nginx:alpine
+COPY --from=builder /usr/src/app/apps/client/dist /usr/share/nginx/html
+EXPOSE 80
