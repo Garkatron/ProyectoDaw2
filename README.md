@@ -15,6 +15,14 @@ Limpora is a web application and service that connects clients with freelance cl
 
 ## Technologies
 
+<p align="center">
+  <img alt="Bun logo" height="40" src="https://raw.githubusercontent.com/alvaro-prieto/bun-logos/main/bun-logo-dark.svg" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img alt="TypeScript logo" height="40" src="https://raw.githubusercontent.com/remojansen/logo.ts/master/ts.svg" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img alt="ElysiaJS logo" height="40" src="https://elysiajs.com/assets/elysia.svg" />
+</p>
+
 ### Runtime & Framework
 - **Bun**: Runtime and environment manager (env variables built-in)
 - **ElysiaJS**: High-performance TypeScript web framework
@@ -60,6 +68,12 @@ modules/
 
 
 ## Security
+
+<p align="center">
+  <img alt="Shield icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/shield-lock.svg" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img alt="Firewall icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/lock-shield.svg" />
+</p>
 - Email verification for non-OAuth accounts
 - CORS
 - HPP (HTTP Parameter Pollution protection)
@@ -70,10 +84,18 @@ modules/
 
 
 ## Observability & Logging
+
+<p align="center">
+  <img alt="Logs icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/clipboard-data.svg" />
+</p>
 - **pino** + **pino-http**
 
 
 ## Documentation (localhost:port/docs)
+
+<p align="center">
+  <img alt="Docs icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/file-description.svg" />
+</p>
 - Interactive and auto-generated API docs
 - Easy frontend integration
 - OpenAPI standard
