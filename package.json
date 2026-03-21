@@ -4,14 +4,10 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/client",
+    "apps/server"
   ],
   "type": "module",
-  "dependencies": {
-    "@elysiajs/eden": "^1.4.8",
-    "elysia": "^1.4.28",
-    "proyectodaw2": "."
-  },
   "devDependencies": {
     "@types/bun": "latest"
   }

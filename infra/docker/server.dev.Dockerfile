@@ -1,22 +1,23 @@
-FROM oven/bun:1
-WORKDIR /usr/src/app
+FROM oven/bun:1 AS base
+WORKDIR /app
 
-# Copiamos el package.json de la raíz PRIMERO
+# Copiar todos los package.json del workspace (bun install los necesita todos)
 COPY package.json bun.lock ./
-
-# Copiamos los package.json de los paquetes manteniendo la estructura exacta
-# que definiste en tu campo "workspaces" (packages/* y apps/*)
-COPY packages/common/package.json ./packages/common/
 COPY apps/server/package.json ./apps/server/
+COPY apps/client/package.json ./apps/client/
+COPY packages/common/package.json ./packages/common/
 
-# Verificamos que los archivos existan y ejecutamos la instalación
-# Agregamos verbose para ver qué está intentando hacer Bun si falla
-RUN bun install --filter 'server' --filter 'common'
+# Pre-install at build time to populate the bun cache layer.
+# Do NOT remove the cache — it's reused at startup for a fast re-install.
+RUN bun install --no-save
 
-# Copiamos el resto del código
-COPY . .
+# Copiar fuentes
+COPY apps/server ./apps/server
+COPY packages/common ./packages/common
 
 EXPOSE 3000
 
-WORKDIR /usr/src/app/apps/server
-CMD ["bun", "--watch", "run", "src/index.ts"]
+# Re-run bun install at startup so the workspace is resolved correctly
+# AFTER the dev volumes (apps/server, packages/common) are mounted.
+# The bun cache from the build layer makes this near-instant.
+CMD ["/bin/sh", "-c", "bun install --no-save && bun run --hot /app/apps/server/src/index.ts"]

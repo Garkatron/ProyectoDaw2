@@ -1,9 +1,10 @@
-FROM oven/bun:1
+FROM docker.io/oven/bun:1
 WORKDIR /usr/src/app
 
 COPY package.json bun.lock ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/server/package.json ./apps/server/
+COPY apps/client/package.json ./apps/client/
 
 RUN bun install --filter 'server'
 

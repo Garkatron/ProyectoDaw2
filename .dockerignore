@@ -1,4 +1,12 @@
-node_modules
-**/node_modules
 .git
-.bun-cache
+.aider*
+node_modules
+apps/mobile
+apps/*/node_modules
+packages/*/node_modules
+*.db
+*.db-shm
+*.db-wal
+documentation
+output
+README*

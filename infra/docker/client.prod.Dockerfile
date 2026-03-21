@@ -1,15 +1,12 @@
-FROM oven/bun:1 AS builder
+FROM docker.io/oven/bun:1 AS builder
 WORKDIR /usr/src/app
-
 COPY package.json bun.lock ./
 COPY packages/common/package.json ./packages/common/
 COPY apps/client/package.json ./apps/client/
-
-RUN bun install --filter 'client'
-
+COPY apps/server/package.json ./apps/server/
+RUN bun install --no-save
 COPY packages/common/ ./packages/common/
 COPY apps/client/ ./apps/client/
-
 RUN bun run --cwd apps/client build
 
 FROM nginx:alpine
