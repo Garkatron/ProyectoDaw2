@@ -21,7 +21,6 @@ services:
       - ./apps/server/.env
     environment:
       - NODE_ENV=production
-      - FRONTEND_URL=https://www.limpora.xyz
     volumes:
       - ./apps/server/data:/usr/src/app/data
     restart: unless-stopped

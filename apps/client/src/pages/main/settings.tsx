@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import {
   Box, Stack, Paper, Text, Title, Group,
-  SegmentedControl, ThemeIcon, Divider,
+  SegmentedControl, ThemeIcon, Divider, ActionIcon,
 } from "@mantine/core";
-import { IconLanguage, IconSettings } from "@tabler/icons-react";
+import { IconLanguage, IconSettings, IconSun, IconMoon } from "@tabler/icons-react";
+import { useMantineColorScheme, useComputedColorScheme } from "@mantine/core";
 import Base from "../../layouts/Base";
 
 const SettingRow = ({
@@ -30,6 +31,8 @@ const SettingRow = ({
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
+  const { setColorScheme } = useMantineColorScheme();
+  const colorScheme = useComputedColorScheme("light");
 
   return (
     <Base>
@@ -69,6 +72,25 @@ export default function Settings() {
                     radius="xl"
                     size="xs"
                   />
+                }
+              />
+
+              <Divider />
+
+              <SettingRow
+                icon={colorScheme === "light" ? <IconSun size={17} /> : <IconMoon size={17} />}
+                title={t("settings.theme.title")}
+                description={t("settings.theme.description")}
+                control={
+                  <ActionIcon
+                    onClick={() => setColorScheme(colorScheme === "light" ? "dark" : "light")}
+                    variant="default"
+                    size="lg"
+                    radius="xl"
+                    aria-label="Toggle theme"
+                  >
+                    {colorScheme === "light" ? <IconMoon size={16} /> : <IconSun size={16} />}
+                  </ActionIcon>
                 }
               />
             </Stack>

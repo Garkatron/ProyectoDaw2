@@ -34,6 +34,13 @@
     "inbox": "Notificaciones",
     "settings": "Ajustes"
   },
+  "footer": {
+    "privacy": "Privacidad",
+    "terms": "Términos de uso",
+    "cookies": "Política de cookies",
+    "legal": "Aviso legal",
+    "rights": "Todos los derechos reservados."
+  },
   "time": {
     "just_now": "ahora mismo",
     "minutes_ago_one": "hace {{count}} min",
@@ -146,6 +153,10 @@
       "description": "Selecciona el idioma de la interfaz",
       "es": "Español",
       "en": "Inglés"
+    },
+    "theme": {
+      "title": "Tema",
+      "description": "Cambia entre modo claro y oscuro"
     }
   },
   "userpanel": {

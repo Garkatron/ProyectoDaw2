@@ -1,16 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Navbar from "../../components/Navbar";
-import News from "../../components/News";
 import logo from "../../assets/logo.svg";
 import HERO_IMAGE from "./../../assets/hero2.jpg";
 import {
   Box, Grid, Group, Image, Paper, Stack,
-  Text, Title, Divider, ThemeIcon, SimpleGrid, Badge,
+  Text, Title, Divider, ThemeIcon, SimpleGrid, Badge, Anchor,
 } from "@mantine/core";
-import { Star, Shield, Clock, Sparkles, CheckCircle, ArrowRight } from "lucide-react";
+import { Star, Shield, Clock, Sparkles, CheckCircle } from "lucide-react";
 
-/* ─── Animación de entrada suave ─── */
 const useFadeIn = (delay = 0) => {
   const ref = useRef(null);
   useEffect(() => {
@@ -28,7 +26,6 @@ const useFadeIn = (delay = 0) => {
   return ref;
 };
 
-/* ─── Contador animado ─── */
 const AnimatedStat = ({ value, label }) => {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -59,7 +56,6 @@ const AnimatedStat = ({ value, label }) => {
   );
 };
 
-/* ─── Features ─── */
 const useFeatures = () => {
   const { t } = useTranslation();
   return [
@@ -222,16 +218,45 @@ const Header = () => {
             <Text size="xs" style={{ opacity: 0.55 }}>{t("home.head.subtitle")}</Text>
           </Stack>
         </Group>
-        <Group gap="xs" visibleFrom="sm" align="center">
-          <Text size="xs" style={{ opacity: 0.5 }}>
-            {new Date().toLocaleDateString("es-ES", {
-              weekday: "long", day: "numeric", month: "long",
-            })}
-          </Text>
-          <ArrowRight size={14} style={{ opacity: 0.3 }} />
-        </Group>
       </Group>
     </Paper>
+  );
+};
+
+/* ─── Footer ─── */
+const Footer = () => {
+  const { t } = useTranslation();
+  const year = new Date().getFullYear();
+
+  const links = [
+    { label: t("footer.privacy"), href: "/privacy" },
+    { label: t("footer.terms"), href: "/terms" },
+    { label: t("footer.cookies"), href: "/cookies" },
+    { label: t("footer.legal"), href: "/legal" },
+  ];
+
+  return (
+    <Box component="footer" py="lg">
+      <Divider mb="lg" />
+      <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+        <Text size="xs" style={{ opacity: 0.45 }}>
+          © {year} Limpora. {t("footer.rights")}
+        </Text>
+        <Group gap="lg" wrap="wrap">
+          {links.map(({ label, href }) => (
+            <Anchor
+              key={href}
+              href={href}
+              size="xs"
+              style={{ opacity: 0.55 }}
+              underline="hover"
+            >
+              {label}
+            </Anchor>
+          ))}
+        </Group>
+      </Group>
+    </Box>
   );
 };
 
@@ -250,13 +275,11 @@ export default function Home() {
         <Navbar />
         <HeroSection />
         <Grid gutter="lg" style={{ flex: 1 }}>
-          <Grid.Col span={{ base: 12, lg: 4 }}>
-            <News />
-          </Grid.Col>
-          <Grid.Col span={{ base: 12, lg: 8 }}>
+          <Grid.Col span={12}>
             <AboutSection />
           </Grid.Col>
         </Grid>
+        <Footer />
       </Stack>
     </Box>
   );

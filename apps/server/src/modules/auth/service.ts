@@ -46,6 +46,7 @@ export abstract class AuthService {
         } catch (error) {
             console.error("[Register][Firebase]:");
             console.error(error);
+            throw status(500, "Error creating user");
         }
 
         if (process.env.EMAIL_VERIFICATION === "true") {

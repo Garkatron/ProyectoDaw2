@@ -57,8 +57,8 @@ const app = new Elysia()
     .use(
         cors({
             origin:
-                Bun.env.NODE_ENV === "production"
-                    ? (Bun.env.FRONTEND_URL ?? "https://www.limpora.xyz")
+                process.env.NODE_ENV === "production"
+                    ? (process.env.FRONTEND_URL ?? "https://www.limpora.xyz")
                     : true,
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
             allowedHeaders: ["Content-Type", "Authorization"],
@@ -92,5 +92,7 @@ const app = new Elysia()
 console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
+
+
 
 export type App = typeof app;

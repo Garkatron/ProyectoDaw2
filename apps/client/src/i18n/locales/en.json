@@ -33,6 +33,13 @@
     "appointments": "Appointments",
     "inbox": "Notifications"
   },
+  "footer": {
+    "privacy": "Privacy",
+    "terms": "Terms of use",
+    "cookies": "Cookie polotics",
+    "legal": "Legal Advice",
+    "rights": "All right reserved."
+  },
   "time": {
     "just_now": "just now",
     "minutes_ago_one": "{{count}} min ago",
@@ -139,6 +146,10 @@
       "description": "Select the interface language",
       "es": "Spanish",
       "en": "English"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Change it between dark and light."
     }
   },
   "userpanel": {

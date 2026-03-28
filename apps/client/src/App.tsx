@@ -18,6 +18,7 @@ import Inbox from "./pages/user/Inbox";
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRef } from "react";
 import Settings from "./pages/main/settings";
+import OAuthCallback from "./pages/auth/OAuthCallback";
 
 // <Route path="/emailcode" element={<EmailCode />} />
 
@@ -53,6 +54,7 @@ const App = () => {
       <Route path="/register" element={<Rergister />} />
       <Route path="/login" element={<Login />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
 
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />

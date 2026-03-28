@@ -140,12 +140,15 @@ const Navbar = () => {
       <Group justify="space-between" wrap="nowrap">
 
         {/* Desktop — con texto */}
-        <Group gap={4} wrap="nowrap" visibleFrom="sm">
+        <Group gap={4} wrap="nowrap" visibleFrom="sm" style={{
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}>
           {navItems.map((item) => (
             <NavItem key={item.to} item={item} pathname={pathname} layoutScope="desktop" />
           ))}
         </Group>
-
         {/* Mobile — solo iconos */}
         <Group gap={8} justify="space-evenly" wrap="nowrap" hiddenFrom="sm" style={{ flex: 1 }}>
           {mainItems.map((item) => (
@@ -179,13 +182,13 @@ const Navbar = () => {
           size="lg"
           radius="xl"
           aria-label="Perfil"
-          style={{ flexShrink: 0, transition: "transform 0.2s ease" }}
+          style={{ flexShrink: 0, transition: "transform 0.2s ease", marginLeft: "auto" }}
           onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.12)"; }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
         >
           <IconUserCircle size={26} stroke={1.6} />
         </ActionIcon>
-        
+
       </Group>
 
       {/* Menú desplegable mobile */}
