@@ -14,15 +14,7 @@
       "November",
       "December"
     ],
-    "weekdays": [
-      "Sun",
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri",
-      "Sat"
-    ],
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     "prev_month": "Previous month",
     "next_month": "Next month"
   },
@@ -157,6 +149,21 @@
       "completed_appointments": "Completed appointments",
       "total_points": "Total points",
       "role": "User role"
+    },
+    "title": {
+      "services": "Services"
+    },
+    "services": {
+      "no_services": "No services registered.",
+      "add_title": "Add service",
+      "add_button": "Add",
+      "select_placeholder": "Select a service...",
+      "price_label": "Price per hour (€)",
+      "price_placeholder": "e.g. 50",
+      "duration_label": "Service duration",
+      "duration_description": "Minimum 15 minutes",
+      "duration_placeholder": "e.g. 90",
+      "earnings_preview": "You charge {{total}} € per session → you receive {{net}} € net (20% commission)"
     }
   },
   "inbox": {
@@ -200,13 +207,12 @@
     "loading_appointments": "Loading appointments...",
     "no_services": "This provider has no services available.",
     "no_slots": "The provider has no availability on this day.",
-    "slot_info": "Service duration: {duration}h. Orange slots are free but the service would extend beyond the scheduled hours.",
+    "slot_info": "Service duration: {duration}. Orange slots are free but the service would extend beyond the scheduled hours.",
     "morning": "Morning",
     "afternoon": "Afternoon",
     "slot_states": {
       "available": "Available",
       "occupied": "Occupied",
-      "overflow": "Overlaps",
       "past": "Past",
       "outside": "No schedule"
     },

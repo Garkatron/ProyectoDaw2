@@ -8,6 +8,7 @@ import Appointments from "./pages/user/Appointments";
 import AdminPanel from "./pages/admin/AdminPanel";
 import BookingConfirmation from "./pages/user/BookingConfirmation";
 import Currency from "./pages/user/Currency";
+import RoleRoute from "./components/RoleRoute";
 import UserFinder from "./pages/main/UserFinder";
 // import EmailCode from './pages/auth/EmailCode';
 import UserPanel from "./pages/user/UserPanel/index";
@@ -15,7 +16,7 @@ import VerifyEmail from "./pages/auth/VerifyEmail";
 import ScheduleSettings from "./pages/user/ScheduleSettings";
 import AppointmentReviewPage from "./pages/user/AppointmentReviewPage";
 import Inbox from "./pages/user/Inbox";
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from "framer-motion";
 import { useRef } from "react";
 import Settings from "./pages/main/settings";
 import OAuthCallback from "./pages/auth/OAuthCallback";
@@ -36,7 +37,6 @@ import OAuthCallback from "./pages/auth/OAuthCallback";
       </Route>
 */
 
-
 const routeOrder = ["/", "/currency", "/appointments", "/userfinder", "/inbox"];
 
 const variants = {
@@ -54,14 +54,16 @@ const App = () => {
       <Route path="/register" element={<Rergister />} />
       <Route path="/login" element={<Login />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/auth/callback" element={<OAuthCallback />} />
+      <Route path="/auth/callback" element={<OAuthCallback />} />
 
       <Route element={<PrivateRoute />}>
         <Route path="/panel/:username" element={<UserPanel />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/review" element={<AppointmentReviewPage />} />
         <Route path="/inbox" element={<Inbox />} />
-        <Route path="/currency" element={<Currency />} />
+        <Route element={<RoleRoute roles={["provider"]} />}>
+          <Route path="/currency" element={<Currency />} />
+        </Route>
         <Route path="/userfinder" element={<UserFinder />} />
         <Route path="/booking" element={<BookingConfirmation />} />
         <Route path="/appointments" element={<Appointments />} />

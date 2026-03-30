@@ -41,15 +41,42 @@ import { useTranslation } from "react-i18next";
 const useStatusConfig = () => {
   const { t } = useTranslation();
   return {
-    Completed:   { color: "green",  icon: CheckCircle, label: t("appointments.status.Completed") },
-    Pending:     { color: "yellow", icon: Clock,       label: t("appointments.status.Pending") },
-    "In Process":{ color: "blue",   icon: RefreshCw,   label: t("appointments.status.In Process") },
-    Cancelled:   { color: "red",    icon: Clock,       label: t("appointments.status.Cancelled") },
+    Completed: {
+      color: "green",
+      icon: CheckCircle,
+      label: t("appointments.status.Completed"),
+    },
+    Pending: {
+      color: "yellow",
+      icon: Clock,
+      label: t("appointments.status.Pending"),
+    },
+    "In Process": {
+      color: "blue",
+      icon: RefreshCw,
+      label: t("appointments.status.In Process"),
+    },
+    Cancelled: {
+      color: "red",
+      icon: Clock,
+      label: t("appointments.status.Cancelled"),
+    },
   } as Record<string, { color: string; icon: typeof Clock; label: string }>;
 };
 
-
 // ─── AppointmentCard ──────────────────────────────────────────────────────────
+const NEXT_STATUSES: Record<AppointmentStatus, AppointmentStatus[]> = {
+  [AppointmentStatus.Pending]: [
+    AppointmentStatus.InProcess,
+    AppointmentStatus.Cancelled,
+  ],
+  [AppointmentStatus.InProcess]: [
+    AppointmentStatus.Completed,
+    AppointmentStatus.Cancelled,
+  ],
+  [AppointmentStatus.Completed]: [],
+  [AppointmentStatus.Cancelled]: [],
+};
 
 const AppointmentCard = ({
   appointment,
@@ -68,15 +95,14 @@ const AppointmentCard = ({
   const [updating, setUpdating] = useState(false);
   const { handlePublishReview, reviewSubmitting, reviewError } = useReviews();
   const navigate = useNavigate();
-  
+
   const { t } = useTranslation();
   const statusConfig = useStatusConfig();
-  
+
+  const config = statusConfig[appointment.status] ?? statusConfig["Pending"];
   const Icon = config.icon;
   const date = new Date(appointment.start_time);
   const end = new Date(appointment.end_time);
-
-
 
   const nextStatuses = NEXT_STATUSES[appointment.status] ?? [];
 
@@ -99,20 +125,30 @@ const AppointmentCard = ({
   };
 
   return (
- <Paper withBorder p="md" shadow="xs" radius="md">
+    <Paper withBorder p="md" shadow="xs" radius="md">
       <Group justify="space-between" mb="sm">
-        <Badge color={config.color} variant="light" leftSection={<Icon size={12} />}>
+        <Badge
+          color={config.color}
+          variant="light"
+          leftSection={<Icon size={12} />}
+        >
           {config.label}
         </Badge>
         <Text size="xs" c="dimmed">
-          {date.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
+          {date.toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
         </Text>
       </Group>
 
       <Stack gap={6}>
         <Group gap="xs">
           <Wrench size={14} color="gray" />
-          <Text fw={600} size="sm">{appointment.service_name}</Text>
+          <Text fw={600} size="sm">
+            {appointment.service_name}
+          </Text>
         </Group>
 
         <Group gap="xs">
@@ -127,13 +163,25 @@ const AppointmentCard = ({
         <Group gap="xs">
           <Clock size={14} color="gray" />
           <Text size="sm">
-            {date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
+            {date.toLocaleTimeString("es-ES", {
+              hour: "2-digit",
+              minute: "2-digit",
+              timeZone: "UTC",
+            })}
             {" – "}
-            {end.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}
+            {end.toLocaleTimeString("es-ES", {
+              hour: "2-digit",
+              minute: "2-digit",
+              timeZone: "UTC",
+            })}
           </Text>
           {appointment.travel_buffer_min > 0 && (
             <Text size="xs" c="dimmed">
-              ({t("appointments.travel_buffer", { count: appointment.travel_buffer_min })})
+              (
+              {t("appointments.travel_buffer", {
+                count: appointment.travel_buffer_min,
+              })}
+              )
             </Text>
           )}
         </Group>
@@ -141,14 +189,19 @@ const AppointmentCard = ({
         <Group justify="space-between">
           <Group gap="xs">
             <Banknote size={14} color="gray" />
-            <Text size="sm" fw={700}>€{appointment.total_price.toFixed(2)}</Text>
+            <Text size="sm" fw={700}>
+              €{appointment.total_price.toFixed(2)}
+            </Text>
             {isProvider && (
               <Text size="xs" c="dimmed">
-                ({t("appointments.net")}: €{appointment.provider_net.toFixed(2)})
+                ({t("appointments.net")}: €{appointment.provider_net.toFixed(2)}
+                )
               </Text>
             )}
           </Group>
-          <Text size="xs" c="dimmed" fs="italic">{appointment.payment_method}</Text>
+          <Text size="xs" c="dimmed" fs="italic">
+            {appointment.payment_method}
+          </Text>
         </Group>
 
         {isProvider && nextStatuses.length > 0 && (
@@ -168,37 +221,71 @@ const AppointmentCard = ({
           </Group>
         )}
 
-        <Button fullWidth size="xs" variant="light" color="blue" leftSection={<Star size={14} />}
-          onClick={() => navigate("/review", { state: { appointmentId: appointment.id } })}>
+        <Button
+          fullWidth
+          size="xs"
+          variant="light"
+          color="blue"
+          leftSection={<Star size={14} />}
+          onClick={() =>
+            navigate("/review", { state: { appointmentId: appointment.id } })
+          }
+        >
           {t("appointments.see_reviews")}
         </Button>
 
         {!isProvider && appointment.status === AppointmentStatus.Completed && (
-          <Button fullWidth size="xs" variant="light" color="yellow" leftSection={<Star size={14} />}
-            onClick={() => setModalOpen(true)}>
+          <Button
+            fullWidth
+            size="xs"
+            variant="light"
+            color="yellow"
+            leftSection={<Star size={14} />}
+            onClick={() => setModalOpen(true)}
+          >
             {t("appointments.rate_service")}
           </Button>
         )}
       </Stack>
 
-      <Modal opened={modalOpen} onClose={() => setModalOpen(false)} title={t("appointments.modal_title")} centered>
+      <Modal
+        opened={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={t("appointments.modal_title")}
+        centered
+      >
         <Stack>
-          <Center><Rating value={rating} onChange={setRating} size="lg" /></Center>
+          <Center>
+            <Rating value={rating} onChange={setRating} size="lg" />
+          </Center>
           <textarea
             placeholder={t("appointments.comment_placeholder")}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            style={{ width: "100%", minHeight: 80, padding: 8, borderRadius: 8, border: "1px solid #ddd" }}
+            style={{
+              width: "100%",
+              minHeight: 80,
+              padding: 8,
+              borderRadius: 8,
+              border: "1px solid #ddd",
+            }}
           />
-          {reviewError && <Text c="red" size="xs">{reviewError}</Text>}
-          <Button color="yellow" onClick={onSendReview} loading={reviewSubmitting}>
+          {reviewError && (
+            <Text c="red" size="xs">
+              {reviewError}
+            </Text>
+          )}
+          <Button
+            color="yellow"
+            onClick={onSendReview}
+            loading={reviewSubmitting}
+          >
             {t("appointments.submit")}
           </Button>
         </Stack>
       </Modal>
     </Paper>
   );
-  
 };
 
 // ─── Página ───────────────────────────────────────────────────────────────────
@@ -257,7 +344,7 @@ export default function Appointments() {
     );
 
   return (
- <Base>
+    <Base>
       <Stack maw={1152} mx="auto" p="xl" gap="lg">
         <Group justify="space-between">
           <Title order={2}>{t("appointments.title")}</Title>
@@ -268,23 +355,40 @@ export default function Appointments() {
           )}
         </Group>
 
-        {error && <Text c="red" size="sm">{error}</Text>}
+        {error && (
+          <Text c="red" size="sm">
+            {error}
+          </Text>
+        )}
 
         <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
           <Paper withBorder p="lg" radius="md">
-            <Calendar markedDates={markedDates} onDateClick={setSelectedDate} selectedDate={selectedDate} />
+            <Calendar
+              markedDates={markedDates}
+              onDateClick={setSelectedDate}
+              selectedDate={selectedDate}
+            />
           </Paper>
 
           <Stack>
             <Text fw={700} fz="lg" c="dimmed">
-              {selectedDate.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}
+              {selectedDate.toLocaleDateString("es-ES", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}
             </Text>
             <ScrollArea mah={500}>
               <Stack gap="sm">
                 {appointmentsOnSelectedDate.length > 0 ? (
                   appointmentsOnSelectedDate.map((appt) => (
-                    <AppointmentCard key={appt.id} appointment={appt} isProvider={isProvider}
-                      onReviewSuccess={fetchAll} onStatusChange={handleStatusChange} />
+                    <AppointmentCard
+                      key={appt.id}
+                      appointment={appt}
+                      isProvider={isProvider}
+                      onReviewSuccess={fetchAll}
+                      onStatusChange={handleStatusChange}
+                    />
                   ))
                 ) : (
                   <Center py={50}>

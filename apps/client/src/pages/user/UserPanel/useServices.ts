@@ -1,104 +1,108 @@
 import { useEffect, useState } from "react";
 import { API } from "../../../lib/api";
-import { status } from 'elysia';
 
 interface UserService {
-    service_id: number;
-    user_id: number;
-    price_per_h: number;
-    is_active: boolean;
-    updated_at: string;
-    category?: string;
+  service_id: number;
+  user_id: number;
+  price_per_h: number;
+  duration_minutes: number;
+  is_active: boolean;
+  updated_at: string;
+  category?: string;
 }
 
 interface Service {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 }
 
 export function useServices(
-    targetUser: { id: number; role: string } | null,
-    isSelf: boolean,
+  targetUser: { id: number; role: string } | null,
+  isSelf: boolean,
 ) {
-    const [userServices, setUserServices] = useState<UserService[]>([]);
-    const [allServices, setAllServices] = useState<Service[]>([]);
-    const [selectedServiceId, setSelectedServiceId] = useState("");
-    const [selectedServicePrice, setSelectedServicePrice] = useState("");
-    const [selectedServiceHours, setSelectedServiceHours] = useState<number>(1);
-    const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+  const [userServices, setUserServices] = useState<UserService[]>([]);
+  const [allServices, setAllServices] = useState<Service[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [selectedServicePrice, setSelectedServicePrice] = useState("");
+  const [selectedServiceMinutes, setSelectedServiceMinutes] =
+    useState<number>(15);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const fetchUserServices = async (id: number) => {
-        const { data, error } = await API.providers({provider_id: id}).services.get();
-        
-        if (!error && data) setUserServices(data);
-    };
+  const fetchUserServices = async (id: number) => {
+    const { data, error } = await API.providers({
+      provider_id: id,
+    }).services.get();
+    if (!error && data) setUserServices(data);
+  };
 
-    useEffect(() => {
-        if (!targetUser?.id || targetUser.role !== "provider") return;
-        
-        fetchUserServices(targetUser.id);
-        
-        if (isSelf) {
-            API.services.get().then(({ data, error }) => {
-                console.log({ data, error }); 
-                if (!error && data) setAllServices(data);
-            });
-        }
-    }, [targetUser?.id, isSelf]);
+  useEffect(() => {
+    if (!targetUser?.id || targetUser.role !== "provider") return;
 
-    const handleAdd = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!targetUser) return;
+    fetchUserServices(targetUser.id);
 
-        setSubmitting(true);
-        setError(null);
+    if (isSelf) {
+      API.services.get().then(({ data, error }) => {
+        if (!error && data) setAllServices(data);
+      });
+    }
+  }, [targetUser?.id, isSelf]);
 
-        const { error } = await API.providers.me.services.assign.post({
-            service_id: Number(selectedServiceId),
-            price_per_h: Number(selectedServicePrice),
-            duration_hours: Number(selectedServiceHours)
-        });
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!targetUser) return;
 
-        if (error) {
-            setError(
-                typeof error.value === "string"
-                    ? error.value
-                    : "Error al añadir el servicio.",
-            );
-        } else {
-            await fetchUserServices(targetUser.id);
-            setSelectedServiceId("");
-            setSelectedServicePrice("");
-        }
+    setSubmitting(true);
+    setError(null);
 
-        setSubmitting(false);
-    };
+    const { error } = await API.providers.me.services.assign.post({
+      service_id: Number(selectedServiceId),
+      price_per_h: Number(selectedServicePrice),
+      duration_minutes: selectedServiceMinutes,
+    });
 
-    const handleDelete = async (service_id: number) => {
-        if (!targetUser) return;
+    if (error) {
+      setError(
+        typeof error.value === "string"
+          ? error.value
+          : "Error al añadir el servicio.",
+      );
+    } else {
+      await fetchUserServices(targetUser.id);
+      setSelectedServiceId("");
+      setSelectedServicePrice("");
+      setSelectedServiceMinutes(15);
+    }
 
-        const { error } = await API.providers.me.services({service_id}).unassign.delete();
+    setSubmitting(false);
+  };
 
-        if (!error)
-            setUserServices((prev) =>
-                prev.filter((s) => s.service_id !== service_id),
-            );
-        else console.error("Error al eliminar servicio:", error.value);
-    };
+  const handleDelete = async (service_id: number) => {
+    if (!targetUser) return;
 
-    return {
-        userServices,
-        allServices,
-        selectedServiceId,
-        setSelectedServiceId,
-        selectedServicePrice,
-        setSelectedServicePrice,
-        selectedServiceHours,
-        setSelectedServiceHours,
-        serviceSubmitting: submitting,
-        serviceError: error,
-        onAdd: handleAdd,
-        onDelete: handleDelete,
-    };
+    const { error } = await API.providers.me
+      .services({ service_id })
+      .unassign.delete();
+
+    if (!error)
+      setUserServices((prev) =>
+        prev.filter((s) => s.service_id !== service_id),
+      );
+    else console.error("Error al eliminar servicio:", error.value);
+  };
+
+  return {
+    userServices,
+    allServices,
+    selectedServiceId,
+    setSelectedServiceId,
+    selectedServicePrice,
+    setSelectedServicePrice,
+    selectedServiceMinutes,
+    setSelectedServiceMinutes,
+    serviceSubmitting: submitting,
+    serviceError: error,
+    onAdd: handleAdd,
+    onDelete: handleDelete,
+  };
 }

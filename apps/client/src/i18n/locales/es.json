@@ -14,15 +14,7 @@
       "Noviembre",
       "Diciembre"
     ],
-    "weekdays": [
-      "Dom",
-      "Lun",
-      "Mar",
-      "Mié",
-      "Jue",
-      "Vie",
-      "Sáb"
-    ],
+    "weekdays": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
     "prev_month": "Mes anterior",
     "next_month": "Mes siguiente"
   },
@@ -160,10 +152,25 @@
     }
   },
   "userpanel": {
+    "title": {
+      "services": "Servicios"
+    },
     "label": {
       "completed_appointments": "Citas completadas",
       "total_points": "Puntos totales",
       "role": "Rol de usuario"
+    },
+    "services": {
+      "no_services": "No hay servicios registrados.",
+      "add_title": "Añadir servicio",
+      "add_button": "Añadir",
+      "select_placeholder": "Selecciona un servicio...",
+      "price_label": "Precio por hora (€)",
+      "price_placeholder": "ej. 50",
+      "duration_label": "Duración del servicio",
+      "duration_description": "Mínimo 15 minutos",
+      "duration_placeholder": "ej. 90",
+      "earnings_preview": "Cobras {{total}} € por sesión → recibes {{net}} € neto (20% comisión)"
     }
   },
   "inbox": {
@@ -207,13 +214,12 @@
     "loading_appointments": "Cargando citas...",
     "no_services": "Este proveedor no tiene servicios disponibles.",
     "no_slots": "El proveedor no tiene horario disponible este día.",
-    "slot_info": "Servicio de {duration}h. Los slots en naranja están libres pero el servicio consumiría horas adicionales del horario.",
+    "slot_info": "Servicio de {duration}. Los slots en naranja están libres pero el servicio sobrepasaría el horario disponible.",
     "morning": "Mañana",
     "afternoon": "Tarde",
     "slot_states": {
       "available": "Disponible",
       "occupied": "Ocupado",
-      "overflow": "Se solapa",
       "past": "Pasado"
     },
     "summary_date": "Fecha",

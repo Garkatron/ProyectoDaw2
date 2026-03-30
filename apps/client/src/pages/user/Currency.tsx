@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useProfileImageMe } from "../../hooks/useProfileImage";
 import Base from "../../layouts/Base";
 import {
   Avatar,
@@ -84,7 +85,13 @@ function StatCard({
 
 // ─── RetentionBar ─────────────────────────────────────────────────────────────
 
-function RetentionBar({ total, retained }: { total: number; retained: number }) {
+function RetentionBar({
+  total,
+  retained,
+}: {
+  total: number;
+  retained: number;
+}) {
   const pct = total > 0 ? Math.round((retained / total) * 100) : 0;
   return (
     <Paper withBorder p="md" radius="md" shadow="xs">
@@ -99,8 +106,12 @@ function RetentionBar({ total, retained }: { total: number; retained: number }) 
         </Group>
         <Progress value={pct} color="red.4" size="sm" radius="xl" />
         <Group justify="space-between">
-          <Text size="xs" c="dimmed">€{retained.toFixed(2)} retenido</Text>
-          <Text size="xs" c="dimmed">€{total.toFixed(2)} total</Text>
+          <Text size="xs" c="dimmed">
+            €{retained.toFixed(2)} retenido
+          </Text>
+          <Text size="xs" c="dimmed">
+            €{total.toFixed(2)} total
+          </Text>
         </Group>
       </Stack>
     </Paper>
@@ -111,13 +122,17 @@ function RetentionBar({ total, retained }: { total: number; retained: number }) 
 
 function EarningsChart({ appointments }: { appointments: Appointment[] }) {
   const monthlyData = useMemo(() => {
-    const map: Record<string, { month: string; total: number; count: number }> = {};
+    const map: Record<string, { month: string; total: number; count: number }> =
+      {};
     appointments
       .filter((a) => a.status === AppointmentStatus.Completed)
       .forEach((a) => {
         const d = new Date(a.start_time);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-        const label = d.toLocaleDateString("es", { month: "short", year: "2-digit" });
+        const label = d.toLocaleDateString("es", {
+          month: "short",
+          year: "2-digit",
+        });
         if (!map[key]) map[key] = { month: label, total: 0, count: 0 };
         map[key].total += a.provider_net;
         map[key].count += 1;
@@ -187,13 +202,16 @@ function UserInfoDisplay({
   earnings: Earnings | null;
   appointments: Appointment[];
 }) {
+  const { image } = useProfileImageMe();
+  const imageUrl = image ? URL.createObjectURL(image) : undefined;
+
   return (
     <Paper shadow="md" p="lg" radius="md" h="100%">
       <Stack gap="md" h="100%">
         <Group justify="center">
           <Avatar
-            src="https://placehold.co/300x300"
-            alt="User"
+            src={imageUrl}
+            alt={user?.name ?? "User"}
             size={96}
             radius="50%"
           />
@@ -312,7 +330,11 @@ function AppointmentItem({
             color={isCompleted ? "green" : isCancelled ? "red" : "yellow"}
             variant="light"
           >
-            {isCompleted ? "Completada" : isCancelled ? "Cancelada" : String(status)}
+            {isCompleted
+              ? "Completada"
+              : isCancelled
+                ? "Cancelada"
+                : String(status)}
           </Badge>
         </Stack>
       </Group>
@@ -322,7 +344,10 @@ function AppointmentItem({
 
 // ─── AppointmentsList ─────────────────────────────────────────────────────────
 
-type FilterValue = "all" | AppointmentStatus.Completed | AppointmentStatus.Cancelled;
+type FilterValue =
+  | "all"
+  | AppointmentStatus.Completed
+  | AppointmentStatus.Cancelled;
 
 function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
   const [filter, setFilter] = useState<FilterValue>("all");
@@ -334,7 +359,7 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
     list.sort((a, b) =>
       sort === "date"
         ? new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
-        : b.provider_net - a.provider_net
+        : b.provider_net - a.provider_net,
     );
     return list;
   }, [appointments, filter, sort]);
@@ -342,10 +367,14 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
   const counts = useMemo(
     () => ({
       all: appointments.length,
-      completed: appointments.filter((a) => a.status === AppointmentStatus.Completed).length,
-      cancelled: appointments.filter((a) => a.status === AppointmentStatus.Cancelled).length,
+      completed: appointments.filter(
+        (a) => a.status === AppointmentStatus.Completed,
+      ).length,
+      cancelled: appointments.filter(
+        (a) => a.status === AppointmentStatus.Cancelled,
+      ).length,
     }),
-    [appointments]
+    [appointments],
   );
 
   return (
@@ -367,8 +396,14 @@ function AppointmentsList({ appointments }: { appointments: Appointment[] }) {
             onChange={(v) => setFilter(v as FilterValue)}
             data={[
               { label: `Todas (${counts.all})`, value: "all" },
-              { label: `Completadas (${counts.completed})`, value: AppointmentStatus.Completed },
-              { label: `Canceladas (${counts.cancelled})`, value: AppointmentStatus.Cancelled },
+              {
+                label: `Completadas (${counts.completed})`,
+                value: AppointmentStatus.Completed,
+              },
+              {
+                label: `Canceladas (${counts.cancelled})`,
+                value: AppointmentStatus.Cancelled,
+              },
             ]}
           />
         </Group>

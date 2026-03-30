@@ -1,38 +1,93 @@
 import { Link, useLocation } from "react-router-dom";
 import lang from "../utils/LangManager";
-import { Group, Anchor, ActionIcon, Paper, Box, Stack, Text } from "@mantine/core";
+import {
+  Group,
+  Anchor,
+  ActionIcon,
+  Paper,
+  Box,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  IconHome2, IconCurrencyEuro, IconCalendarEvent,
-  IconUsersGroup, IconMail, IconMenu2, IconX, IconUserCircle,
+  IconHome2,
+  IconCurrencyEuro,
+  IconCalendarEvent,
+  IconUsersGroup,
+  IconMail,
+  IconMenu2,
+  IconX,
+  IconUserCircle,
   IconLanguage,
 } from "@tabler/icons-react";
 import i18n from "../i18n";
 import { IconSettings } from "@tabler/icons-react";
+import { useAuthStore } from "../stores/auth.store";
 
-const navItems = [
-  { name: "nav.home", to: "/", icon: IconHome2 },
-  { name: "nav.currency", to: "/currency", icon: IconCurrencyEuro },
-  { name: "nav.appointments", to: "/appointments", icon: IconCalendarEvent },
-  { name: "nav.search", to: "/userfinder", icon: IconUsersGroup },
-  { name: "nav.inbox", to: "/inbox", icon: IconMail },
-  { name: "nav.settings", to: "/settings", icon: IconSettings },
-
+const allNavItems = [
+  { name: "nav.home", to: "/", icon: IconHome2, providerOnly: false },
+  {
+    name: "nav.currency",
+    to: "/currency",
+    icon: IconCurrencyEuro,
+    providerOnly: true,
+  },
+  {
+    name: "nav.appointments",
+    to: "/appointments",
+    icon: IconCalendarEvent,
+    providerOnly: false,
+  },
+  {
+    name: "nav.search",
+    to: "/userfinder",
+    icon: IconUsersGroup,
+    providerOnly: false,
+  },
+  { name: "nav.inbox", to: "/inbox", icon: IconMail, providerOnly: false },
+  {
+    name: "nav.settings",
+    to: "/settings",
+    icon: IconSettings,
+    providerOnly: false,
+  },
 ];
 
-const mainItems = [
-  { name: "nav.home", to: "/", icon: IconHome2 },
-  { name: "nav.search", to: "/userfinder", icon: IconUsersGroup },
-  { name: "nav.appointments", to: "/appointments", icon: IconCalendarEvent },
-  { name: "nav.currency", to: "/currency", icon: IconCurrencyEuro },
-  { name: "nav.inbox", to: "/inbox", icon: IconMail },
+const allMainItems = [
+  { name: "nav.home", to: "/", icon: IconHome2, providerOnly: false },
+  {
+    name: "nav.search",
+    to: "/userfinder",
+    icon: IconUsersGroup,
+    providerOnly: false,
+  },
+  {
+    name: "nav.appointments",
+    to: "/appointments",
+    icon: IconCalendarEvent,
+    providerOnly: false,
+  },
+  {
+    name: "nav.currency",
+    to: "/currency",
+    icon: IconCurrencyEuro,
+    providerOnly: true,
+  },
+  { name: "nav.inbox", to: "/inbox", icon: IconMail, providerOnly: false },
 ];
+
+type NavItemType = (typeof allNavItems)[0];
 
 const NavItem = ({
-  item, pathname, onClick, showLabel = true, layoutScope,
+  item,
+  pathname,
+  onClick,
+  showLabel = true,
+  layoutScope,
 }: {
-  item: (typeof navItems)[0];
+  item: NavItemType;
   pathname: string;
   onClick?: () => void;
   showLabel?: boolean;
@@ -102,7 +157,11 @@ const NavItem = ({
       />
 
       {showLabel && (
-        <Text component="span" size="sm" style={{ position: "relative", zIndex: 1 }}>
+        <Text
+          component="span"
+          size="sm"
+          style={{ position: "relative", zIndex: 1 }}
+        >
           {lang(item.name)}
         </Text>
       )}
@@ -131,28 +190,63 @@ const NavItem = ({
 const Navbar = () => {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const isProvider = user?.role === "provider";
+
+  const navItems = allNavItems.filter(
+    (item) => !item.providerOnly || isProvider,
+  );
+  const mainItems = allMainItems.filter(
+    (item) => !item.providerOnly || isProvider,
+  );
 
   return (
     <Paper
-      px="md" py="sm" radius="xl" shadow="xs" withBorder component="nav"
+      px="md"
+      py="sm"
+      radius="xl"
+      shadow="xs"
+      withBorder
+      component="nav"
       style={{ backgroundColor: "transparent", backdropFilter: "blur(12px)" }}
     >
       <Group justify="space-between" wrap="nowrap">
-
         {/* Desktop — con texto */}
-        <Group gap={4} wrap="nowrap" visibleFrom="sm" style={{
-          position: "absolute",
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}>
+        <Group
+          gap={4}
+          wrap="nowrap"
+          visibleFrom="sm"
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
           {navItems.map((item) => (
-            <NavItem key={item.to} item={item} pathname={pathname} layoutScope="desktop" />
+            <NavItem
+              key={item.to}
+              item={item}
+              pathname={pathname}
+              layoutScope="desktop"
+            />
           ))}
         </Group>
         {/* Mobile — solo iconos */}
-        <Group gap={8} justify="space-evenly" wrap="nowrap" hiddenFrom="sm" style={{ flex: 1 }}>
+        <Group
+          gap={8}
+          justify="space-evenly"
+          wrap="nowrap"
+          hiddenFrom="sm"
+          style={{ flex: 1 }}
+        >
           {mainItems.map((item) => (
-            <NavItem key={item.to} item={item} pathname={pathname} showLabel={false} layoutScope="mobile" />
+            <NavItem
+              key={item.to}
+              item={item}
+              pathname={pathname}
+              showLabel={false}
+              layoutScope="mobile"
+            />
           ))}
         </Group>
 
@@ -169,10 +263,12 @@ const Navbar = () => {
             transform: open ? "rotate(90deg)" : "rotate(0deg)",
           }}
         >
-          {open ? <IconX size={20} stroke={1.8} /> : <IconMenu2 size={20} stroke={1.8} />}
+          {open ? (
+            <IconX size={20} stroke={1.8} />
+          ) : (
+            <IconMenu2 size={20} stroke={1.8} />
+          )}
         </ActionIcon>
-
-
 
         {/* Perfil */}
         <ActionIcon
@@ -182,13 +278,20 @@ const Navbar = () => {
           size="lg"
           radius="xl"
           aria-label="Perfil"
-          style={{ flexShrink: 0, transition: "transform 0.2s ease", marginLeft: "auto" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.12)"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
+          style={{
+            flexShrink: 0,
+            transition: "transform 0.2s ease",
+            marginLeft: "auto",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.transform = "scale(1.12)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+          }}
         >
           <IconUserCircle size={26} stroke={1.6} />
         </ActionIcon>
-
       </Group>
 
       {/* Menú desplegable mobile */}

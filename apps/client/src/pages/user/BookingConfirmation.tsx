@@ -5,8 +5,17 @@ import Base from "../../layouts/Base";
 import { useAuthStore } from "../../stores/auth.store";
 import lang from "../../utils/LangManager";
 import {
-  Alert, Box, Button, Group, Paper, SimpleGrid,
-  Skeleton, Stack, Text, Title, UnstyledButton,
+  Alert,
+  Box,
+  Button,
+  Group,
+  Paper,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  UnstyledButton,
 } from "@mantine/core";
 import { API } from "../../lib/api";
 import { PaymentMethod, type Appointment } from "@limpora/common";
@@ -15,15 +24,25 @@ interface ProviderService {
   service_id: number;
   user_id: number;
   price: number;
-  duration_hours: number;
+  duration_minutes: number;
   is_active: boolean;
   service_name?: string;
   name?: string;
 }
 
+/** Formats a minute count as "1h 30m", "1h", "45 min", etc. */
+function formatDuration(minutes: number): string {
+  if (!minutes || minutes <= 0) return "—";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m} min`;
+}
+
 const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal"];
 
-type SlotState = "available" | "occupied" | "overflow" | "past" | "outside";
+type SlotState = "available" | "occupied" | "past" | "outside";
 
 const statusColorMap: Record<string, string> = {
   Completed: "green",
@@ -43,37 +62,48 @@ function slotToMinutes(slot: string): number {
 }
 
 const ToggleButton = ({
-  selected, onClick, children,
+  selected,
+  onClick,
+  children,
 }: {
   selected: boolean;
   onClick: () => void;
   children: React.ReactNode;
 }) => (
   <UnstyledButton onClick={onClick} style={{ width: "100%" }}>
-    <Paper withBorder p="sm" ta="center" style={{
-      cursor: "pointer",
-      backgroundColor: selected ? "var(--mantine-color-default-color)" : undefined,
-      transition: "all 0.15s",
-    }}>
-      <Text component="div" size="sm" fw={500}
-        c={selected ? "var(--mantine-color-body)" : "dimmed"}>
+    <Paper
+      withBorder
+      p="sm"
+      ta="center"
+      style={{
+        cursor: "pointer",
+        backgroundColor: selected
+          ? "var(--mantine-color-default-color)"
+          : undefined,
+        transition: "all 0.15s",
+      }}
+    >
+      <Text
+        component="div"
+        size="sm"
+        fw={500}
+        c={selected ? "var(--mantine-color-body)" : "dimmed"}
+      >
         {children}
       </Text>
     </Paper>
   </UnstyledButton>
 );
 
-const getSlotStyles = (): Record<SlotState, { bg?: string; text: string; label?: string }> => ({
+const getSlotStyles = (): Record<
+  SlotState,
+  { bg?: string; text: string; label?: string }
+> => ({
   available: { text: "dimmed" },
   occupied: {
     bg: "var(--mantine-color-red-0)",
     text: "var(--mantine-color-red-6)",
     label: lang("booking.slot_states.occupied"),
-  },
-  overflow: {
-    bg: "var(--mantine-color-orange-0)",
-    text: "var(--mantine-color-orange-6)",
-    label: lang("booking.slot_states.overflow"),
   },
   past: {
     bg: "var(--mantine-color-gray-1)",
@@ -87,30 +117,47 @@ const getSlotStyles = (): Record<SlotState, { bg?: string; text: string; label?:
 });
 
 const SlotButton = ({
-  slot, state, selected, onClick,
+  slot,
+  state,
+  selected,
+  onClick,
 }: {
   slot: string;
   state: SlotState;
   selected: boolean;
   onClick: () => void;
 }) => {
-  const disabled = state === "occupied" || state === "past" || state === "outside";
+  const disabled =
+    state === "occupied" || state === "past" || state === "outside";
   const styles = getSlotStyles()[state];
   return (
     <UnstyledButton
       onClick={disabled ? undefined : onClick}
       style={{ width: "100%", cursor: disabled ? "not-allowed" : "pointer" }}
     >
-      <Paper withBorder p="xs" ta="center" style={{
-        backgroundColor: selected ? "var(--mantine-color-default-color)" : styles.bg,
-        transition: "all 0.15s",
-        opacity: state === "past" || state === "outside" ? 0.45 : 1,
-      }}>
-        <Text size="sm" fw={500} c={selected ? "var(--mantine-color-body)" : styles.text}>
+      <Paper
+        withBorder
+        p="xs"
+        ta="center"
+        style={{
+          backgroundColor: selected
+            ? "var(--mantine-color-default-color)"
+            : styles.bg,
+          transition: "all 0.15s",
+          opacity: state === "past" || state === "outside" ? 0.45 : 1,
+        }}
+      >
+        <Text
+          size="sm"
+          fw={500}
+          c={selected ? "var(--mantine-color-body)" : styles.text}
+        >
           {slot}
         </Text>
         {!selected && styles.label && (
-          <Text size="10px" c={styles.text} mt={2}>{styles.label}</Text>
+          <Text size="10px" c={styles.text} mt={2}>
+            {styles.label}
+          </Text>
         )}
       </Paper>
     </UnstyledButton>
@@ -118,7 +165,11 @@ const SlotButton = ({
 };
 
 const SlotGroup = ({
-  label, slots, slotStates, selectedTime, onSelect,
+  label,
+  slots,
+  slotStates,
+  selectedTime,
+  onSelect,
 }: {
   label: string;
   slots: string[];
@@ -129,7 +180,9 @@ const SlotGroup = ({
   if (slots.length === 0) return null;
   return (
     <Box>
-      <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb="xs">{label}</Text>
+      <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb="xs">
+        {label}
+      </Text>
       <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
         {slots.map((slot) => (
           <SlotButton
@@ -154,11 +207,16 @@ export default function BookingConfirmation() {
   const [markedDates, setMarkedDates] = useState<MarkedDate[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loadingAppts, setLoadingAppts] = useState(false);
-  const [providerServices, setProviderServices] = useState<ProviderService[]>([]);
+  const [providerServices, setProviderServices] = useState<ProviderService[]>(
+    [],
+  );
   const [loadingServices, setLoadingServices] = useState(false);
-  const [selectedService, setSelectedService] = useState<ProviderService | null>(null);
+  const [selectedService, setSelectedService] =
+    useState<ProviderService | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.BankTransfer);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PaymentMethod.BankTransfer,
+  );
   const [allSlots, setAllSlots] = useState<string[]>([]);
   const [occupiedSlots, setOccupiedSlots] = useState<Set<string>>(new Set());
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -180,7 +238,10 @@ export default function BookingConfirmation() {
         });
         const marks: MarkedDate[] = [];
         Object.values(dateMap).forEach((appts) => {
-          marks.push({ date: new Date(appts[0].start_time), status: appts[0].status });
+          marks.push({
+            date: new Date(appts[0].start_time),
+            status: appts[0].status,
+          });
         });
         setMarkedDates(marks);
       } finally {
@@ -194,7 +255,9 @@ export default function BookingConfirmation() {
     (async () => {
       setLoadingServices(true);
       try {
-        const { data } = await API.providers({ provider_id: String(providerId) }).services.get();
+        const { data } = await API.providers({
+          provider_id: String(providerId),
+        }).services.get();
         setProviderServices(data ?? []);
       } finally {
         setLoadingServices(false);
@@ -210,7 +273,9 @@ export default function BookingConfirmation() {
       setOccupiedSlots(new Set());
       setSelectedTime(null);
       try {
-        const dateStr = selectedDate.toISOString().split("T")[0];
+        // Use local date parts to avoid UTC offset shifting the day
+        const pad2 = (n: number) => String(n).padStart(2, "0");
+        const dateStr = `${selectedDate.getFullYear()}-${pad2(selectedDate.getMonth() + 1)}-${pad2(selectedDate.getDate())}`;
         const { data } = await API.bookings
           .provider({ provider_id: String(providerId) })
           .availability.get({ query: { date: dateStr } });
@@ -225,8 +290,7 @@ export default function BookingConfirmation() {
   const slotStates: Record<string, SlotState> = (() => {
     if (!selectedDate || allSlots.length === 0) return {};
     const now = new Date();
-    const durationMin = (selectedService?.duration_hours ?? 0) * 60;
-    const allSlotsSet = new Set(allSlots);
+    const durationMin = selectedService?.duration_minutes ?? 0;
 
     return Object.fromEntries(
       allSlots.map((slot) => {
@@ -235,14 +299,16 @@ export default function BookingConfirmation() {
         slotDate.setHours(h, m, 0, 0);
         if (slotDate < now) return [slot, "past" as SlotState];
         if (occupiedSlots.has(slot)) return [slot, "occupied" as SlotState];
-        if (!selectedService || durationMin === 0) return [slot, "available" as SlotState];
+        if (!selectedService || durationMin === 0)
+          return [slot, "available" as SlotState];
 
+        // Check if any 30-min chunk of the service duration is occupied
         const startMin = slotToMinutes(slot);
         const endMin = startMin + durationMin;
         for (let cursor = startMin; cursor < endMin; cursor += 30) {
           const currentCheck = `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`;
-          if (occupiedSlots.has(currentCheck)) return [slot, "occupied" as SlotState];
-          if (!allSlotsSet.has(currentCheck)) return [slot, "overflow" as SlotState];
+          if (occupiedSlots.has(currentCheck))
+            return [slot, "occupied" as SlotState];
         }
         return [slot, "available" as SlotState];
       }),
@@ -264,7 +330,8 @@ export default function BookingConfirmation() {
     setSelectedTime(slot);
   };
 
-  const canConfirm = selectedDate && selectedTime && selectedService && paymentMethod;
+  const canConfirm =
+    selectedDate && selectedTime && selectedService && paymentMethod;
 
   const handleConfirm = async () => {
     if (!canConfirm || !currentUser) return;
@@ -272,12 +339,26 @@ export default function BookingConfirmation() {
     setError(null);
     try {
       const [hours, minutes] = selectedTime.split(":").map(Number);
-      const dateTime = new Date(selectedDate);
-      dateTime.setHours(hours, minutes, 0, 0);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      // Build a naive ISO string (no Z / timezone offset) so the server
+      // compares against schedule times with the same "wall clock" reference.
+      // toISOString() would shift to UTC and break the HH:MM schedule check.
+      const start_time = [
+        selectedDate.getFullYear(),
+        "-",
+        pad(selectedDate.getMonth() + 1),
+        "-",
+        pad(selectedDate.getDate()),
+        "T",
+        pad(hours),
+        ":",
+        pad(minutes),
+        ":00",
+      ].join("");
       await API.bookings.me.post({
         provider_id: providerId,
         service_id: selectedService.service_id,
-        start_time: dateTime.toISOString(),
+        start_time,
         payment_method: paymentMethod as PaymentMethod,
       });
       setSuccess(true);
@@ -300,14 +381,20 @@ export default function BookingConfirmation() {
 
         {/* Paso 1 — Calendario */}
         <Paper withBorder p="lg" shadow="sm">
-          <Text fw={600} mb="sm">{lang("booking.step1")}</Text>
+          <Text fw={600} mb="sm">
+            {lang("booking.step1")}
+          </Text>
           <Group gap="md" mb="md">
             {Object.entries(statusColorMap).map(([label, color]) => (
               <Group key={label} gap={6}>
-                <Box w={10} h={10} style={{
-                  borderRadius: "50%",
-                  backgroundColor: `var(--mantine-color-${color}-5)`,
-                }} />
+                <Box
+                  w={10}
+                  h={10}
+                  style={{
+                    borderRadius: "50%",
+                    backgroundColor: `var(--mantine-color-${color}-5)`,
+                  }}
+                />
                 <Text size="xs" c="dimmed">
                   {lang(`booking.status.${label}`)}
                 </Text>
@@ -315,7 +402,9 @@ export default function BookingConfirmation() {
             ))}
           </Group>
           {loadingAppts && (
-            <Text size="xs" c="dimmed" mb="xs">{lang("booking.loading_appointments")}</Text>
+            <Text size="xs" c="dimmed" mb="xs">
+              {lang("booking.loading_appointments")}
+            </Text>
           )}
           <Calendar
             markedDates={markedDates}
@@ -327,34 +416,53 @@ export default function BookingConfirmation() {
         {/* Paso 2 — Servicio */}
         {selectedDate && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="lg">{lang("booking.step2")}</Text>
+            <Text fw={600} mb="lg">
+              {lang("booking.step2")}
+            </Text>
             {loadingServices ? (
               <Stack gap="xs">
                 <Skeleton height={48} />
                 <Skeleton height={48} />
               </Stack>
             ) : providerServices.length === 0 ? (
-              <Text size="sm" c="dimmed" fs="italic">{lang("booking.no_services")}</Text>
+              <Text size="sm" c="dimmed" fs="italic">
+                {lang("booking.no_services")}
+              </Text>
             ) : (
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
                 {providerServices.map((svc) => (
                   <ToggleButton
                     key={svc.service_id}
                     selected={selectedService?.service_id === svc.service_id}
-                    onClick={() => { setSelectedService(svc); setSelectedTime(null); }}
+                    onClick={() => {
+                      setSelectedService(svc);
+                      setSelectedTime(null);
+                    }}
                   >
                     <Group justify="space-between">
-                      <Text size="sm" fw={500}
-                        c={selectedService?.service_id === svc.service_id
-                          ? "var(--mantine-color-body)" : "dimmed"}>
-                        {svc.service_name ?? svc.name ?? `Servicio #${svc.service_id}`}
+                      <Text
+                        size="sm"
+                        fw={500}
+                        c={
+                          selectedService?.service_id === svc.service_id
+                            ? "var(--mantine-color-body)"
+                            : "dimmed"
+                        }
+                      >
+                        {svc.service_name ??
+                          svc.name ??
+                          `Servicio #${svc.service_id}`}
                       </Text>
                       <Group gap={6}>
-                        {svc.duration_hours && (
-                          <Text size="xs" c="dimmed">{svc.duration_hours}h</Text>
+                        {svc.duration_minutes && (
+                          <Text size="xs" c="dimmed">
+                            {formatDuration(svc.duration_minutes)}
+                          </Text>
                         )}
                         {svc.price != null && (
-                          <Text size="xs" fw={600} c="dimmed">{svc.price} €</Text>
+                          <Text size="xs" fw={600} c="dimmed">
+                            {svc.price} €
+                          </Text>
                         )}
                       </Group>
                     </Group>
@@ -371,15 +479,25 @@ export default function BookingConfirmation() {
             <Group justify="space-between" mb="md">
               <Text fw={600}>{lang("booking.step3")}</Text>
               <Group gap="md">
-                {([
-                  { key: "available", color: "var(--mantine-color-default-border)" },
-                  { key: "occupied", color: "var(--mantine-color-red-4)" },
-                  { key: "overflow", color: "var(--mantine-color-orange-4)" },
-                  { key: "past", color: "var(--mantine-color-gray-4)" },
-                ] as const).map(({ key, color }) => (
+                {(
+                  [
+                    {
+                      key: "available",
+                      color: "var(--mantine-color-default-border)",
+                    },
+                    { key: "occupied", color: "var(--mantine-color-red-4)" },
+                    { key: "past", color: "var(--mantine-color-gray-4)" },
+                  ] as const
+                ).map(({ key, color }) => (
                   <Group key={key} gap={6}>
-                    <Box w={10} h={10} style={{ borderRadius: "50%", backgroundColor: color }} />
-                    <Text size="xs" c="dimmed">{lang(`booking.slot_states.${key}`)}</Text>
+                    <Box
+                      w={10}
+                      h={10}
+                      style={{ borderRadius: "50%", backgroundColor: color }}
+                    />
+                    <Text size="xs" c="dimmed">
+                      {lang(`booking.slot_states.${key}`)}
+                    </Text>
                   </Group>
                 ))}
               </Group>
@@ -387,18 +505,25 @@ export default function BookingConfirmation() {
 
             <Text size="xs" c="dimmed" mb="md">
               ℹ️{" "}
-              {lang("booking.slot_info").replace("{duration}", String(selectedService.duration_hours))}
+              {lang("booking.slot_info").replace(
+                "{duration}",
+                formatDuration(selectedService.duration_minutes),
+              )}
             </Text>
 
             {loadingSlots ? (
               <Stack gap="xs">
                 <Skeleton height={16} width={60} />
                 <SimpleGrid cols={{ base: 4, sm: 6 }} spacing="xs">
-                  {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} height={48} />)}
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <Skeleton key={i} height={48} />
+                  ))}
                 </SimpleGrid>
               </Stack>
             ) : allSlots.length === 0 ? (
-              <Text size="sm" c="dimmed" fs="italic">{lang("booking.no_slots")}</Text>
+              <Text size="sm" c="dimmed" fs="italic">
+                {lang("booking.no_slots")}
+              </Text>
             ) : (
               <Stack gap="lg">
                 <SlotGroup
@@ -423,7 +548,9 @@ export default function BookingConfirmation() {
         {/* Paso 4 — Pago */}
         {selectedDate && selectedService && selectedTime && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="md">{lang("booking.step4")}</Text>
+            <Text fw={600} mb="md">
+              {lang("booking.step4")}
+            </Text>
             <SimpleGrid cols={3} spacing="xs">
               {PAYMENT_METHODS.map((method) => (
                 <ToggleButton
@@ -441,31 +568,60 @@ export default function BookingConfirmation() {
         {/* Resumen + Confirmar */}
         {canConfirm && (
           <Paper withBorder p="lg" shadow="sm">
-            <Text fw={600} mb="md">{lang("booking.summary")}</Text>
+            <Text fw={600} mb="md">
+              {lang("booking.summary")}
+            </Text>
             <Stack gap={6} mb="lg">
               <Text size="sm">
-                📅 <Text span fw={500}>{lang("booking.summary_date")}:</Text>{" "}
+                📅{" "}
+                <Text span fw={500}>
+                  {lang("booking.summary_date")}:
+                </Text>{" "}
                 {selectedDate.toLocaleDateString("es-ES", {
-                  weekday: "long", year: "numeric", month: "long", day: "numeric",
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </Text>
               <Text size="sm">
-                🕐 <Text span fw={500}>{lang("booking.summary_time")}:</Text>{" "}
-                {selectedTime} → {addMinutes(selectedTime, selectedService.duration_hours * 60)}
+                🕐{" "}
+                <Text span fw={500}>
+                  {lang("booking.summary_time")}:
+                </Text>{" "}
+                {selectedTime} →{" "}
+                {addMinutes(selectedTime, selectedService.duration_minutes)}
               </Text>
               <Text size="sm">
-                🛠 <Text span fw={500}>{lang("booking.summary_service")}:</Text>{" "}
-                {selectedService.service_name ?? selectedService.name ?? `#${selectedService.service_id}`}
-                {selectedService.price != null && ` — ${selectedService.price} €`}
+                🛠{" "}
+                <Text span fw={500}>
+                  {lang("booking.summary_service")}:
+                </Text>{" "}
+                {selectedService.service_name ??
+                  selectedService.name ??
+                  `#${selectedService.service_id}`}
+                {selectedService.price != null &&
+                  ` — ${selectedService.price} €`}
               </Text>
               <Text size="sm">
-                💳 <Text span fw={500}>{lang("booking.summary_payment")}:</Text>{" "}
+                💳{" "}
+                <Text span fw={500}>
+                  {lang("booking.summary_payment")}:
+                </Text>{" "}
                 {lang(`booking.payment_methods.${paymentMethod}`)}
               </Text>
             </Stack>
 
-            {error && <Alert color="red" mb="md">{error}</Alert>}
-            {success && <Alert color="green" mb="md">{lang("booking.success")}</Alert>}
+            {error && (
+              <Alert color="red" mb="md">
+                {error}
+              </Alert>
+            )}
+            {success && (
+              <Alert color="green" mb="md">
+                {lang("booking.success")}
+              </Alert>
+            )}
 
             <Button
               onClick={handleConfirm}

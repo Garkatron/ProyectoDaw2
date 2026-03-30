@@ -16,395 +16,387 @@ import { NotificationService } from "../notification/service";
 import { UserQueries } from "../user/queries";
 
 export abstract class BookingService {
-    static async assign({
-        service_id,
-        provider_id,
-        client_id,
-        start_time,
-        payment_method,
-    }: BookingModel["assignBody"]): Promise<BookingModel["assignResponse"]> {
-        // ? Avoid self contract
-        if (provider_id === client_id)
-            throw status(
-                403,
-                "You cannot contract yourself" satisfies BookingModel["forbidden"],
-            );
+  static async assign({
+    service_id,
+    provider_id,
+    client_id,
+    start_time,
+    payment_method,
+  }: BookingModel["assignBody"]): Promise<BookingModel["assignResponse"]> {
+    // ? Avoid self contract
+    if (provider_id === client_id)
+      throw status(
+        403,
+        "You cannot contract yourself" satisfies BookingModel["forbidden"],
+      );
 
-        // ? Find users
-        const provider = await UserService.getById({ id: String(provider_id) });
-        const client = await UserService.getById({ id: String(client_id) });
+    // ? Find users
+    const provider = await UserService.getById({ id: String(provider_id) });
+    const client = await UserService.getById({ id: String(client_id) });
 
-        if (provider.role !== UserRole.Provider)
-            throw status(
-                403,
-                "User is not a provider" satisfies BookingModel["forbidden"],
-            );
+    if (provider.role !== UserRole.Provider)
+      throw status(
+        403,
+        "User is not a provider" satisfies BookingModel["forbidden"],
+      );
 
-        if (client.role !== UserRole.Client)
-            throw status(
-                403,
-                "User is not a client" satisfies BookingModel["forbidden"],
-            );
+    if (client.role !== UserRole.Client)
+      throw status(
+        403,
+        "User is not a client" satisfies BookingModel["forbidden"],
+      );
 
-        // ? Find service
-        const providerService = ProviderQueries.findByProviderAndService.get({
-            user_id: provider_id,
-            service_id,
-        });
+    // ? Find service
+    const providerService = ProviderQueries.findByProviderAndService.get({
+      user_id: provider_id,
+      service_id,
+    });
 
-        if (!providerService || !providerService.is_active)
-            throw status(
-                403,
-                "User does not offer this service" satisfies BookingModel["forbidden"],
-            );
+    if (!providerService || !providerService.is_active)
+      throw status(
+        403,
+        "User does not offer this service" satisfies BookingModel["forbidden"],
+      );
 
-        // ? Calc time
-        const duration_hours = providerService.duration_hours;
-        const startDate = new Date(start_time);
-        const endDate = new Date(
-            startDate.getTime() + duration_hours * 60 * 60 * 1000,
-        );
-        const new_start = startDate.toISOString();
-        const new_end = endDate.toISOString();
+    // ? Calc time
+    const duration_minutes = providerService.duration_minutes;
+    const startDate = new Date(start_time);
+    const endDate = new Date(
+      startDate.getTime() + duration_minutes * 60 * 1000,
+    );
+    const new_start = startDate.toISOString();
+    const new_end = endDate.toISOString();
 
-        // ? Validate against ProviderSchedule
-        const dayOfWeek = (startDate.getDay() + 6) % 7; // 0=Lunes
-        const schedule = BookingQueries.findScheduleByUserAndDay.all({
-            user_id: provider_id,
-            day_of_week: dayOfWeek,
-        });
+    // ? Validate against ProviderSchedule
+    const dayOfWeek = (startDate.getDay() + 6) % 7; // 0=Lunes
+    const schedule = BookingQueries.findScheduleByUserAndDay.all({
+      user_id: provider_id,
+      day_of_week: dayOfWeek,
+    });
 
-        if (schedule.length === 0)
-            throw status(
-                409,
-                "Provider is not available in this timeframe" satisfies BookingModel["dateOccupied"],
-            );
+    if (schedule.length === 0)
+      throw status(
+        409,
+        "Provider is not available in this timeframe" satisfies BookingModel["dateOccupied"],
+      );
 
-        const startHHMM = startDate.getHours() * 60 + startDate.getMinutes();
-        const endHHMM = endDate.getHours() * 60 + endDate.getMinutes();
+    // Only validate that the START time falls within a schedule block.
+    // End-time overflow is intentionally not enforced here.
+    const startHHMM = startDate.getHours() * 60 + startDate.getMinutes();
 
-        const fitsInSchedule = schedule.some((s) => {
-            const [sh, sm] = s.start_time.split(":").map(Number);
-            const [eh, em] = s.end_time.split(":").map(Number);
-            return startHHMM >= sh * 60 + sm && endHHMM <= eh * 60 + em;
-        });
+    const fitsInSchedule = schedule.some((s) => {
+      const [sh, sm] = s.start_time.split(":").map(Number);
+      const [eh, em] = s.end_time.split(":").map(Number);
+      return startHHMM >= sh * 60 + sm && startHHMM < eh * 60 + em;
+    });
 
-        if (!fitsInSchedule)
-            throw status(
-                409,
-                "Provider is not available in this timeframe" satisfies BookingModel["dateOccupied"],
-            );
+    if (!fitsInSchedule)
+      throw status(
+        409,
+        "Provider is not available in this timeframe" satisfies BookingModel["dateOccupied"],
+      );
 
-        // ? Avoid service time overlaps
-        const conflict = BookingQueries.findConflict.get({
-            provider_id,
-            new_start,
-            new_end,
-        });
-        if (conflict)
-            throw status(
-                409,
-                "Provider is not available in this timeframe" satisfies BookingModel["dateOccupied"],
-            );
+    // ? Avoid service time overlaps
+    const conflict = BookingQueries.findConflict.get({
+      provider_id,
+      new_start,
+      new_end,
+    });
+    if (conflict)
+      throw status(
+        409,
+        "Provider is not available in this timeframe" satisfies BookingModel["dateOccupied"],
+      );
 
-        // ? Economic stuff
-        const provider_net = providerService.price_per_h * duration_hours;
-        const app_commission = provider_net * APP_COMMISSION_PERCENT;
-        const total_price = provider_net + app_commission;
+    // ? Economic stuff
+    const provider_net = providerService.price_per_h * (duration_minutes / 60);
+    const app_commission = provider_net * APP_COMMISSION_PERCENT;
+    const total_price = provider_net + app_commission;
 
-        // ? Travel buffer from provider profile
-        const providerProfile = BookingQueries.findProviderProfile.get({
-            user_id: provider_id,
-        });
-        const travel_buffer_min = providerProfile?.travel_buffer_min ?? 30;
+    // ? Travel buffer from provider profile
+    const providerProfile = BookingQueries.findProviderProfile.get({
+      user_id: provider_id,
+    });
+    const travel_buffer_min = providerProfile?.travel_buffer_min ?? 30;
 
-        // ? Insert
-        const { lastInsertRowid } = BookingQueries.insert.run({
-            start_time: new_start,
-            end_time: new_end,
-            travel_buffer_min,
-            status: AppointmentStatus.Pending,
-            total_price,
-            provider_net,
-            app_commission,
-            payment_method,
-            client_id,
-            provider_id,
-            service_id,
-        });
+    // ? Insert
+    const { lastInsertRowid } = BookingQueries.insert.run({
+      start_time: new_start,
+      end_time: new_end,
+      travel_buffer_min,
+      status: AppointmentStatus.Pending,
+      total_price,
+      provider_net,
+      app_commission,
+      payment_method,
+      client_id,
+      provider_id,
+      service_id,
+    });
 
-        const created = BookingQueries.findById.get({
-            id: Number(lastInsertRowid),
-        });
+    const created = BookingQueries.findById.get({
+      id: Number(lastInsertRowid),
+    });
 
-        if (!created)
-            throw status(500, "Failed to retrieve the created appointment");
+    if (!created)
+      throw status(500, "Failed to retrieve the created appointment");
 
-        const expires_at = new Date(
-            Date.now() + 2 * 24 * 60 * 60 * 1000,
-        ).toISOString();
+    const expires_at = new Date(
+      Date.now() + 2 * 24 * 60 * 60 * 1000,
+    ).toISOString();
 
-        NotificationService.sendInbox({
-            user_id: client.id,
-            expires_at,
-            content: `Tu cita para "${providerService.service_name}" con ${provider.name} el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)} ha sido confirmada.`,
-        });
+    NotificationService.sendInbox({
+      user_id: client.id,
+      expires_at,
+      content: `Tu cita para "${providerService.service_name}" con ${provider.name} el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)} ha sido confirmada.`,
+    });
 
-        NotificationService.sendInbox({
-            user_id: provider.id,
-            expires_at,
-            content: `Nueva cita: ${client.name} ha reservado "${providerService.service_name}" el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)}.`,
-        });
+    NotificationService.sendInbox({
+      user_id: provider.id,
+      expires_at,
+      content: `Nueva cita: ${client.name} ha reservado "${providerService.service_name}" el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)}.`,
+    });
 
-        // TODO: Avoid querie the user two times...
-        // This happens because I use the UserService that doesn't send the Email for security, but I need the Email here to send then notification.
-        const _client = UserQueries.findById.get({ id: Number(client.id) });
+    // TODO: Avoid querie the user two times...
+    // This happens because I use the UserService that doesn't send the Email for security, but I need the Email here to send then notification.
+    const _client = UserQueries.findById.get({ id: Number(client.id) });
 
-        const { id } = await NotificationService.sendConfirmationEmail({
-            to: _client!.email,
-            booking_id: String(created.id),
-            client_name: _client!.name,
-            provider_name: provider.name,
-            service_name: providerService.service_name,
-            date: new_start,
-            time: new_start,
-            end_time: new_end,
-            payment_method,
-            total_price: String(total_price),
-        });
+    const { id } = await NotificationService.sendConfirmationEmail({
+      to: _client!.email,
+      booking_id: String(created.id),
+      client_name: _client!.name,
+      provider_name: provider.name,
+      service_name: providerService.service_name,
+      date: new_start,
+      time: new_start,
+      end_time: new_end,
+      payment_method,
+      total_price: String(total_price),
+    });
 
-        return created;
+    return created;
+  }
+
+  static getAvailability(
+    { provider_id }: { provider_id: number },
+    { date }: { date: string },
+  ): BookingModel["availabilityResponse"] {
+    const day_start = `${date}T00:00:00`;
+    const day_end = `${date}T23:59:59`;
+    const dayOfWeek = (new Date(date).getDay() + 6) % 7; // 0=Lunes
+
+    const schedule = BookingQueries.findScheduleByUserAndDay.all({
+      user_id: provider_id,
+      day_of_week: dayOfWeek,
+    });
+
+    // ? Generate all available slots from provider schedule (every 30min)
+    const all_slots = new Set<string>();
+    for (const s of schedule) {
+      const [sh, sm] = s.start_time.split(":").map(Number);
+      const [eh, em] = s.end_time.split(":").map(Number);
+      let current = sh * 60 + sm;
+      const end = eh * 60 + em;
+
+      while (current < end) {
+        const h = String(Math.floor(current / 60)).padStart(2, "0");
+        const m = String(current % 60).padStart(2, "0");
+        all_slots.add(`${h}:${m}`);
+        current += 30;
+      }
     }
 
-    static getAvailability(
-        { provider_id }: { provider_id: number },
-        { date }: { date: string },
-    ): BookingModel["availabilityResponse"] {
-        const day_start = `${date}T00:00:00`;
-        const day_end = `${date}T23:59:59`;
-        const dayOfWeek = (new Date(date).getDay() + 6) % 7; // 0=Lunes
+    // ? Remove slots blocked by appointments + travel buffer
+    const rows = BookingQueries.findOccupiedSlots.all({
+      provider_id,
+      day_start,
+      day_end,
+    });
+    const occupied_slots = new Set<string>();
 
-        const schedule = BookingQueries.findScheduleByUserAndDay.all({
-            user_id: provider_id,
-            day_of_week: dayOfWeek,
-        });
+    for (const row of rows) {
+      const start = new Date(row.start_time);
+      const end = new Date(row.end_time);
+      const bufferEnd = new Date(
+        end.getTime() + row.travel_buffer_min * 60_000,
+      );
 
-        // ? Generate all available slots from provider schedule (every 30min)
-        const all_slots = new Set<string>();
-        for (const s of schedule) {
-            const [sh, sm] = s.start_time.split(":").map(Number);
-            const [eh, em] = s.end_time.split(":").map(Number);
-            let current = sh * 60 + sm;
-            const end = eh * 60 + em;
-
-            while (current < end) {
-                const h = String(Math.floor(current / 60)).padStart(2, "0");
-                const m = String(current % 60).padStart(2, "0");
-                all_slots.add(`${h}:${m}`);
-                current += 30;
-            }
+      for (const slot of all_slots) {
+        const slotDate = new Date(`${date}T${slot}:00`);
+        if (slotDate >= start && slotDate < bufferEnd) {
+          occupied_slots.add(slot);
         }
-
-        // ? Remove slots blocked by appointments + travel buffer
-        const rows = BookingQueries.findOccupiedSlots.all({
-            provider_id,
-            day_start,
-            day_end,
-        });
-        const occupied_slots = new Set<string>();
-
-        for (const row of rows) {
-            const start = new Date(row.start_time);
-            const end = new Date(row.end_time);
-            const bufferEnd = new Date(
-                end.getTime() + row.travel_buffer_min * 60_000,
-            );
-
-            for (const slot of all_slots) {
-                const slotDate = new Date(`${date}T${slot}:00`);
-                if (slotDate >= start && slotDate < bufferEnd) {
-                    occupied_slots.add(slot);
-                }
-            }
-        }
-
-        return {
-            date,
-            all_slots: [...all_slots].sort(),
-            occupied_slots: [...occupied_slots],
-        };
+      }
     }
 
-    static getSchedule({
-        provider_id,
-    }: {
-        provider_id: number;
-    }): BookingModel["scheduleResponse"] {
-        return BookingQueries.findScheduleByUserId.all({
-            user_id: provider_id,
-        });
+    return {
+      date,
+      all_slots: [...all_slots].sort(),
+      occupied_slots: [...occupied_slots],
+    };
+  }
+
+  static getSchedule({
+    provider_id,
+  }: {
+    provider_id: number;
+  }): BookingModel["scheduleResponse"] {
+    return BookingQueries.findScheduleByUserId.all({
+      user_id: provider_id,
+    });
+  }
+
+  static async upsertSchedule(
+    { provider_id }: { provider_id: number },
+    slots: BookingModel["upsertScheduleBody"],
+    uid: string,
+  ): Promise<BookingModel["scheduleResponse"]> {
+    const user = await UserService.getMe({ uid });
+
+    if (user.id !== provider_id)
+      throw status(
+        403,
+        "You can only manage your own schedule" satisfies BookingModel["forbidden"],
+      );
+
+    // ? Replace full schedule for this provider
+    BookingQueries.deleteScheduleByUser.run({ user_id: provider_id });
+
+    for (const slot of slots) {
+      BookingQueries.insertSchedule.run({
+        user_id: provider_id,
+        day_of_week: slot.day_of_week,
+        start_time: slot.start_time,
+        end_time: slot.end_time,
+      });
     }
 
-    static async upsertSchedule(
-        { provider_id }: { provider_id: number },
-        slots: BookingModel["upsertScheduleBody"],
-        uid: string,
-    ): Promise<BookingModel["scheduleResponse"]> {
-        const user = await UserService.getMe({ uid });
+    return BookingQueries.findScheduleByUserId.all({
+      user_id: provider_id,
+    });
+  }
 
-        if (user.id !== provider_id)
-            throw status(
-                403,
-                "You can only manage your own schedule" satisfies BookingModel["forbidden"],
-            );
+  static async getMe(uid: string): Promise<BookingModel["listResponse"]> {
+    const user = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
 
-        // ? Replace full schedule for this provider
-        BookingQueries.deleteScheduleByUser.run({ user_id: provider_id });
+    if (!user)
+      throw status(404, "User not found" satisfies BookingModel["notFound"]);
 
-        for (const slot of slots) {
-            BookingQueries.insertSchedule.run({
-                user_id: provider_id,
-                day_of_week: slot.day_of_week,
-                start_time: slot.start_time,
-                end_time: slot.end_time,
-            });
-        }
-
-        return BookingQueries.findScheduleByUserId.all({
-            user_id: provider_id,
-        });
+    if (user.role === UserRole.Client) {
+      return BookingQueries.findByClientId.all({ client_id: user.id });
     }
 
-    static async getMe(uid: string): Promise<BookingModel["listResponse"]> {
-        const user = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
-
-        if (!user)
-            throw status(
-                404,
-                "User not found" satisfies BookingModel["notFound"],
-            );
-
-        if (user.role === UserRole.Client) {
-            return BookingQueries.findByClientId.all({ client_id: user.id });
-        }
-
-        if (user.role === UserRole.Provider) {
-            return BookingQueries.findByProviderId.all({
-                provider_id: user.id,
-            });
-        }
-
-        throw status(
-            403,
-            "Admins can't have appointments" satisfies BookingModel["forbidden"],
-        );
+    if (user.role === UserRole.Provider) {
+      return BookingQueries.findByProviderId.all({
+        provider_id: user.id,
+      });
     }
 
-    static async updateStatusMe(
-        { status: appointment_status }: BookingModel["updateStatusBody"],
-        { id }: BookingModel["appointmentIdParam"],
-        uid: string,
-    ): Promise<BookingModel["updateResponse"]> {
-        const user = await UserService.getMe({ uid });
-        const appointment = BookingQueries.findById.get({ id });
+    throw status(
+      403,
+      "Admins can't have appointments" satisfies BookingModel["forbidden"],
+    );
+  }
 
-        if (!appointment)
-            throw status(
-                404,
-                "Appointment not found" satisfies BookingModel["notFound"],
-            );
+  static async updateStatusMe(
+    { status: appointment_status }: BookingModel["updateStatusBody"],
+    { id }: BookingModel["appointmentIdParam"],
+    uid: string,
+  ): Promise<BookingModel["updateResponse"]> {
+    const user = await UserService.getMe({ uid });
+    const appointment = BookingQueries.findById.get({ id });
 
-        if (appointment.provider_id != user.id)
-            throw status(
-                403,
-                "You can only manage your own appointments" satisfies BookingModel["forbidden"],
-            );
+    if (!appointment)
+      throw status(
+        404,
+        "Appointment not found" satisfies BookingModel["notFound"],
+      );
 
-        // ? Validate status transition
-        const VALID_TRANSITIONS: Record<
-            AppointmentStatus,
-            AppointmentStatus[]
-        > = {
-            [AppointmentStatus.Pending]: [
-                AppointmentStatus.InProcess,
-                AppointmentStatus.Cancelled,
-            ],
-            [AppointmentStatus.InProcess]: [
-                AppointmentStatus.Completed,
-                AppointmentStatus.Cancelled,
-            ],
-            [AppointmentStatus.Completed]: [],
-            [AppointmentStatus.Cancelled]: [],
-        };
+    if (appointment.provider_id != user.id)
+      throw status(
+        403,
+        "You can only manage your own appointments" satisfies BookingModel["forbidden"],
+      );
 
-        const allowed =
-            VALID_TRANSITIONS[appointment.status as AppointmentStatus] ?? [];
-        if (!allowed.includes(appointment_status))
-            throw status(
-                409,
-                "Invalid status transition" satisfies BookingModel["invalidTransition"],
-            );
+    // ? Validate status transition
+    const VALID_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
+      [AppointmentStatus.Pending]: [
+        AppointmentStatus.InProcess,
+        AppointmentStatus.Cancelled,
+      ],
+      [AppointmentStatus.InProcess]: [
+        AppointmentStatus.Completed,
+        AppointmentStatus.Cancelled,
+      ],
+      [AppointmentStatus.Completed]: [],
+      [AppointmentStatus.Cancelled]: [],
+    };
 
-        BookingQueries.updateStatus.run({
-            id: appointment.id,
-            status: appointment_status,
-        });
+    const allowed =
+      VALID_TRANSITIONS[appointment.status as AppointmentStatus] ?? [];
+    if (!allowed.includes(appointment_status))
+      throw status(
+        409,
+        "Invalid status transition" satisfies BookingModel["invalidTransition"],
+      );
 
-        const updated = BookingQueries.findById.get({ id: appointment.id });
-        if (!updated) throw new Error("Appointment not found after update");
+    BookingQueries.updateStatus.run({
+      id: appointment.id,
+      status: appointment_status,
+    });
 
-        return updated;
-    }
+    const updated = BookingQueries.findById.get({ id: appointment.id });
+    if (!updated) throw new Error("Appointment not found after update");
 
-    static async assignByUid(
-        body: BookingModel["assignMeBody"],
-        client_uid: string,
-    ): Promise<BookingModel["assignResponse"]> {
-        const client = AuthQueries.findByFirebaseUid.get({
-            firebase_uid: client_uid,
-        });
-        if (!client)
-            throw status(
-                404,
-                "User not found" satisfies BookingModel["notFound"],
-            );
+    return updated;
+  }
 
-        return await BookingService.assign({ ...body, client_id: client.id });
-    }
+  static async assignByUid(
+    body: BookingModel["assignMeBody"],
+    client_uid: string,
+  ): Promise<BookingModel["assignResponse"]> {
+    const client = AuthQueries.findByFirebaseUid.get({
+      firebase_uid: client_uid,
+    });
+    if (!client)
+      throw status(404, "User not found" satisfies BookingModel["notFound"]);
 
-    static async getByProviderId({
-        provider_id,
-    }: BookingModel["providerIdParam"]): Promise<BookingModel["listResponse"]> {
-        const provider = await UserService.getById({ id: String(provider_id) });
+    return await BookingService.assign({ ...body, client_id: client.id });
+  }
 
-        if (provider.role !== UserRole.Provider)
-            throw status(
-                403,
-                "User is not a provider" satisfies BookingModel["forbidden"],
-            );
+  static async getByProviderId({
+    provider_id,
+  }: BookingModel["providerIdParam"]): Promise<BookingModel["listResponse"]> {
+    const provider = await UserService.getById({ id: String(provider_id) });
 
-        const appointments = BookingQueries.findByProviderId.all({
-            provider_id: Number(provider_id),
-        });
+    if (provider.role !== UserRole.Provider)
+      throw status(
+        403,
+        "User is not a provider" satisfies BookingModel["forbidden"],
+      );
 
-        return appointments;
-    }
+    const appointments = BookingQueries.findByProviderId.all({
+      provider_id: Number(provider_id),
+    });
 
-    static async getByClientId({
-        client_id,
-    }: BookingModel["clientIdParam"]): Promise<BookingModel["listResponse"]> {
-        const client = await UserService.getById({ id: String(client_id) });
+    return appointments;
+  }
 
-        if (client.role !== UserRole.Client)
-            throw status(
-                403,
-                "User is not a client" satisfies BookingModel["forbidden"],
-            );
+  static async getByClientId({
+    client_id,
+  }: BookingModel["clientIdParam"]): Promise<BookingModel["listResponse"]> {
+    const client = await UserService.getById({ id: String(client_id) });
 
-        const appointments = BookingQueries.findByClientId.all({
-            client_id: Number(client_id),
-        });
+    if (client.role !== UserRole.Client)
+      throw status(
+        403,
+        "User is not a client" satisfies BookingModel["forbidden"],
+      );
 
-        return appointments;
-    }
+    const appointments = BookingQueries.findByClientId.all({
+      client_id: Number(client_id),
+    });
+
+    return appointments;
+  }
 }

@@ -23,15 +23,34 @@ const Base = ({ children }) => {
   const variants = {
     initial: (dir: number) => ({ y: dir === 0 ? 0 : dir * -40, opacity: 0 }),
     animate: { y: 0, opacity: 1 },
-    exit:    (dir: number) => ({ y: dir === 0 ? 0 : dir * 40, opacity: 0 }),
+    exit: (dir: number) => ({ y: dir === 0 ? 0 : dir * 40, opacity: 0 }),
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-
-      <Box visibleFrom="sm" style={{ padding: "0.5rem" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        minHeight: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        // Respect safe area on sides (landscape notch)
+        paddingLeft: "env(safe-area-inset-left)",
+        paddingRight: "env(safe-area-inset-right)",
+      }}
+    >
+      {/* Desktop navbar — top, with safe area top padding */}
+      <Box
+        visibleFrom="sm"
+        style={{
+          padding: "0.5rem",
+          paddingTop: "calc(0.5rem + env(safe-area-inset-top))",
+        }}
+      >
         <Navbar />
       </Box>
+
+      {/* Mobile: push content down by safe-area-inset-top */}
+      <Box hiddenFrom="sm" style={{ paddingTop: "env(safe-area-inset-top)" }} />
 
       <Box style={{ position: "relative", overflow: "hidden", flex: 1 }}>
         <AnimatePresence mode="wait" custom={direction}>
@@ -49,6 +68,7 @@ const Base = ({ children }) => {
         </AnimatePresence>
       </Box>
 
+      {/* Mobile bottom navbar — safe area bottom padding */}
       <Box
         hiddenFrom="sm"
         style={{
@@ -56,11 +76,11 @@ const Base = ({ children }) => {
           bottom: 0,
           zIndex: 100,
           padding: "0.5rem",
+          paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom))",
         }}
       >
         <Navbar />
       </Box>
-
     </div>
   );
 };

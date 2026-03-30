@@ -6,13 +6,21 @@ import {
   Divider,
   Group,
   NumberInput,
+  Paper,
   Select,
   SimpleGrid,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import { useState } from "react";
+
+const APP_COMMISSION = 0.2;
+
+function calcEarnings(pricePerHour: number, durationMinutes: number) {
+  const gross = pricePerHour * (durationMinutes / 60);
+  const net = gross * (1 - APP_COMMISSION);
+  return { gross, net };
+}
 
 export default function ServicesSection({
   isSelf,
@@ -24,14 +32,21 @@ export default function ServicesSection({
   setSelectedServiceId,
   selectedServicePrice,
   setSelectedServicePrice,
-  selectedServiceHours,
-  setSelectedServiceHours,
+  selectedServiceMinutes,
+  setSelectedServiceMinutes,
   serviceSubmitting,
   serviceError,
 }) {
   const availableServices = allServices
     .filter((s) => !userServices.some((us) => us.service_id === s.id))
     .map((s) => ({ value: String(s.id), label: s.name }));
+
+  const price = Number(selectedServicePrice);
+  const minutes = Number(selectedServiceMinutes);
+  const showPreview = price > 0 && minutes >= 15;
+  const { gross, net } = showPreview
+    ? calcEarnings(price, minutes)
+    : { gross: 0, net: 0 };
 
   return (
     <Stack gap="md">
@@ -53,7 +68,7 @@ export default function ServicesSection({
         </SimpleGrid>
       ) : (
         <Text size="sm" c="dimmed">
-          No hay servicios registrados.
+          {lang("userpanel.services.no_services")}
         </Text>
       )}
 
@@ -61,7 +76,7 @@ export default function ServicesSection({
         <Stack gap="sm" pt="sm">
           <Divider />
           <Title order={3} fw={300} fz="lg">
-            Añadir servicio
+            {lang("userpanel.services.add_title")}
           </Title>
 
           {serviceError && (
@@ -71,44 +86,68 @@ export default function ServicesSection({
           )}
 
           <form onSubmit={onAdd}>
-            <Group align="flex-end" gap="sm" wrap="wrap">
-              <Select
-                style={{ flex: 1, minWidth: 180 }}
-                placeholder="Selecciona un servicio..."
-                data={availableServices}
-                value={selectedServiceId ? String(selectedServiceId) : null}
-                onChange={(val) => setSelectedServiceId(Number(val))}
-                required
-              />
+            <Stack gap="sm">
+              <Group align="flex-end" gap="sm" wrap="wrap">
+                <Select
+                  style={{ flex: 1, minWidth: 180 }}
+                  placeholder={lang("userpanel.services.select_placeholder")}
+                  data={availableServices}
+                  value={selectedServiceId ? String(selectedServiceId) : null}
+                  onChange={(val) => setSelectedServiceId(Number(val))}
+                  required
+                />
 
-              <NumberInput
-                w={128}
-                placeholder="Precio (€)"
-                min={50}
-                decimalScale={2}
-                value={selectedServicePrice}
-                onChange={setSelectedServicePrice}
-                required
-              />
+                <NumberInput
+                  w={160}
+                  label={lang("userpanel.services.price_label")}
+                  placeholder={lang("userpanel.services.price_placeholder")}
+                  min={50}
+                  decimalScale={2}
+                  suffix=" €/h"
+                  value={selectedServicePrice}
+                  onChange={setSelectedServicePrice}
+                  required
+                />
 
-              <NumberInput
-                w={128}
-                placeholder="Horas"
-                min={1}
-                decimalScale={0}
-                value={selectedServiceHours}
-                onChange={setSelectedServiceHours}
-                required
-              />
+                <NumberInput
+                  w={180}
+                  label={lang("userpanel.services.duration_label")}
+                  description={lang("userpanel.services.duration_description")}
+                  placeholder={lang("userpanel.services.duration_placeholder")}
+                  min={15}
+                  max={480}
+                  step={15}
+                  suffix=" min"
+                  value={selectedServiceMinutes}
+                  onChange={(val) => setSelectedServiceMinutes(Number(val))}
+                />
 
-              <Button
-                type="submit"
-                variant="default"
-                loading={serviceSubmitting}
-              >
-                Añadir
-              </Button>
-            </Group>
+                <Button
+                  type="submit"
+                  variant="default"
+                  loading={serviceSubmitting}
+                  style={{ alignSelf: "flex-end" }}
+                >
+                  {lang("userpanel.services.add_button")}
+                </Button>
+              </Group>
+
+              {showPreview && (
+                <Paper
+                  withBorder
+                  p="sm"
+                  radius="md"
+                  bg="var(--mantine-color-green-light)"
+                >
+                  <Text size="sm" c="green" fw={500}>
+                    💰{" "}
+                    {lang("userpanel.services.earnings_preview")
+                      .replace("{{total}}", gross.toFixed(2))
+                      .replace("{{net}}", net.toFixed(2))}
+                  </Text>
+                </Paper>
+              )}
+            </Stack>
           </form>
         </Stack>
       )}
