@@ -44,6 +44,8 @@ export default function Login() {
     e.preventDefault();
 
     const result = LoginSchema.safeParse({ email, password });
+    console.log("AAAAAAAAAAAA: ", email);
+    
 
     if (!result.success) {
       setModalTitle(lang("login.validation_error"));
@@ -61,6 +63,8 @@ export default function Login() {
       if (user?.role === UserRole.Admin) setAdmin(true);
     } else {
     if (response.error?.includes("verified email")) {
+        console.log("AAAAAAAAAAAA2: ", email);
+
         navigate("/verify-email", { state: { email } });
         return;
     }
