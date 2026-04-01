@@ -95,7 +95,6 @@ export default function Register() {
                             data={[
                                 { value: 'client', label: lang('register.roles.client') },
                                 { value: 'provider', label: lang('register.roles.provider') },
-                                { value: 'admin', label: lang('register.roles.admin') },
                             ]}
                         />
                     </Stack>
