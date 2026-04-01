@@ -11,6 +11,7 @@ import type { DecodedIdToken, UserRecord } from "firebase-admin/auth";
 import { AuthQueries } from "./queries";
 import { NotificationService } from "../notification/service";
 import generateVefCode from "../../utils";
+import { logger } from "../../libs/pino";
 
 export abstract class AuthService {
     static async register({
@@ -19,9 +20,13 @@ export abstract class AuthService {
         email,
         role,
     }: AuthModel["registerBody"]): Promise<AuthModel["registerResponse"]> {
+        logger.info({ email, role }, "register attempt");
+
         const existing = AuthQueries.findByEmail.get({ email: email });
 
         if (existing) {
+            logger.warn({ email }, "register failed: email already in use");
+
             throw status(
                 400,
                 "Email already in use" satisfies AuthModel["registerInvalid"],
@@ -43,7 +48,12 @@ export abstract class AuthService {
                 email: email,
                 role: role,
             });
+            logger.info(
+                { email, uid: firebaseUser.uid },
+                "firebase user created",
+            );
         } catch (error) {
+            logger.error({ email, error }, "register failed: firebase error");
             console.error("[Register][Firebase]:");
             console.error(error);
             throw status(500, "Error creating user");
@@ -51,13 +61,19 @@ export abstract class AuthService {
 
         if (process.env.EMAIL_VERIFICATION === "true") {
             const generated = await generateVefCode();
-            
-            AuthQueries.insertVerificationCode.run({email, hashed_code: generated.hashed_code});
+
+            AuthQueries.insertVerificationCode.run({
+                email,
+                hashed_code: generated.hashed_code,
+            });
             const { id } = await NotificationService.sendVerificationEmail({
                 to: email,
                 code: generated.code,
             });
-            
+            logger.info(
+                { email, notificationId: id },
+                "verification email sent",
+            );
         }
 
         return { username, email };
@@ -67,11 +83,19 @@ export abstract class AuthService {
         email,
         password,
     }: AuthModel["loginBody"]): Promise<AuthModel["loginResponse"]> {
+        logger.info({ email }, "login attempt");
+
         if (!email || !password) {
+            logger.error(
+                { email },
+                "login failed: email and password are required",
+            );
             throw status(400, "Email and password are required");
         }
 
         try {
+            logger.info({ email }, "fetching firebase user");
+
             // Fetch Firebase Identity Toolkit
             const firebaseResponse = await fetch(
                 `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
@@ -91,7 +115,10 @@ export abstract class AuthService {
                 const message = firebaseResponse.error.message;
 
                 // Firebase log
-                console.warn(`[AuthService] Firebase Auth Error: ${message}`);
+                logger.error(
+                    { error: firebaseResponse.error, message },
+                    "firebase error: login failed",
+                );
 
                 switch (message) {
                     case "EMAIL_NOT_FOUND":
@@ -117,14 +144,21 @@ export abstract class AuthService {
             let userRecord = AuthQueries.findByFirebaseUid.get({
                 firebase_uid,
             });
+            logger.info({ email }, "user found.");
 
             // ! Syncronization
             if (!userRecord) {
+                logger.info({ email }, "synchronizing user");
+
                 try {
                     const firebaseUser =
                         await firebaseAuth.getUser(firebase_uid);
 
                     if (!firebaseUser.email) {
+                        logger.error(
+                            {},
+                            "login failed: firebase user has no email",
+                        );
                         throw status(500, "Firebase user has no email");
                     }
 
@@ -139,31 +173,44 @@ export abstract class AuthService {
                         firebase_uid,
                     });
                 } catch (dbErr) {
-                    console.error(
-                        "[AuthService] Error syncing user to DB:",
-                        dbErr,
-                    );
+                    logger.error({ dbErr }, "login failed: firebase error");
                     throw status(500, "Error syncing user with database");
                 }
             }
 
             if (!userRecord) {
+                logger.error(
+                    {},
+                    "login failed: Failed to retrieve user record after sync",
+                );
                 throw status(500, "Failed to retrieve user record after sync");
             }
 
             if (process.env.EMAIL_VERIFICATION === "true") {
+                logger.info(
+                    {},
+                    "login: email verification is enabled, continuing to verification",
+                );
                 if (userRecord.email_verified == 0) {
-                    
                     const generated = await generateVefCode();
-                    
-                    AuthQueries.insertVerificationCode.run({email: userRecord.email, hashed_code: generated.hashed_code});
-                    
+
+                    AuthQueries.insertVerificationCode.run({
+                        email: userRecord.email,
+                        hashed_code: generated.hashed_code,
+                    });
+
                     await NotificationService.sendVerificationEmail({
                         to: email,
                         code: generated.code,
                     });
-                    throw status(403, "User isn't verified email.  Sending email..." satisfies AuthModel["emailNotVerified"]);
-                } 
+
+                    logger.warn({}, "login failed: user not verified");
+
+                    throw status(
+                        403,
+                        "User isn't verified email.  Sending email..." satisfies AuthModel["emailNotVerified"],
+                    );
+                }
             }
 
             return {
@@ -174,10 +221,11 @@ export abstract class AuthService {
             };
         } catch (err: any) {
             if (err.code && err.response) {
+                logger.error({ err }, "login failed: unknown error");
                 throw err;
             }
 
-            // Si es un error de red o inesperado
+            logger.error({ err }, "login failed: unknown error");
             console.error("[AuthService][login] Unexpected System Error:", err);
             throw status(500, "Internal Server Connection Error");
         }
@@ -210,20 +258,47 @@ export abstract class AuthService {
         await firebaseAuth.revokeRefreshTokens(uid);
     }
 
-    static async verifyEmailCode({ email, code: sent_code }: AuthModel["verifyEmailBody"]): Promise<AuthModel["emailVerifiedResponse"]> {
+    static async verifyEmailCode({
+        email,
+        code: sent_code,
+    }: AuthModel["verifyEmailBody"]): Promise<
+        AuthModel["emailVerifiedResponse"]
+    > {
+        logger.info({ email, sent_code }, "email verification attempt");
 
-        const r = AuthQueries.findVerificationCodeByEmail.get({email});
+        const r = AuthQueries.findVerificationCodeByEmail.get({ email });
 
-        if (!r) throw status(404, "Verification code not found" satisfies AuthModel["verificationCodeNotGenerated"]);
+        if (!r) {
+            logger.error(
+                { email },
+                "email verification failed: Verification code not found",
+            );
+
+            throw status(
+                404,
+                "Verification code not found" satisfies AuthModel["verificationCodeNotGenerated"],
+            );
+        }
 
         const isValid = await Bun.password.verify(sent_code, r.code);
-        if (!isValid) throw status(401, "Invalid verification code." satisfies AuthModel["invalidCode"]);
+        if (!isValid) {
+            logger.error({ email, sent_code }, "email verification failed: invalid verification code");
 
+            throw status(
+                401,
+                "Invalid verification code." satisfies AuthModel["invalidCode"],
+            );
+        }
         AuthQueries.markCodeAsUsed.run({ id: r.id });
-        const { lastInsertRowid } = AuthQueries.updateEmailVerified.run({ email });
+        const { lastInsertRowid } = AuthQueries.updateEmailVerified.run({
+            email,
+        });
+
+        logger.info({ email }, "email verification succed");
+
 
         return {
-            success:!!lastInsertRowid
-        }
+            success: !!lastInsertRowid,
+        };
     }
 }

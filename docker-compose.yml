@@ -27,6 +27,22 @@ services:
     networks:
       - limpora-network
 
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "127.0.0.1:3100:3100"
+    networks:
+      - limpora-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    networks:
+      - limpora-network
+
 networks:
   limpora-network:
     name: limpora-network

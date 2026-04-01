@@ -20,6 +20,10 @@ import { mediaController } from "./modules/media";
 import { oauthController } from "./modules/oauth";
 import { userCurrencyController } from "./modules/currency";
 
+// ? Logging
+import { logger as pinoLogger } from "./libs/pino";
+
+
 // import { elysiaHelmet, permission } from 'elysiajs-helmet';
 
 const securityHeaders = new Elysia({ name: "security-headers" }).onRequest(
@@ -46,13 +50,7 @@ const securityHeaders = new Elysia({ name: "security-headers" }).onRequest(
 
 // ? Definition
 const app = new Elysia()
-    .use(
-        logger({
-            transport: {
-                target: "pino-pretty",
-            },
-        }),
-    )
+    .use(logger(pinoLogger))
     // Security
     .use(
         cors({
@@ -92,7 +90,5 @@ const app = new Elysia()
 console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
-
-
 
 export type App = typeof app;
