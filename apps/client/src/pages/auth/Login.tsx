@@ -61,7 +61,7 @@ export default function Login() {
       if (user?.role === UserRole.Admin) setAdmin(true);
     } else {
     if (response.error?.includes("verified email")) {
-        navigate("/verify-email?email=" + email);
+        navigate("/verify-email", { state: { email } });
         return;
     }
 
