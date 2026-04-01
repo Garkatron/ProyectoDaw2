@@ -1,16 +1,22 @@
 import pino from 'pino'
 import PinoLoki from 'pino-loki'
+import { multistream } from 'pino'
 
-const stream = PinoLoki({
+const lokiStream = PinoLoki({
   host: 'http://loki:3100',
   labels: { app: 'limpora-server', env: 'production' },
-  propsToLabels: ['level'],
   silenceErrors: false,
   batching: false,
 })
 
-stream.on('error', (err: any) => console.error('PINO-LOKI ERROR:', err))
+lokiStream.on('error', (err: any) => console.error('LOKI ERROR:', err))
 
-export const logger = pino({ level: 'info' }, stream)
+export const logger = pino(
+  { level: 'info' },
+  multistream([
+    { stream: process.stdout },   
+    { stream: lokiStream },       
+  ])
+)
 
-logger.info('pino-loki startup test')
+logger.info('startup test')
