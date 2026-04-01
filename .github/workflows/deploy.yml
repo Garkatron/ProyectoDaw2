@@ -19,50 +19,52 @@ jobs:
           port: 22
           script: |
             cd /var/www/html/ProyectoDaw2
-            
+
             git reset --hard
             git clean -fd
             git pull origin develop
-            
+
             rm -f docker-compose.override.yml
-            
+
             cat > apps/server/.env << 'ENVEOF'
-            NODE_ENV=production
-            PORT=${{ vars.PORT }}
-            DB_CONNECTION_LIMIT=${{ vars.DB_CONNECTION_LIMIT }}
+            NODE_ENV="production"
+            PORT="${{ vars.PORT }}"
+            DB_CONNECTION_LIMIT="${{ vars.DB_CONNECTION_LIMIT }}"
 
-            FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
-            FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}
-            FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}
-            FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+            FIREBASE_PROJECT_ID="${{ secrets.FIREBASE_PROJECT_ID }}"
+            FIREBASE_CLIENT_EMAIL="${{ secrets.FIREBASE_CLIENT_EMAIL }}"
+            FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"
+            FIREBASE_API_KEY="${{ secrets.FIREBASE_API_KEY }}"
 
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            GOOGLE_REDIRECT_URI=${{ vars.GOOGLE_REDIRECT_URI }}
+            GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
+            GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
+            GOOGLE_REDIRECT_URI="${{ vars.GOOGLE_REDIRECT_URI }}"
 
-            RESEND_KEY=${{ secrets.RESEND_KEY }}
-            RESEND_AUTH_EMAIL=${{ vars.RESEND_AUTH_EMAIL }}
-            RESEND_NOTIFICATION_EMAIL=${{ vars.RESEND_NOTIFICATION_EMAIL }}
+            RESEND_KEY="${{ secrets.RESEND_KEY }}"
+            RESEND_AUTH_EMAIL="${{ vars.RESEND_AUTH_EMAIL }}"
+            RESEND_NOTIFICATION_EMAIL="${{ vars.RESEND_NOTIFICATION_EMAIL }}"
 
-            EMAIL_VERIFICATION=${{ vars.EMAIL_VERIFICATION }}
+            EMAIL_VERIFICATION="${{ vars.EMAIL_VERIFICATION }}"
 
-            IMAGEKIT_PRIVATE_KEY=${{ secrets.IMAGEKIT_PRIVATE_KEY }}
-            IMAGEKIT_PUBLIC_KEY=${{ secrets.IMAGEKIT_PUBLIC_KEY }}
-            IMAGEKIT_URL_ENDPOINT=${{ vars.IMAGEKIT_URL_ENDPOINT }}
+            FRONTEND_URL="https://www.limpora.xyz"
+
+            IMAGEKIT_PRIVATE_KEY="${{ secrets.IMAGEKIT_PRIVATE_KEY }}"
+            IMAGEKIT_PUBLIC_KEY="${{ secrets.IMAGEKIT_PUBLIC_KEY }}"
+            IMAGEKIT_URL_ENDPOINT="${{ vars.IMAGEKIT_URL_ENDPOINT }}"
             ENVEOF
-            
+
             echo "=== .env created ==="
             ls -la apps/server/.env
             echo "=== apps/server/.env (keys only) ==="
             head -n 5 apps/server/.env | sed 's/=.*/=***/'
-            
+
             docker compose down
             docker image prune -f
             docker compose build limpora-client
             docker compose build limpora-server
             docker compose up -d
-            
+
             sleep 10
-            
+
             echo "=== Container Status ==="
             docker compose ps
