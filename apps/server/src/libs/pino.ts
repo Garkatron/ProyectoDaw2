@@ -1,14 +1,13 @@
 import pino from 'pino'
-import pinoLoki from 'pino-loki'
+import PinoLoki, { LokiOptions } from 'pino-loki'
 
-const transport = pino.transport({
-  target: 'pino-loki',
+
+const transport = pino.transport<LokiOptions>({
+  target: "pino-loki",
   options: {
-    batching: true,
-    interval: 5,
-    host: 'http://localhost:3100',
-    labels: { app: 'mi-app', env: 'production' },
+    host: 'http://loki:3100',
+    basicAuth: undefined
   },
-})
+});
 
-export const logger = pino({ level: 'info' }, transport)
+export const logger = pino(transport);
