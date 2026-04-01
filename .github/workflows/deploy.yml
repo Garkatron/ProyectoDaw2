@@ -16,18 +16,16 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          port: 2222
+          port: 22
           script: |
             cd /var/www/html/ProyectoDaw2
             
             git reset --hard
-            git clean -fdx
+            git clean -fd
             git pull origin develop
             
             rm -f docker-compose.override.yml
             
-            # Create .env for limpora-server
             cat > apps/server/.env << 'ENVEOF'
             NODE_ENV=production
             PORT=${{ vars.PORT }}
