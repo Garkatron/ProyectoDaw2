@@ -11,6 +11,13 @@ services:
     networks:
       - limpora-network
 
+  loki:
+    image: grafana/loki:latest
+    ports:
+          - "3100:3100"
+    networks:
+      - limpora-network
+
   limpora-server:
     build:
       context: .
@@ -26,13 +33,10 @@ services:
     restart: unless-stopped
     networks:
       - limpora-network
+    depends_on:
+      - loki
 
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "127.0.0.1:3100:3100"
-    networks:
-      - limpora-network
+
 
   grafana:
     image: grafana/grafana:latest
