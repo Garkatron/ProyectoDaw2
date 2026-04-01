@@ -29,9 +29,16 @@ interface AuthStore {
 }
 
 const errorToString = (value: unknown): string => {
+    if (!value) return 'Unknown error';
+
     if (typeof value === 'string') return value;
-    if (typeof value === 'object' && value !== null && 'summary' in value)
-        return (value as { summary: string }).summary ?? 'Unknown error';
+
+    if (typeof value === 'object') {
+        if ('message' in value) return String((value as any).message);
+        if ('summary' in value) return String((value as any).summary);
+        if ('error' in value) return String((value as any).error);
+    }
+
     return 'Unknown error';
 };
 

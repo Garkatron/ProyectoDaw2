@@ -60,9 +60,15 @@ export default function Login() {
       setSuccess(true);
       if (user?.role === UserRole.Admin) setAdmin(true);
     } else {
-      setModalTitle(lang("login.error_title"));
-      setModalMessage(response.error ?? lang("login.generic_error"));
+    if (response.error?.includes("verified email")) {
+        navigate("/verify-email?email=" + email);
+        return;
     }
+
+    setModalTitle(lang("login.error_title"));
+    setModalMessage(response.error ?? lang("login.generic_error"));
+    setModalOpen(true);
+}
 
     setModalOpen(true);
   };
