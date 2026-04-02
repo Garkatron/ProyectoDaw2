@@ -212,7 +212,7 @@ export abstract class BookingService {
                 const h = String(Math.floor(current / 60)).padStart(2, "0");
                 const m = String(current % 60).padStart(2, "0");
                 all_slots.add(`${h}:${m}`);
-                current += 30;
+                current += 15;
             }
         }
 
