@@ -41,7 +41,12 @@ function formatDuration(minutes: number): string {
   return `${m} min`;
 }
 
-const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal", "Stripe"];
+const PAYMENT_METHODS_LIST = [
+  { label: "Bizum", value: PaymentMethod.Bizum },
+  { label: "Bank Transfer", value: PaymentMethod.BankTransfer },
+  { label: "Paypal", value: PaymentMethod.Paypal },
+  { label: "Tarjeta (Stripe)", value: PaymentMethod.Stripe },
+];
 
 type SlotState = "available" | "occupied" | "past" | "outside";
 
@@ -344,7 +349,13 @@ export default function BookingConfirmation() {
     selectedDate && selectedTime && selectedService && paymentMethod;
 
   const handleConfirm = async () => {
-    if (!canConfirm || !currentUser || !stripe || !elements) return;
+    if (!canConfirm || !currentUser) return;
+
+    if (paymentMethod === PaymentMethod.Stripe && (!stripe || !elements)) {
+      setError("El sistema de pagos no está listo. Inténtalo de nuevo.");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -356,36 +367,38 @@ export default function BookingConfirmation() {
         provider_id: providerId,
         service_id: selectedService.service_id,
         start_time,
-        payment_method: PaymentMethod.Stripe,
+        payment_method: paymentMethod, // Enviamos el Enum
       });
 
-      if (errAppt || !appointment) throw new Error("Error creating appointment");
+      if (errAppt || !appointment) throw new Error("Error al crear la reserva");
 
-      const { data: paymentData, error: errPay } = await API.payment.post({
-        amount: selectedService.price * 100 // Centimos
-      });
-
-      if (errPay || !paymentData?.client_secret) throw new Error("Stripe Error");
-
-      const cardElement = elements.getElement(CardElement);
-      const result = await stripe.confirmCardPayment(paymentData.client_secret, {
-        payment_method: { card: cardElement! },
-      });
-
-      if (result.error) throw new Error(result.error.message);
-
-      if (result.paymentIntent?.status === "succeeded") {
-        await API.payment.confirm.post({
-          appointmentId: appointment.id,
-          paymentIntentId: result.paymentIntent.id
+      if (paymentMethod === PaymentMethod.Stripe) {
+        const { data: paymentData, error: errPay } = await API.payment.post({
+          amount: selectedService.price * 100 // Stripe usa céntimos
         });
 
-        setSuccess(true);
-        setTimeout(() => navigate("/mis-reservas"), 2000);
+        if (errPay || !paymentData?.client_secret) throw new Error("No se pudo iniciar el pago");
+
+        const cardElement = elements!.getElement(CardElement);
+        const result = await stripe!.confirmCardPayment(paymentData.client_secret, {
+          payment_method: { card: cardElement! },
+        });
+
+        if (result.error) throw new Error(result.error.message);
+
+        if (result.paymentIntent?.status === "succeeded") {
+          await API.payment.confirm.post({
+            appointmentId: appointment.id,
+            paymentIntentId: result.paymentIntent.id
+          });
+        }
       }
 
+      setSuccess(true);
+      setTimeout(() => navigate("/appointments"), 2000);
+
     } catch (e: any) {
-      setError(e.message || lang("booking.error"));
+      setError(e.message || "Ocurrió un error inesperado");
     } finally {
       setSubmitting(false);
     }
@@ -572,24 +585,42 @@ export default function BookingConfirmation() {
             <Text fw={600} mb="md">
               {lang("booking.step4")}
             </Text>
-            <SimpleGrid cols={3} spacing="xs">
-              {PAYMENT_METHODS.map((method) => (
+            <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs">
+              {PAYMENT_METHODS_LIST.map((method) => (
                 <ToggleButton
-                  key={method}
-                  selected={paymentMethod === method}
-                  onClick={() => setPaymentMethod(method as PaymentMethod)}
+                  key={method.value}
+                  selected={paymentMethod === method.value}
+                  onClick={() => setPaymentMethod(method.value)}
                 >
-                  {lang(`booking.payment_methods.${method}`)}
+                  {method.label}
                 </ToggleButton>
               ))}
             </SimpleGrid>
+
             {paymentMethod === PaymentMethod.Stripe && (
-              <Box mt="md" p="sm" style={{ border: '1px solid #ced4da', borderRadius: '4px' }}>
-                <CardElement options={{
-                  style: {
-                    base: { fontSize: '16px' }
-                  }
-                }} />
+              <Box
+                mt="md"
+                p="md"
+                style={{
+                  border: '1px solid var(--mantine-color-default-border)',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--mantine-color-gray-0)'
+                }}
+              >
+                <Text size="xs" fw={500} mb="xs" c="dimmed">
+                  Introduce los datos de tu tarjeta:
+                </Text>
+                <CardElement
+                  options={{
+                    style: {
+                      base: {
+                        fontSize: '16px',
+                        color: '#424770',
+                        '::placeholder': { color: '#aab7c4' },
+                      },
+                    },
+                  }}
+                />
               </Box>
             )}
           </Paper>
