@@ -58,10 +58,10 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/auth/callback" element={<OAuthCallback />} />
+        <Route path="/settings" element={<Settings />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/panel/:username" element={<UserPanel />} />
-          <Route path="/settings" element={<Settings />} />
           <Route path="/review" element={<AppointmentReviewPage />} />
           <Route path="/inbox" element={<Inbox />} />
           <Route element={<RoleRoute roles={["provider"]} />}>

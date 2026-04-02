@@ -129,7 +129,6 @@ const NavItem = ({
         }
       }}
     >
-      {/* Fondo animado del tab activo */}
       {isActive && (
         <motion.span
           layoutId={`active-tab-bg-${layoutScope}`}
@@ -166,7 +165,6 @@ const NavItem = ({
         </Text>
       )}
 
-      {/* Indicador deslizante */}
       {isActive && (
         <motion.span
           layoutId={`active-indicator-${layoutScope}`}

@@ -37,9 +37,9 @@ const DAYS = [
   "Domingo",
 ];
 
-const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
-  const h = String(Math.floor(i / 2)).padStart(2, "0");
-  const m = i % 2 === 0 ? "00" : "30";
+const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
+  const h = String(Math.floor(i / 4)).padStart(2, "0");
+  const m = String((i % 4) * 15).padStart(2, "0");
   return `${h}:${m}`;
 });
 
@@ -131,9 +131,21 @@ export default function ScheduleSettings({
   ) =>
     setSchedule((p) => {
       const updated = [...p[day]];
-      updated[i] = { ...updated[i], [field]: value };
+      const slot = { ...updated[i], [field]: value };
+
+      if (field === "start_time" && slot.end_time <= value) {
+        const idx = TIME_OPTIONS.indexOf(value);
+        slot.end_time = TIME_OPTIONS[idx + 1] ?? value;
+      }
+
+      updated[i] = slot;
       return { ...p, [day]: updated };
     });
+
+  const toMinutes = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + m;
+  };
 
   const validate = (): string | null => {
     for (const [day, slots] of Object.entries(schedule)) {
@@ -143,12 +155,14 @@ export default function ScheduleSettings({
         if (sh * 60 + sm >= eh * 60 + em)
           return `${DAYS[Number(day)]}: inicio debe ser anterior al fin.`;
       }
-      const sorted = [...slots].sort((a, b) =>
-        a.start_time.localeCompare(b.start_time),
+      const sorted = [...slots].sort(
+        (a, b) => toMinutes(a.start_time) - toMinutes(b.start_time)
       );
-      for (let i = 0; i < sorted.length - 1; i++)
-        if (sorted[i].end_time > sorted[i + 1].start_time)
+
+      for (let i = 0; i < sorted.length - 1; i++) {
+        if (toMinutes(sorted[i].end_time) > toMinutes(sorted[i + 1].start_time))
           return `${DAYS[Number(day)]}: hay franjas solapadas.`;
+      }
     }
     return null;
   };
@@ -300,7 +314,7 @@ export default function ScheduleSettings({
                     <Select
                       size="xs"
                       w={90}
-                      data={TIME_OPTIONS}
+                      data={TIME_OPTIONS.filter(t => t > slot.start_time)}
                       value={slot.end_time}
                       onChange={(v) => v && updateSlot(day, i, "end_time", v)}
                       allowDeselect={false}
