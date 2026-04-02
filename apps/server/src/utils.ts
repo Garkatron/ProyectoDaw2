@@ -11,6 +11,7 @@ export default async function generateVefCode(): Promise<{
 }
 
 export function fail<T extends string>(code: number, message: T): never {
-    logger.info({ code }, message);
+    logger.error({ code }, message);
     throw status(code, message);
 }
+
