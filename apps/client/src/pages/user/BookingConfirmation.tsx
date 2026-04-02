@@ -18,19 +18,10 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { API } from "../../lib/api";
-import { PaymentMethod, type Appointment } from "@limpora/common";
+import { PaymentMethod, type Appointment, type ProviderService } from "@limpora/common";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import CheckoutForm from "../../components/CheckoutForm";
 
-interface ProviderService {
-  service_id: number;
-  user_id: number;
-  price: number;
-  duration_minutes: number;
-  is_active: boolean;
-  service_name?: string;
-  name?: string;
-}
 
 /** Formats a minute count as "1h 30m", "1h", "45 min", etc. */
 function formatDuration(minutes: number): string {
@@ -374,24 +365,49 @@ export default function BookingConfirmation() {
       if (errAppt || !appointment) throw new Error("Error al crear la reserva");
 
       if (paymentMethod === PaymentMethod.Stripe) {
+        // 1. Calculate safely (Ensure price_per_h exists)
+        const unitPrice = selectedService.price_per_h ?? 0;
+        const totalAmount = Math.round(unitPrice * 100);
+
+        if (totalAmount <= 0) {
+          throw new Error("El precio del servicio no es válido.");
+        }
+
+        // 2. Call your backend to create the PaymentIntent
         const { data: paymentData, error: errPay } = await API.payment.post({
-          amount: selectedService.price * 100
+          amount: totalAmount
         });
 
-        if (errPay || !paymentData?.client_secret) throw new Error("No se pudo iniciar el pago");
+        if (errPay || !paymentData?.client_secret) {
+          console.error("Backend Error:", errPay);
+          throw new Error("No se pudo iniciar el pago con el servidor.");
+        }
 
+        // 3. Use Stripe.js to handle the actual card logic
         const cardElement = elements!.getElement(CardElement);
+
+        // Use the client_secret returned from your backend
         const result = await stripe!.confirmCardPayment(paymentData.client_secret, {
-          payment_method: { card: cardElement! },
+          payment_method: {
+            card: cardElement!,
+            billing_details: {
+              name: currentUser.name
+            }
+          },
         });
 
-        if (result.error) throw new Error(result.error.message);
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
 
+        // 4. Confirm the booking on your backend once Stripe clears the charge
         if (result.paymentIntent?.status === "succeeded") {
-          await API.payment.confirm.post({
+          const { error: confirmErr } = await API.payment.confirm.post({
             appointmentId: appointment.id,
             paymentIntentId: result.paymentIntent.id
           });
+
+          if (confirmErr) throw new Error("Pago completado, pero falló la confirmación de la cita.");
         }
       }
 
@@ -602,7 +618,7 @@ export default function BookingConfirmation() {
             {paymentMethod === PaymentMethod.Stripe && (
               <Box mt="xl">
                 <CheckoutForm
-                  amount={selectedService.price * 100} 
+                  amount={selectedService.price * 100}
                 />
               </Box>
             )}
