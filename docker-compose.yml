@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: ./infra/docker/client.prod.Dockerfile
+    env_file:
+        - apps/client/.env
     ports:
       - "127.0.0.1:3002:80"
     environment:

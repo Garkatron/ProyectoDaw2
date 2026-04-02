@@ -22,30 +22,10 @@ import Settings from "./pages/main/settings";
 import OAuthCallback from "./pages/auth/OAuthCallback";
 import CookieConsent from 'react-cookie-consent';
 import lang from './utils/LangManager';
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
 
-// <Route path="/emailcode" element={<EmailCode />} />
-
-/*
-
-<Route element={<PrivateRoute />}>
-        <Route path="/panel/:username" element={<UserPanel />} />
-
-        <Route path="/currency" element={<Currency />} />
-        <Route path="/userfinder" element={<UserFinder />} />
-        <Route path="/booking" element={<BookingConfirmation />} />
-        <Route path="/appointments" element={<Appointments />} />
-        <Route path="/top" element={<TopUsers />} />
-        <Route path="/panel/admin" element={<AdminPanel />} />
-      </Route>
-*/
-
-const routeOrder = ["/", "/currency", "/appointments", "/userfinder", "/inbox"];
-
-const variants = {
-  initial: (dir: number) => ({ x: dir * 50, opacity: 0 }),
-  animate: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir * -50, opacity: 0 }),
-};
 
 const App = () => {
   const location = useLocation();
@@ -68,7 +48,11 @@ const App = () => {
             <Route path="/currency" element={<Currency />} />
           </Route>
           <Route path="/userfinder" element={<UserFinder />} />
-          <Route path="/booking" element={<BookingConfirmation />} />
+          <Route path="/booking" element={
+            <Elements stripe={stripePromise}>
+              <BookingConfirmation />
+            </Elements>
+          } />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/panel/admin" element={<AdminPanel />} />
         </Route>
