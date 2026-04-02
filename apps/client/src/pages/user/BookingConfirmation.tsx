@@ -41,7 +41,7 @@ function formatDuration(minutes: number): string {
   return `${m} min`;
 }
 
-const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal"];
+const PAYMENT_METHODS = ["Bizum", "Bank Transfer", "Paypal", "Stripe"];
 
 type SlotState = "available" | "occupied" | "past" | "outside";
 
