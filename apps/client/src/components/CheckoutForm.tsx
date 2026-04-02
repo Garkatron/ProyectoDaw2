@@ -27,7 +27,7 @@ import { API } from "../lib/api";
 
 
 interface CheckoutFormProps {
-  amount?: number; // centavos, default 2000
+  amount?: number;
 }
 
 type PaymentStatus = "idle" | "loading" | "success" | "error";
@@ -66,12 +66,12 @@ const CheckoutForm = ({ amount = 2000 }: CheckoutFormProps) => {
 
     try {
       const { data, error } = await API.payment.post({ amount });
-      if (error || !data?.clientSecret) throw new Error("No client secret");
+      if (error || !data?.client_secret) throw new Error("No client secret");
 
       const cardElement = elements?.getElement(CardElement);
       if (!stripe || !cardElement) throw new Error("Stripe not ready");
 
-      const result = await stripe.confirmCardPayment(data.clientSecret, {
+      const result = await stripe.confirmCardPayment(data.client_secret, {
         payment_method: { card: cardElement },
       });
 
