@@ -1,6 +1,7 @@
 import { status } from 'elysia';
 import { ServicesModel } from './model';
 import { ServicesQueries } from './queries';
+import { fail } from '../../utils';
 
 export abstract class ServicesService {
     static async create({
@@ -9,7 +10,7 @@ export abstract class ServicesService {
     }: ServicesModel['createBody']): Promise<ServicesModel['createResponse']> {
         const existing = ServicesQueries.findByName.get({ name });
         if (existing)
-            throw status(400, 'Service already exists' satisfies ServicesModel['alreadyExists']);
+            throw fail(400, 'Service already exists' satisfies ServicesModel['alreadyExists']);
 
         const { lastInsertRowid } = ServicesQueries.insert.run({
             name,
@@ -32,7 +33,7 @@ export abstract class ServicesService {
     }: ServicesModel['serviceIdParam']): Promise<ServicesModel['getByIdResponse']> {
         const service = ServicesQueries.findById.get({ id: Number(id) });
 
-        if (!service) throw status(404, 'Service not found' satisfies ServicesModel['notFound']);
+        if (!service) throw fail(404, 'Service not found' satisfies ServicesModel['notFound']);
 
         return service;
     }

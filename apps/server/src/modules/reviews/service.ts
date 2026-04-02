@@ -4,6 +4,7 @@ import { UserQueries } from "../user/queries";
 import { ReviewsQueries } from "./queries";
 import { AuthQueries } from "../auth/queries";
 import { BookingQueries } from "../booking/queries";
+import { fail } from "../../utils";
 
 export abstract class ReviewsService {
     static async publishMe(
@@ -14,7 +15,7 @@ export abstract class ReviewsService {
             firebase_uid: reviewer_uid,
         });
         if (!reviewer)
-            throw status(
+            throw fail(
                 404,
                 "User not found" satisfies ReviewsModel["userNotFound"],
             );
@@ -24,25 +25,25 @@ export abstract class ReviewsService {
         const appointment = BookingQueries.findById.get({ id: appointment_id });
 
         if (!appointment) {
-            throw status(
+            throw fail(
                 404,
                 "Appointment not found" satisfies ReviewsModel["appointmentNotFound"],
             );
         }
         if (reviewer.id === existing?.reviewed_id)
-            throw status(
+            throw fail(
                 400,
                 "You cannot review yourself" satisfies ReviewsModel["forbidden"],
             );
 
         if (existing)
-            throw status(
+            throw fail(
                 400,
                 "You have already reviewed this appointment" satisfies ReviewsModel["alreadyExists"],
             );
 
         if (appointment.status !== "Completed") {
-            throw status(
+            throw fail(
                 400,
                 "You can only review completed appointments" satisfies ReviewsModel["forbiddenNotCompleted"],
             );
@@ -59,7 +60,7 @@ export abstract class ReviewsService {
         const review = ReviewsQueries.findById.get({
             id: Number(lastInsertRowid),
         });
-        if (!review) throw status(500, "Error creating review");
+        if (!review) throw fail(500, "Error creating review");
 
         return review;
     }
@@ -83,10 +84,10 @@ export abstract class ReviewsService {
     static async delete(id: number, requester_id: number, isAdmin: boolean) {
         const review = ReviewsQueries.findById.get({ id });
 
-        if (!review) throw status(404, "Review not found");
+        if (!review) throw fail(404, "Review not found");
 
         if (review.reviewer_id !== requester_id && !isAdmin) {
-            throw status(
+            throw fail(
                 403,
                 "You can only manage your own reviews" satisfies ReviewsModel["forbiddenNotOwner"],
             );
@@ -106,13 +107,13 @@ export abstract class ReviewsService {
             firebase_uid: uid,
         });
         if (!reviewer)
-            throw status(
+            throw fail(
                 404,
                 "User not found" satisfies ReviewsModel["userNotFound"],
             );
 
         if (existing.reviewer_id !== reviewer.id)
-            throw status(
+            throw fail(
                 403,
                 "You can only manage your own reviews" satisfies ReviewsModel["forbiddenNotOwner"],
             );
@@ -127,7 +128,7 @@ export abstract class ReviewsService {
     }: ReviewsModel["reviewIdParam"]): Promise<ReviewsModel["getOneResponse"]> {
         const review = ReviewsQueries.findById.get({ id: Number(id) });
         if (!review)
-            throw status(
+            throw fail(
                 404,
                 "Review not found" satisfies ReviewsModel["notFound"],
             );
@@ -140,7 +141,7 @@ export abstract class ReviewsService {
     }: ReviewsModel["clientIdParam"]): Promise<ReviewsModel["getAllResponse"]> {
         const user = UserQueries.findById.get({ id: Number(client_id) });
         if (!user)
-            throw status(
+            throw fail(
                 404,
                 "User not found" satisfies ReviewsModel["userNotFound"],
             );
@@ -158,7 +159,7 @@ export abstract class ReviewsService {
         const review = ReviewsQueries.findByAppointmentId.get({
             appointment_id,
         });
-        if (!review) throw status(404, "Review not found");
+        if (!review) throw fail(404, "Review not found");
         return review;
     }
 }

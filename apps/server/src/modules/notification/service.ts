@@ -8,6 +8,7 @@ import { NotificationModel } from "./model";
 import { status } from "elysia";
 import { NotificationQueries } from "./queries";
 import { UserService } from "../user/service";
+import { fail } from "../../utils";
 
 const VERIFICATION_TEMPLATE = await Bun.file(
     import.meta.dir + "/templates/vec.html",
@@ -97,9 +98,8 @@ export abstract class NotificationService {
         });
 
         if (response.error && !response.data) {
-            console.log(response.error);
 
-            throw status(
+            throw fail(
                 400,
                 "Error sending Email notifiaction" satisfies NotificationModel["error"],
             );

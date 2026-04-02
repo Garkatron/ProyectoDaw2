@@ -9,6 +9,7 @@ import { status } from "elysia";
 import { ImageKitClient } from "../../libs/imagekit";
 import { MediaModel } from "./model";
 import { UserService } from "../user/service";
+import { fail } from "../../utils";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -31,14 +32,14 @@ export abstract class MediaService {
         folder,
     }: MediaModel["postImageBody"]): Promise<MediaModel["postImageResponse"]> {
         if (!ALLOWED_TYPES.includes(file.type)) {
-            throw status(
+            throw fail(
                 400,
                 "Invalid file type. Allowed: image/jpeg, image/png, image/webp" satisfies MediaModel["invalidType"],
             );
         }
 
         if (file.size > MAX_SIZE) {
-            throw status(
+            throw fail(
                 400,
                 "File too large. Max: 5242880 bytes" satisfies MediaModel["fileTooLarge"],
             );
@@ -57,11 +58,11 @@ export abstract class MediaService {
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Unknown error";
-            throw status(502, `Upload failed: ${message}` satisfies MediaModel["uploadFailed"]);
+            throw fail(502, `Upload failed: ${message}` satisfies MediaModel["uploadFailed"]);
         }
 
         if (!response.fileId || !response.url) {
-            throw status(
+            throw fail(
                 502,
                 `Incomplete data: fileId=${response.fileId}, url=${response.url}` satisfies MediaModel["incompleteResponse"],
             );

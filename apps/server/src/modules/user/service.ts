@@ -7,6 +7,7 @@ import { status } from 'elysia';
 import type { UserModel } from './model';
 import { UserQueries } from './queries';
 import { AuthQueries } from '../auth/queries';
+import { fail } from '../../utils';
 
 export abstract class UserService {
     static async getAllUsers(): Promise<UserModel['getAllUsers']> {
@@ -16,7 +17,7 @@ export abstract class UserService {
     static async getById({ id }: UserModel['userIdParam']): Promise<UserModel['getUserById']> {
         const user = UserQueries.findById.get({ id: Number(id) });
 
-        if (!user) throw status(404, 'User not found' satisfies UserModel['notFound']);
+        if (!user) throw fail(404, 'User not found' satisfies UserModel['notFound']);
 
         return user;
     }
@@ -24,7 +25,7 @@ export abstract class UserService {
       static async getRoleById({ id }: UserModel['userIdParam']): Promise<UserModel['getRoleResponse']> {
         const role = UserQueries.findRoleById.get({ id: Number(id) });
 
-        if (!role) throw status(404, 'User not found' satisfies UserModel['notFound']);
+        if (!role) throw fail(404, 'User not found' satisfies UserModel['notFound']);
 
         return role;
     }
@@ -35,7 +36,7 @@ export abstract class UserService {
     static async getMe({ uid }: { uid: string }): Promise<UserModel['getUserById']> {
         const user = AuthQueries.findByFirebaseUid.get({ firebase_uid: uid });
         if (!user)
-            throw status(404, 'User not found' satisfies UserModel['notFound']);
+            throw fail(404, 'User not found' satisfies UserModel['notFound']);
 
         return await UserService.getById({id: String(user.id)});
     }
@@ -45,7 +46,7 @@ export abstract class UserService {
     }: UserModel['userNameParam']): Promise<UserModel['getUserByName']> {
         const user = UserQueries.findByName.get({ name: name });
 
-        if (!user) throw status(404, 'User not found' satisfies UserModel['notFound']);
+        if (!user) throw fail(404, 'User not found' satisfies UserModel['notFound']);
 
         return user;
     }

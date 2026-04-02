@@ -6,6 +6,8 @@ import { UserService } from "../user/service";
 import { UserRole } from "@limpora/common/*";
 import { firebaseAuth } from "../../libs/firebase";
 import { AuthQueries } from "../auth/queries";
+import { fail } from "../../utils";
+import { logger } from "../../libs/pino";
 
 export abstract class OAuthService {
     static async callback({
@@ -17,15 +19,16 @@ export abstract class OAuthService {
         cookie: Context["cookie"];
         redirect: Context["redirect"];
     }) {
+        logger.info("google callback attempt");
         try {
             if (query.error) {
-                console.error("Google OAuth error:", query.error);
+                logger.error({ error: query.error }, "google OAuth error");
                 return redirect(`${process.env.FRONTEND_URL}/login`);
             }
 
             const code = query.code;
             if (!code) {
-                console.error("Missing OAuth code");
+                logger.error({ error: query.error }, "missing OAuth code");
                 return redirect(`${process.env.FRONTEND_URL}/login`);
             }
 
@@ -40,17 +43,20 @@ export abstract class OAuthService {
             const { data } = await oauth2.userinfo.get();
             const { email, name } = data;
             if (!email) {
-                throw status(400, "No email from Google");
+                throw fail(400, "No email from Google");
             }
 
-            if (!email) throw status(400, "No email from Google");
+            if (!email) throw fail(400, "No email from Google");
 
             let firebaseUser;
             try {
                 firebaseUser = await AuthService.getFirebaseUserByEmail(email);
-                console.log("[OAuth] Firebase user found:", firebaseUser.uid);
+                logger.info(
+                    { firebase_user_id: firebaseUser.uid },
+                    "found firebase user",
+                );
             } catch {
-                console.log("[OAuth] Firebase user not found, registering...");
+                logger.info("not found firebase user");
                 try {
                     await AuthService.register({
                         username: name || email.split("@")[0],
@@ -73,7 +79,7 @@ export abstract class OAuthService {
             try {
                 userRecord = await UserService.getMe({ uid: firebaseUser.uid });
             } catch {
-                console.log("[OAuth] User not in DB, syncing...");
+                logger.info({ error: query.error }, "user not in db, syncing...");
                 AuthQueries.insert.run({
                     firebase_uid: firebaseUser.uid,
                     name: firebaseUser.displayName || email.split("@")[0],
@@ -82,8 +88,6 @@ export abstract class OAuthService {
                 });
                 userRecord = await UserService.getMe({ uid: firebaseUser.uid });
             }
-
-            console.log("[OAuth] userRecord:", userRecord);
 
             const role =
                 userRecord?.role ||
@@ -128,7 +132,7 @@ export abstract class OAuthService {
                 `${process.env.FRONTEND_URL}/auth/callback?token=${tokenData.idToken}`,
             );
         } catch (err) {
-            console.error("OAuth callback error:", err);
+            logger.error({ error: err }, "google callback failed");
             return redirect(`${process.env.FRONTEND_URL}/login`);
         }
     }
