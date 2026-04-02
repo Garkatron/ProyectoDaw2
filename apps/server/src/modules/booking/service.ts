@@ -336,6 +336,11 @@ export abstract class BookingService {
             AppointmentStatus,
             AppointmentStatus[]
         > = {
+            [AppointmentStatus.PendingPayment]: [
+                AppointmentStatus.Pending,
+                AppointmentStatus.Cancelled,
+            ],
+            
             [AppointmentStatus.Pending]: [
                 AppointmentStatus.InProcess,
                 AppointmentStatus.Cancelled,

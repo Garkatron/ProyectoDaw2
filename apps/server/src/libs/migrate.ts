@@ -123,11 +123,11 @@ export function migrate(db: Database) {
             travel_buffer_min INTEGER DEFAULT 30, -- Tiempo de margen para desplazarse
 
             -- Economy
-            status            TEXT DEFAULT 'Pending' CHECK (status IN ('Completed', 'Pending', 'In Process', 'Cancelled')),
+            status            TEXT DEFAULT 'Pending' CHECK (status IN ('Completed', 'Pending', 'Pending Payment', 'In Process', 'Cancelled')),
             total_price       REAL NOT NULL, -- Precio final que paga el cliente
             provider_net      REAL NOT NULL, -- Lo que recibe el autónomo
             app_commission    REAL NOT NULL, -- El "mordisco" de la app
-            payment_method    TEXT CHECK (payment_method IN ('Bizum', 'Bank Transfer', 'Paypal')),
+            payment_method    TEXT CHECK (payment_method IN ('Bizum', 'Bank Transfer', 'Paypal', 'Stripe')),
 
             created_at        TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (client_id)   REFERENCES Users(id),

@@ -19,6 +19,7 @@ import {
 } from "@mantine/core";
 import { API } from "../../lib/api";
 import { PaymentMethod, type Appointment } from "@limpora/common";
+import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 interface ProviderService {
   service_id: number;
@@ -224,6 +225,9 @@ export default function BookingConfirmation() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const stripe = useStripe();
+  const elements = useElements();
+
   useEffect(() => {
     if (!providerId) return;
     (async () => {
@@ -340,37 +344,48 @@ export default function BookingConfirmation() {
     selectedDate && selectedTime && selectedService && paymentMethod;
 
   const handleConfirm = async () => {
-    if (!canConfirm || !currentUser) return;
+    if (!canConfirm || !currentUser || !stripe || !elements) return;
     setSubmitting(true);
     setError(null);
+
     try {
-      const [hours, minutes] = selectedTime.split(":").map(Number);
       const pad = (n: number) => String(n).padStart(2, "0");
-      // Build a naive ISO string (no Z / timezone offset) so the server
-      // compares against schedule times with the same "wall clock" reference.
-      // toISOString() would shift to UTC and break the HH:MM schedule check.
-      const start_time = [
-        selectedDate.getFullYear(),
-        "-",
-        pad(selectedDate.getMonth() + 1),
-        "-",
-        pad(selectedDate.getDate()),
-        "T",
-        pad(hours),
-        ":",
-        pad(minutes),
-        ":00",
-      ].join("");
-      await API.bookings.me.post({
+      const start_time = `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}T${selectedTime}:00`;
+
+      const { data: appointment, error: errAppt } = await API.bookings.me.post({
         provider_id: providerId,
         service_id: selectedService.service_id,
         start_time,
-        payment_method: paymentMethod as PaymentMethod,
+        payment_method: PaymentMethod.Stripe,
       });
-      setSuccess(true);
-      setTimeout(() => navigate(-1), 2000);
-    } catch {
-      setError(lang("booking.error"));
+
+      if (errAppt || !appointment) throw new Error("Error creating appointment");
+
+      const { data: paymentData, error: errPay } = await API.payment.post({
+        amount: selectedService.price * 100 // Centimos
+      });
+
+      if (errPay || !paymentData?.client_secret) throw new Error("Stripe Error");
+
+      const cardElement = elements.getElement(CardElement);
+      const result = await stripe.confirmCardPayment(paymentData.client_secret, {
+        payment_method: { card: cardElement! },
+      });
+
+      if (result.error) throw new Error(result.error.message);
+
+      if (result.paymentIntent?.status === "succeeded") {
+        await API.payment.confirm.post({
+          appointmentId: appointment.id,
+          paymentIntentId: result.paymentIntent.id
+        });
+
+        setSuccess(true);
+        setTimeout(() => navigate("/mis-reservas"), 2000);
+      }
+
+    } catch (e: any) {
+      setError(e.message || lang("booking.error"));
     } finally {
       setSubmitting(false);
     }
@@ -568,6 +583,15 @@ export default function BookingConfirmation() {
                 </ToggleButton>
               ))}
             </SimpleGrid>
+            {paymentMethod === 'Stripe' && (
+              <Box mt="md" p="sm" style={{ border: '1px solid #ced4da', borderRadius: '4px' }}>
+                <CardElement options={{
+                  style: {
+                    base: { fontSize: '16px' }
+                  }
+                }} />
+              </Box>
+            )}
           </Paper>
         )}
 

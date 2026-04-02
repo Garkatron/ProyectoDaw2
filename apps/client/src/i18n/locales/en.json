@@ -256,5 +256,20 @@
       "placeholder": "Search by name...",
       "tooltip": "Search by name"
     }
+  },
+  "payment": {
+    "title": "Secure Payment",
+    "subtitle": "Your transaction is encrypted end-to-end",
+    "cardDetails": "Card Details",
+    "cardPlaceholder": "Card number",
+    "pay": "Pay Now",
+    "processing": "Processing...",
+    "success": "Payment successful",
+    "successDetail": "Your payment has been processed correctly.",
+    "error": "Payment failed",
+    "errorDetail": "There was a problem processing your payment. Please try again.",
+    "securedBy": "Secured by Stripe",
+    "amount": "Amount",
+    "retry": "Try again"
   }
 }

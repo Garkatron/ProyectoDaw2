@@ -65,6 +65,9 @@ jobs:
             IMAGEKIT_PRIVATE_KEY="${{ secrets.IMAGEKIT_PRIVATE_KEY }}"
             IMAGEKIT_PUBLIC_KEY="${{ secrets.IMAGEKIT_PUBLIC_KEY }}"
             IMAGEKIT_URL_ENDPOINT="${{ vars.IMAGEKIT_URL_ENDPOINT }}"
+
+            STRIPE_KEY=${{ secrets.STRIPE_KEY }}
+
             ENVEOF
 
             docker compose stop limpora-server

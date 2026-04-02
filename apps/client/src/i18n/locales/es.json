@@ -262,5 +262,20 @@
       "placeholder": "Buscar por nombre...",
       "tooltip": "Escribir un nombre"
     }
+  },
+  "payment": {
+    "title": "Pago Seguro",
+    "subtitle": "Tu transacción está cifrada de extremo a extremo",
+    "cardDetails": "Datos de la tarjeta",
+    "cardPlaceholder": "Número de tarjeta",
+    "pay": "Pagar ahora",
+    "processing": "Procesando...",
+    "success": "Pago realizado",
+    "successDetail": "Tu pago se ha procesado correctamente.",
+    "error": "Pago fallido",
+    "errorDetail": "Hubo un problema al procesar tu pago. Inténtalo de nuevo.",
+    "securedBy": "Protegido por Stripe",
+    "amount": "Importe",
+    "retry": "Reintentar",
   }
 }

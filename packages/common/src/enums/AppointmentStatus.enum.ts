@@ -3,4 +3,5 @@ export enum AppointmentStatus {
     Pending   = "Pending",
     InProcess = "In Process",
     Cancelled = "Cancelled",
+    PendingPayment = "Pending Payment"
 }
