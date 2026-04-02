@@ -2,10 +2,12 @@ import { useTranslation } from "react-i18next";
 import {
   Box, Stack, Paper, Text, Title, Group,
   SegmentedControl, ThemeIcon, Divider, ActionIcon,
+  Button,
 } from "@mantine/core";
-import { IconLanguage, IconSettings, IconSun, IconMoon } from "@tabler/icons-react";
+import { IconLanguage, IconSettings, IconSun, IconMoon, IconCookie } from "@tabler/icons-react";
 import { useMantineColorScheme, useComputedColorScheme } from "@mantine/core";
 import Base from "../../layouts/Base";
+import { resetCookieConsentValue } from "react-cookie-consent";
 
 const SettingRow = ({
   icon, title, description, control,
@@ -39,7 +41,6 @@ export default function Settings() {
       <Box maw={640} mx="auto" p={{ base: "md", sm: "xl" }}>
         <Stack gap="lg">
 
-          {/* Cabecera */}
           <Stack gap={4}>
             <Group gap="sm" align="center">
               <IconSettings size={22} stroke={1.8} style={{ opacity: 0.7 }} />
@@ -54,7 +55,29 @@ export default function Settings() {
 
           <Divider />
 
-          {/* Secciones */}
+          <Paper withBorder radius="xl" p={{ base: "lg", sm: "xl" }}>
+            <SettingRow
+              icon={<IconCookie size={17} />}
+              title={t("settings.cookies.title")}
+              description={t("settings.cookies.description")}
+              control={
+                <Button
+                  size="xs"
+                  radius="xl"
+                  variant="default"
+                  onClick={() => {
+                    resetCookieConsentValue();
+                    window.location.reload();
+                  }}
+                >
+                  {t("settings.cookies.reset")}
+                </Button>
+              }
+            />
+          </Paper>
+
+          <Divider />
+
           <Paper withBorder radius="xl" p={{ base: "lg", sm: "xl" }}>
             <Stack gap="lg">
               <SettingRow

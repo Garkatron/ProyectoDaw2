@@ -1,4 +1,7 @@
 {
+  "cookies": {
+    "message": "this site uses third-party cookies (ImageKit, email tracking). Login it's necessary."
+  },
   "calendar": {
     "months": [
       "January",
@@ -14,7 +17,15 @@
       "November",
       "December"
     ],
-    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
     "prev_month": "Previous month",
     "next_month": "Next month"
   },
@@ -142,6 +153,10 @@
     "theme": {
       "title": "Theme",
       "description": "Change it between dark and light."
+    },
+    "cookies": {
+      "title": "Manage cookies",
+      "description": "Reset cookies"
     }
   },
   "userpanel": {

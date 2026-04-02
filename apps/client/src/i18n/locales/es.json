@@ -1,4 +1,7 @@
 {
+  "cookies": {
+    "message": "Este sitio usa cookies de terceros (ImageKit, email tracking). El login es necesario para usar la app."
+  },
   "calendar": {
     "months": [
       "Enero",
@@ -14,7 +17,15 @@
       "Noviembre",
       "Diciembre"
     ],
-    "weekdays": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    "weekdays": [
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mié",
+      "Jue",
+      "Vie",
+      "Sáb"
+    ],
     "prev_month": "Mes anterior",
     "next_month": "Mes siguiente"
   },
@@ -149,6 +160,10 @@
     "theme": {
       "title": "Tema",
       "description": "Cambia entre modo claro y oscuro"
+    },
+    "cookies": {
+      "title": "Gestionar cookies",
+      "description": "Reiniciar cookies"
     }
   },
   "userpanel": {

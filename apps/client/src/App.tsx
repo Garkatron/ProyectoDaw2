@@ -20,6 +20,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRef } from "react";
 import Settings from "./pages/main/settings";
 import OAuthCallback from "./pages/auth/OAuthCallback";
+import CookieConsent from 'react-cookie-consent';
+import lang from './utils/LangManager';
 
 // <Route path="/emailcode" element={<EmailCode />} />
 
@@ -49,27 +51,45 @@ const App = () => {
   const location = useLocation();
 
   return (
-    <Routes location={location} key={location.pathname}>
-      <Route path="/" element={<Home />} />
-      <Route path="/register" element={<Rergister />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/auth/callback" element={<OAuthCallback />} />
+    <>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Rergister />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
 
-      <Route element={<PrivateRoute />}>
-        <Route path="/panel/:username" element={<UserPanel />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/review" element={<AppointmentReviewPage />} />
-        <Route path="/inbox" element={<Inbox />} />
-        <Route element={<RoleRoute roles={["provider"]} />}>
-          <Route path="/currency" element={<Currency />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/panel/:username" element={<UserPanel />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/review" element={<AppointmentReviewPage />} />
+          <Route path="/inbox" element={<Inbox />} />
+          <Route element={<RoleRoute roles={["provider"]} />}>
+            <Route path="/currency" element={<Currency />} />
+          </Route>
+          <Route path="/userfinder" element={<UserFinder />} />
+          <Route path="/booking" element={<BookingConfirmation />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/panel/admin" element={<AdminPanel />} />
         </Route>
-        <Route path="/userfinder" element={<UserFinder />} />
-        <Route path="/booking" element={<BookingConfirmation />} />
-        <Route path="/appointments" element={<Appointments />} />
-        <Route path="/panel/admin" element={<AdminPanel />} />
-      </Route>
-    </Routes>
+      </Routes>
+      <CookieConsent
+        buttonText="Aceptar"
+        declineButtonText="Rechazar"
+        enableDeclineButton
+        onAccept={() => {
+
+        }}
+        onDecline={() => {
+
+        }}
+        style={{ background: "#2B373B" }}
+        buttonStyle={{ background: "#4CAF50", color: "#fff" }}
+        declineButtonStyle={{ background: "#f44336", color: "#fff" }}
+      >
+        {lang("cookies.message")}
+      </CookieConsent>
+    </>
   );
 };
 
