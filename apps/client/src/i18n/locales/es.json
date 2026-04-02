@@ -252,7 +252,8 @@
     "payment_methods": {
       "Bizum": "Bizum",
       "Bank Transfer": "Transferencia bancaria",
-      "Paypal": "PayPal"
+      "Paypal": "PayPal",
+      "Stripe": "Stripe"
     }
   },
   "search": {
@@ -276,6 +277,6 @@
     "errorDetail": "Hubo un problema al procesar tu pago. Inténtalo de nuevo.",
     "securedBy": "Protegido por Stripe",
     "amount": "Importe",
-    "retry": "Reintentar",
+    "retry": "Reintentar"
   }
 }

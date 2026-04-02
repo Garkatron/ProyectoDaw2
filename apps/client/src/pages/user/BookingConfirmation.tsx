@@ -583,7 +583,7 @@ export default function BookingConfirmation() {
                 </ToggleButton>
               ))}
             </SimpleGrid>
-            {paymentMethod === 'Stripe' && (
+            {paymentMethod === PaymentMethod.Stripe && (
               <Box mt="md" p="sm" style={{ border: '1px solid #ced4da', borderRadius: '4px' }}>
                 <CardElement options={{
                   style: {
@@ -595,7 +595,6 @@ export default function BookingConfirmation() {
           </Paper>
         )}
 
-        {/* Resumen + Confirmar */}
         {canConfirm && (
           <Paper withBorder p="lg" shadow="sm">
             <Text fw={600} mb="md">

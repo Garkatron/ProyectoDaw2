@@ -246,7 +246,8 @@
     "payment_methods": {
       "Bizum": "Bizum",
       "Bank Transfer": "Bank Transfer",
-      "Paypal": "PayPal"
+      "Paypal": "PayPal",
+      "Stripe": "Stripe"
     }
   },
   "search": {
