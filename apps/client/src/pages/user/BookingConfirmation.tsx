@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import {
-  Alert, Box, Button, Group, Paper, SimpleGrid,
+  Alert, Box, Button, Divider, Group, Paper, SimpleGrid,
   Skeleton, Stack, Text, Title, UnstyledButton,
 } from "@mantine/core";
 
