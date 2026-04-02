@@ -23,7 +23,7 @@ jobs:
             git pull origin develop
 
             cat > apps/client/.env << 'ENVEOF'
-            VITE_STRIPE_PUBLIC_KEY="${{ secrets.STRIPE_PUBLIC_KEY }}"
+            VITE_STRIPE_PUBLIC_KEY="${{ secrets.STRIPE_FRONTEND_KEY }}"
             VITE_API_URL="https://api.limpora.xyz"
             ENVEOF
 
