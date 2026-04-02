@@ -20,6 +20,7 @@ import {
 import { API } from "../../lib/api";
 import { PaymentMethod, type Appointment } from "@limpora/common";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import CheckoutForm from "../../components/CheckoutForm";
 
 interface ProviderService {
   service_id: number;
@@ -367,14 +368,14 @@ export default function BookingConfirmation() {
         provider_id: providerId,
         service_id: selectedService.service_id,
         start_time,
-        payment_method: paymentMethod, // Enviamos el Enum
+        payment_method: paymentMethod,
       });
 
       if (errAppt || !appointment) throw new Error("Error al crear la reserva");
 
       if (paymentMethod === PaymentMethod.Stripe) {
         const { data: paymentData, error: errPay } = await API.payment.post({
-          amount: selectedService.price * 100 // Stripe usa céntimos
+          amount: selectedService.price * 100
         });
 
         if (errPay || !paymentData?.client_secret) throw new Error("No se pudo iniciar el pago");
@@ -585,7 +586,8 @@ export default function BookingConfirmation() {
             <Text fw={600} mb="md">
               {lang("booking.step4")}
             </Text>
-            <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs">
+
+            <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs" mb="md">
               {PAYMENT_METHODS_LIST.map((method) => (
                 <ToggleButton
                   key={method.value}
@@ -598,34 +600,14 @@ export default function BookingConfirmation() {
             </SimpleGrid>
 
             {paymentMethod === PaymentMethod.Stripe && (
-              <Box
-                mt="md"
-                p="md"
-                style={{
-                  border: '1px solid var(--mantine-color-default-border)',
-                  borderRadius: '8px',
-                  backgroundColor: 'var(--mantine-color-gray-0)'
-                }}
-              >
-                <Text size="xs" fw={500} mb="xs" c="dimmed">
-                  Introduce los datos de tu tarjeta:
-                </Text>
-                <CardElement
-                  options={{
-                    style: {
-                      base: {
-                        fontSize: '16px',
-                        color: '#424770',
-                        '::placeholder': { color: '#aab7c4' },
-                      },
-                    },
-                  }}
+              <Box mt="xl">
+                <CheckoutForm
+                  amount={selectedService.price * 100} 
                 />
               </Box>
             )}
           </Paper>
         )}
-
         {canConfirm && (
           <Paper withBorder p="lg" shadow="sm">
             <Text fw={600} mb="md">
