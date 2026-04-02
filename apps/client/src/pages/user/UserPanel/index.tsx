@@ -16,6 +16,11 @@ export default function UserPanel() {
   const services = useServices(targetUser, isSelf);
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+    if (!loading && (error || !targetUser)) navigate("/login");
+  }, [error, targetUser, loading]);
+
   if (loading)
     return (
       <Base>
@@ -24,10 +29,6 @@ export default function UserPanel() {
         </Center>
       </Base>
     );
-
-  useEffect(() => {
-    if (error || !targetUser) navigate("/login");
-  }, [error, targetUser]);
 
   if (error || !targetUser) return null;
 
