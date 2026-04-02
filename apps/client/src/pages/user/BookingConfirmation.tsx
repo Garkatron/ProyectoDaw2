@@ -287,6 +287,8 @@ export default function BookingConfirmation() {
     })();
   }, [providerId, selectedDate]);
 
+  const SLOT_STEP = 15;
+
   const slotStates: Record<string, SlotState> = (() => {
     if (!selectedDate || allSlots.length === 0) return {};
     const now = new Date();
@@ -297,20 +299,24 @@ export default function BookingConfirmation() {
         const [h, m] = slot.split(":").map(Number);
         const slotDate = new Date(selectedDate);
         slotDate.setHours(h, m, 0, 0);
-        if (slotDate < now) return [slot, "past" as SlotState];
-        if (occupiedSlots.has(slot)) return [slot, "occupied" as SlotState];
-        if (!selectedService || durationMin === 0)
-          return [slot, "available" as SlotState];
 
-        // Check if any 30-min chunk of the service duration is occupied
+        if (slotDate < now) return [slot, "past"];
+        if (occupiedSlots.has(slot)) return [slot, "occupied"];
+
+        if (!selectedService || durationMin === 0)
+          return [slot, "available"];
+
         const startMin = slotToMinutes(slot);
         const endMin = startMin + durationMin;
-        for (let cursor = startMin; cursor < endMin; cursor += 30) {
-          const currentCheck = `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`;
-          if (occupiedSlots.has(currentCheck))
-            return [slot, "occupied" as SlotState];
+
+        if (endMin > 24 * 60) return [slot, "outside"];
+
+        for (let cursor = startMin; cursor < endMin; cursor += SLOT_STEP) {
+          const key = `${String(Math.floor(cursor / 60)).padStart(2, "0")}:${String(cursor % 60).padStart(2, "0")}`;
+          if (occupiedSlots.has(key)) return [slot, "occupied"];
         }
-        return [slot, "available" as SlotState];
+
+        return [slot, "available"];
       }),
     );
   })();
