@@ -10,6 +10,7 @@ import { ImageKitClient } from "../../libs/imagekit";
 import { MediaModel } from "./model";
 import { UserService } from "../user/service";
 import { fail } from "../../utils";
+import { logger } from "../../libs/pino";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -58,7 +59,10 @@ export abstract class MediaService {
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : "Unknown error";
-            throw fail(502, `Upload failed: ${message}` satisfies MediaModel["uploadFailed"]);
+            throw fail(
+                502,
+                `Upload failed: ${message}` satisfies MediaModel["uploadFailed"],
+            );
         }
 
         if (!response.fileId || !response.url) {
@@ -74,9 +78,9 @@ export abstract class MediaService {
         };
     }
 
-    static async getProfileImage(
-        { id }: MediaModel["profileParams"],
-    ): Promise<MediaModel["getImageResponse"]> {
+    static async getProfileImage({
+        id,
+    }: MediaModel["profileParams"]): Promise<MediaModel["getImageResponse"]> {
         return MediaService.getImage({ src: `user/${id}/profile` });
     }
 
@@ -84,9 +88,19 @@ export abstract class MediaService {
         { file }: MediaModel["fileBody"],
         id: number,
     ): Promise<MediaModel["postImageResponse"]> {
+        logger.info(
+            { userId: id },
+            "set profile image attempt",
+        );
+
         try {
             await ImageKitClient.files.delete(`user/${id}/profile`);
-        } catch (_) { }
+        } catch (error) {
+            logger.info(
+                { error, userId: id },
+                "error trying to delete perofile image for this user",
+            );
+        }
 
         return MediaService.postImage({
             file,
@@ -110,10 +124,9 @@ export abstract class MediaService {
         return MediaService.setProfileImage({ file }, user.id);
     }
 
-
-    static async getBannerImage(
-        { id }: MediaModel["bannerParams"],
-    ): Promise<MediaModel["getImageResponse"]> {
+    static async getBannerImage({
+        id,
+    }: MediaModel["bannerParams"]): Promise<MediaModel["getImageResponse"]> {
         return MediaService.getImage({ src: `user/${id}/banner` });
     }
 
@@ -123,7 +136,7 @@ export abstract class MediaService {
     ): Promise<MediaModel["postImageResponse"]> {
         try {
             await ImageKitClient.files.delete(`user/${id}/banner`);
-        } catch (_) { }
+        } catch (_) {}
 
         return MediaService.postImage({
             file,
