@@ -156,7 +156,8 @@
     },
     "cookies": {
       "title": "Manage cookies",
-      "description": "Reset cookies"
+      "description": "Reset cookies",
+      "button": "Reset"
     }
   },
   "userpanel": {

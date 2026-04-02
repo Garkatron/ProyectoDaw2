@@ -8,11 +8,13 @@ import ServicesSection from "./components/ServicesSection";
 import Base from "../../../layouts/Base";
 import { Box, Loader, Center, Text, Paper, Stack } from "@mantine/core";
 import ScheduleSettings from "../ScheduleSettings";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function UserPanel() {
   const { targetUser, isSelf, loading, error, handleLogout } = useUserPanel();
   const services = useServices(targetUser, isSelf);
-  const reviews = useReviews(targetUser, isSelf);
+  const navigate = useNavigate();
 
   if (loading)
     return (
@@ -23,14 +25,11 @@ export default function UserPanel() {
       </Base>
     );
 
-  if (error || !targetUser)
-    return (
-      <Base>
-        <Box maw={1152} mx="auto" p="xl">
-          <Text c="red">{error || "Usuario no encontrado."}</Text>
-        </Box>
-      </Base>
-    );
+  useEffect(() => {
+    if (error || !targetUser) navigate("/login");
+  }, [error, targetUser]);
+
+  if (error || !targetUser) return null;
 
   return (
     <Base>
@@ -43,7 +42,7 @@ export default function UserPanel() {
           />
 
           <Stack gap="lg" p="lg">
-            <InfoSection targetUser={targetUser} isSelf={isSelf} />
+            <InfoSection targetUser={targetUser} />
             <MetricsBar targetUser={targetUser} />
 
             {targetUser.role === "provider" && (

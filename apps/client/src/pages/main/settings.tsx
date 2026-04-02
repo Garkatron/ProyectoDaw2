@@ -70,7 +70,7 @@ export default function Settings() {
                     window.location.reload();
                   }}
                 >
-                  {t("settings.cookies.reset")}
+                  {t("settings.cookies.button")}
                 </Button>
               }
             />

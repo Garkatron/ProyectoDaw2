@@ -163,7 +163,8 @@
     },
     "cookies": {
       "title": "Gestionar cookies",
-      "description": "Reiniciar cookies"
+      "description": "Reiniciar cookies",
+      "button": "Reiniciar"
     }
   },
   "userpanel": {
