@@ -61,8 +61,7 @@ jobs:
 
             EMAIL_VERIFICATION="${{ vars.EMAIL_VERIFICATION }}"
 
-            FRONTEND_URL="https://www.limpora.xyz"
-
+            FRONTEND_URL=https://www.limpora.xyz
             IMAGEKIT_PRIVATE_KEY="${{ secrets.IMAGEKIT_PRIVATE_KEY }}"
             IMAGEKIT_PUBLIC_KEY="${{ secrets.IMAGEKIT_PUBLIC_KEY }}"
             IMAGEKIT_URL_ENDPOINT="${{ vars.IMAGEKIT_URL_ENDPOINT }}"
