@@ -1,5 +1,5 @@
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { useState, FormEvent } from "react";
+import { useState } from 'react';
 import { useTranslation } from "react-i18next";
 import {
   Paper,
@@ -22,17 +22,16 @@ import {
   XCircle,
   RefreshCw,
 } from "lucide-react";
-import { treaty } from "@elysiajs/eden";
 import { API } from "../lib/api";
-
 
 interface CheckoutFormProps {
   amount?: number;
+  onSuccess?: () => void;
 }
 
 type PaymentStatus = "idle" | "loading" | "success" | "error";
 
-const CheckoutForm = ({ amount = 2000 }: CheckoutFormProps) => {
+const CheckoutForm = ({ amount = 2000, onSuccess }: CheckoutFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const theme = useMantineTheme();
@@ -60,7 +59,7 @@ const CheckoutForm = ({ amount = 2000 }: CheckoutFormProps) => {
     },
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setStatus("loading");
 
@@ -77,6 +76,7 @@ const CheckoutForm = ({ amount = 2000 }: CheckoutFormProps) => {
 
       if (result.paymentIntent?.status === "succeeded") {
         setStatus("success");
+        onSuccess?.();
       } else {
         throw new Error(result.error?.message ?? "Payment failed");
       }
@@ -92,6 +92,11 @@ const CheckoutForm = ({ amount = 2000 }: CheckoutFormProps) => {
           <CheckCircle size={48} color={theme.colors.green[6]} strokeWidth={1.5} />
           <Title order={3}>{t("payment.success")}</Title>
           <Text c="dimmed" ta="center">{t("payment.successDetail")}</Text>
+          {onSuccess && (
+            <Button onClick={onSuccess} mt="xs">
+              {t("payment.continue")}
+            </Button>
+          )}
         </Stack>
       </Paper>
     );

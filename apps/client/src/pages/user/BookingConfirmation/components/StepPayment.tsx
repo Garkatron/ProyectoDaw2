@@ -3,6 +3,7 @@ import { PaymentMethod, type ProviderService } from "@limpora/common";
 import { ToggleButton } from "./BookingUI";
 import { PAYMENT_METHODS_LIST } from "../utils";
 import lang from "../../../../utils/LangManager";
+import CheckoutForm from "../../../../components/CheckoutForm";
 
 interface StepPaymentProps {
   selectedService: ProviderService;
