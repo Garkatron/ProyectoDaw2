@@ -6,7 +6,6 @@ import Login from "./pages/auth/Login";
 import Appointments from "./pages/user/Appointments";
 // import TopUsers from './pages/main/TopUsers';
 import AdminPanel from "./pages/admin/AdminPanel";
-import BookingConfirmation from "./pages/user/BookingConfirmation";
 import Currency from "./pages/user/Currency";
 import RoleRoute from "./components/RoleRoute";
 import UserFinder from "./pages/main/UserFinder";
@@ -24,6 +23,7 @@ import CookieConsent from 'react-cookie-consent';
 import lang from './utils/LangManager';
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import BookingConfirmation from "./pages/user/BookingConfirmation";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
 
 
