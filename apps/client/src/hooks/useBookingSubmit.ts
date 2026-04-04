@@ -84,6 +84,9 @@ export function useBookingSubmit() {
                     payment_method: paymentMethod,
                 });
 
+            console.log("response error:", errAppt);
+            console.log("response data:", appointment);
+
             if (errAppt || !appointment)
                 throw new Error("Error al crear la reserva");
 
