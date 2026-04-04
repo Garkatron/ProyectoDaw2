@@ -2,6 +2,7 @@ import { Paper, Text, SimpleGrid, Skeleton, Stack, Group } from "@mantine/core";
 import { type ProviderService } from "@limpora/common";
 import { ToggleButton } from "./BookingUI";
 import { formatDuration, calculateServicePrice } from "../utils";
+import { useTranslation } from "react-i18next";
 
 interface StepServiceProps {
   services: ProviderService[];
@@ -11,6 +12,7 @@ interface StepServiceProps {
 }
 
 export default function StepService({ services, selectedService, loading, onSelect }: StepServiceProps) {
+  const { t } = useTranslation();
   return (
     <Paper withBorder p="lg" shadow="sm">
       <Text fw={600} mb="lg">{t("booking.step2")}</Text>
@@ -29,7 +31,7 @@ export default function StepService({ services, selectedService, loading, onSele
               onClick={() => onSelect(svc)}
             >
               <Group justify="space-between">
-                <Text size="sm">{svc.service_name ?? svc.name ?? `Servicio #${svc.service_id}`}</Text>
+                <Text size="sm">{svc.service_name ?? `Servicio #${svc.service_id}`}</Text>
                 <Group gap={6}>
                   <Text size="xs" c="dimmed">{formatDuration(svc.duration_minutes)}</Text>
                   <Text size="xs" fw={600} c="dimmed">{calculateServicePrice(svc).toFixed(2)} €</Text>
