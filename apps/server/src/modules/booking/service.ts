@@ -31,12 +31,11 @@ export abstract class BookingService {
         );
 
         // ? Avoid self contract
-        if (provider_id === client_id) 
+        if (provider_id === client_id)
             throw fail(
                 403,
                 "You cannot contract yourself" satisfies BookingModel["forbidden"],
             );
-        
 
         // ? Find users
         const provider = await UserService.getById({ id: String(provider_id) });
@@ -155,17 +154,23 @@ export abstract class BookingService {
             Date.now() + 2 * 24 * 60 * 60 * 1000,
         ).toISOString();
 
-        NotificationService.sendInbox({
-            user_id: client.id,
-            expires_at,
-            content: `Tu cita para "${providerService.service_name}" con ${provider.name} el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)} ha sido confirmada.`,
-        });
+        try {
+            NotificationService.sendInbox({
+                user_id: client.id,
+                expires_at,
+                content: `Tu cita para "${providerService.service_name}" con ${provider.name} el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)} ha sido confirmada.`,
+            });
 
-        NotificationService.sendInbox({
-            user_id: provider.id,
-            expires_at,
-            content: `Nueva cita: ${client.name} ha reservado "${providerService.service_name}" el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)}.`,
-        });
+            NotificationService.sendInbox({
+                user_id: provider.id,
+                expires_at,
+                content: `Nueva cita: ${client.name} ha reservado "${providerService.service_name}" el ${new Date(new_start).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las ${new_start.substring(11, 16)}.`,
+            });
+
+            const _client = UserQueries.findById.get({ id: Number(client.id) });
+        } catch (e) {
+            logger.error(e, "Notification failed, booking still created");
+        }
 
         // TODO: Avoid querie the user two times...
         // This happens because I use the UserService that doesn't send the Email for security, but I need the Email here to send then notification.
@@ -340,7 +345,7 @@ export abstract class BookingService {
                 AppointmentStatus.Pending,
                 AppointmentStatus.Cancelled,
             ],
-            
+
             [AppointmentStatus.Pending]: [
                 AppointmentStatus.InProcess,
                 AppointmentStatus.Cancelled,
