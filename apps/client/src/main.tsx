@@ -6,6 +6,7 @@ import { mantineTheme } from "./themes/theme.js";
 import "index.css";
 import "./i18n";
 import { MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");
