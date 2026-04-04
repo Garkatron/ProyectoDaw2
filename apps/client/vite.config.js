@@ -8,6 +8,9 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom'],
   },
+  build: {
+  sourcemap: true,
+},
   server: {
     allowedHosts: true,
     host: true,

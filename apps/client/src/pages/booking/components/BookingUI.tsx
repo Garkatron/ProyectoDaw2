@@ -2,7 +2,6 @@ import { Paper, Text, UnstyledButton, Group } from "@mantine/core";
 import { type SlotState } from "../utils";
 import { useTranslation } from "react-i18next";
 
-// ToggleButton — selección simple (servicio, método de pago)
 export const ToggleButton = ({
   selected,
   onClick,
@@ -12,7 +11,7 @@ export const ToggleButton = ({
   onClick: () => void;
   children: React.ReactNode;
 }) => (
-  
+
   <UnstyledButton onClick={onClick} style={{ width: "100%" }}>
     <Paper
       withBorder
@@ -30,25 +29,8 @@ export const ToggleButton = ({
     </Paper>
   </UnstyledButton>
 );
-  const { t } = useTranslation();
 
-// Estilos por estado de slot
-const slotStyles: Record<SlotState, { bg?: string; text: string; label?: string }> = {
-  available: { text: "dimmed" },
-  occupied: {
-    bg: "var(--mantine-color-red-0)",
-    text: "var(--mantine-color-red-6)",
-    label: t("booking.slot_states.occupied"),
-  },
-  past: { bg: "var(--mantine-color-gray-1)", text: "var(--mantine-color-gray-5)" },
-  outside: {
-    bg: "var(--mantine-color-gray-1)",
-    text: "var(--mantine-color-gray-4)",
-    label: t("booking.slot_states.outside"),
-  },
-};
 
-// SlotButton — hueco horario con estado visual
 export const SlotButton = ({
   slot,
   state,
@@ -60,6 +42,23 @@ export const SlotButton = ({
   selected: boolean;
   onClick: () => void;
 }) => {
+  const { t } = useTranslation();
+
+  const slotStyles: Record<SlotState, { bg?: string; text: string; label?: string }> = {
+    available: { text: "dimmed" },
+    occupied: {
+      bg: "var(--mantine-color-red-0)",
+      text: "var(--mantine-color-red-6)",
+      label: t("booking.slot_states.occupied"),
+    },
+    past: { bg: "var(--mantine-color-gray-1)", text: "var(--mantine-color-gray-5)" },
+    outside: {
+      bg: "var(--mantine-color-gray-1)",
+      text: "var(--mantine-color-gray-4)",
+      label: t("booking.slot_states.outside"),
+    },
+  };
+
   const disabled = state === "occupied" || state === "past" || state === "outside";
   const styles = slotStyles[state];
 
