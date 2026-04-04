@@ -4,7 +4,7 @@ import type { MarkedDate } from "../components/Calendar";
 import { API } from "../lib/api";
 
 
-export function useBookingData(providerId: string | undefined) {
+export function useBookingData(providerId: number | undefined) {
   const [markedDates, setMarkedDates] = useState<MarkedDate[]>([]);
   const [providerServices, setProviderServices] = useState<ProviderService[]>([]);
   const [allSlots, setAllSlots] = useState<string[]>([]);

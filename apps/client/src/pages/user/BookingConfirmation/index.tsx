@@ -18,7 +18,7 @@ import { useAuthStore } from "../../../stores/auth.store";
 export default function BookingConfirmation() {
   const location = useLocation();
   const currentUser = useAuthStore((s) => s.user);
-  const providerId: string | undefined = location.state?.userId;
+  const providerId: number | undefined = location.state?.userId;
 
   // Estado de selección del usuario
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);

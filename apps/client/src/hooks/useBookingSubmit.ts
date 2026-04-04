@@ -2,15 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { PaymentMethod, type ProviderService } from "@limpora/common";
-import { API } from "../../../lib/api";
+import { API } from "../lib/api";
 
 interface SubmitParams {
-  providerId: string;
+  providerId: number;
   selectedDate: Date;
   selectedTime: string;
   selectedService: ProviderService;
   paymentMethod: PaymentMethod;
-  currentUser: { id: string } | null;
+  currentUser: { id: number } | null;
 }
 
 export function useBookingSubmit() {

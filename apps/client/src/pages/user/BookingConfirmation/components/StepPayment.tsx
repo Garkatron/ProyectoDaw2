@@ -15,7 +15,7 @@ interface StepPaymentProps {
   success: boolean;
   onMethodChange: (method: PaymentMethod) => void;
   onConfirmManual: () => void;
-  onStripeSuccess: () => void;  // ← callback al completar pago Stripe
+  onStripeSuccess: () => void;
 }
 
 export default function StepPayment({
@@ -66,15 +66,13 @@ export default function StepPayment({
       {paymentMethod === PaymentMethod.Stripe ? (
         <Box mt="xl">
           {finalPriceCents > 0 ? (
-            <>
+            success ? (
+              <Button mt="md" fullWidth color="green" onClick={onStripeSuccess}>
+                Continuar
+              </Button>
+            ) : (
               <CheckoutForm amount={finalPriceCents} onSuccess={onStripeSuccess} />
-              {/* Si el pago ya se completó, mostrar botón de continuar */}
-              {success && (
-                <Button mt="md" fullWidth color="green" onClick={onStripeSuccess}>
-                  Continuar
-                </Button>
-              )}
-            </>
+            )
           ) : (
             <Alert color="red">Error en el cálculo del precio.</Alert>
           )}
