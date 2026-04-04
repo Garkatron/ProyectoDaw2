@@ -38,7 +38,7 @@ export default function BookingConfirmation() {
   } = useBookingData(providerId);
 
   // Submit
-  const { submitting, error, success, confirmManual, onStripeSuccess } = useBookingSubmit();
+  const { submitting, error, success, confirmManual, onStripeSuccess, confirmStripe } = useBookingSubmit();
 
   // Precio final
   const finalPrice = selectedService
@@ -89,6 +89,19 @@ export default function BookingConfirmation() {
     });
   };
 
+  const handleStripeSuccess = () => {
+    if (!selectedDate || !selectedTime || !selectedService || !providerId) return;
+    confirmStripe({
+      providerId,
+      selectedDate,
+      selectedTime,
+      selectedService,
+      paymentMethod: PaymentMethod.Stripe,
+      currentUser,
+    });
+  };
+
+
   return (
     <Base>
       <Stack maw={768} mx="auto" p="lg" gap="lg">
@@ -136,7 +149,7 @@ export default function BookingConfirmation() {
             success={success}
             onMethodChange={setPaymentMethod}
             onConfirmManual={handleConfirmManual}
-            onStripeSuccess={onStripeSuccess}
+            onStripeSuccess={handleStripeSuccess}
           />
         )}
       </Stack>
