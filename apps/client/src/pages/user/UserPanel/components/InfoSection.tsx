@@ -18,7 +18,7 @@ export default function InfoSection({ targetUser }) {
 
                 <Group gap="md" wrap="wrap">
                     <InfoCard
-                        label={lang('userpanel.label.role')}
+                        label={t('userpanel.label.role')}
                         value={targetUser.role}
                     />
                 </Group>
