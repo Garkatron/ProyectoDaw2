@@ -14,4 +14,4 @@ db.run("PRAGMA foreign_keys = ON");
 
 // ? Database
 migrate(db); // Database migration
-// seed(db);
+seed(db);
