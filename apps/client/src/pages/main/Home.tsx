@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Navbar from "../../components/Navbar";
 import logo from "../../assets/logo.svg";
-import HERO_IMAGE from "./../../assets/hero2.jpg";
+import HERO_IMAGE from "./../../assets/hero2.webp";
 import {
   Box, Grid, Group, Image, Paper, Stack,
   Text, Title, Divider, ThemeIcon, SimpleGrid, Badge, Anchor,
