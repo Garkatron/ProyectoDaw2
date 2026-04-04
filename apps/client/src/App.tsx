@@ -3,27 +3,21 @@ import Home from "./pages/main/Home";
 import PrivateRoute from "./components/PrivateRoute";
 import Rergister from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
-import Appointments from "./pages/user/Appointments";
-// import TopUsers from './pages/main/TopUsers';
-import AdminPanel from "./pages/admin/AdminPanel";
 import Currency from "./pages/user/Currency";
 import RoleRoute from "./components/RoleRoute";
 import UserFinder from "./pages/main/UserFinder";
-// import EmailCode from './pages/auth/EmailCode';
-import UserPanel from "./pages/user/UserPanel/index";
+import UserPanel from "./pages/user/UserPanel";
 import VerifyEmail from "./pages/auth/VerifyEmail";
-import ScheduleSettings from "./pages/user/ScheduleSettings";
 import AppointmentReviewPage from "./pages/user/AppointmentReviewPage";
 import Inbox from "./pages/user/Inbox";
-import { AnimatePresence, motion } from "framer-motion";
-import { useRef } from "react";
-import Settings from "./pages/main/settings";
+import Settings from "./pages/main/Settings";
 import OAuthCallback from "./pages/auth/OAuthCallback";
 import CookieConsent from 'react-cookie-consent';
 import lang from './utils/LangManager';
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import BookingConfirmation from "./pages/user/BookingConfirmation";
+import BookingConfirmation from "./pages/booking";
+import Appointments from "./pages/user/Appointments";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
 
 
@@ -44,19 +38,23 @@ const App = () => {
           <Route path="/panel/:username" element={<UserPanel />} />
           <Route path="/review" element={<AppointmentReviewPage />} />
           <Route path="/inbox" element={<Inbox />} />
+      
           <Route element={<RoleRoute roles={["provider"]} />}>
             <Route path="/currency" element={<Currency />} />
           </Route>
+      
           <Route path="/userfinder" element={<UserFinder />} />
+      
           <Route path="/booking" element={
             <Elements stripe={stripePromise}>
               <BookingConfirmation />
             </Elements>
           } />
           <Route path="/appointments" element={<Appointments />} />
-          <Route path="/panel/admin" element={<AdminPanel />} />
+      
         </Route>
       </Routes>
+
       <CookieConsent
         buttonText="Aceptar"
         declineButtonText="Rechazar"

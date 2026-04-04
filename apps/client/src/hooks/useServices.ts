@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API } from "../../../lib/api";
+import { API } from "../lib/api";
 
 interface UserService {
   service_id: number;

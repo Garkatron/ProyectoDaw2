@@ -1,7 +1,7 @@
 import { Paper, Text } from "@mantine/core";
-import type { MarkedDate } from "../../../../components/Calendar";
-import Calendar from "../../../../components/Calendar";
-import lang from "../../../../utils/LangManager";
+import Calendar, { type MarkedDate } from "../../../components/Calendar";
+import { useTranslation } from "react-i18next";
+
 
 interface StepCalendarProps {
   markedDates: MarkedDate[];
@@ -9,10 +9,12 @@ interface StepCalendarProps {
   onDateClick: (date: Date) => void;
 }
 
+
 export default function StepCalendar({ markedDates, selectedDate, onDateClick }: StepCalendarProps) {
+  const { t } = useTranslation();
   return (
     <Paper withBorder p="lg" shadow="sm">
-      <Text fw={600} mb="sm">{lang("booking.step1")}</Text>
+      <Text fw={600} mb="sm">{t("booking.step1")}</Text>
       <Calendar
         markedDates={markedDates}
         onDateClick={onDateClick}

@@ -1,6 +1,6 @@
 import { CalendarDays, Trophy } from 'lucide-react';
-import lang from '../../../../utils/LangManager';
 import { Group, Paper, Text, ThemeIcon, Divider } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 const MetricPill = ({ icon: Icon, label, value }) => (
     <Paper withBorder px="md" py="sm" radius="xl" shadow="xs">
@@ -14,17 +14,19 @@ const MetricPill = ({ icon: Icon, label, value }) => (
 );
 
 export default function MetricsBar({ targetUser }) {
+      const { t } = useTranslation();
+    
     return (
         <>
             <Group gap="md">
                 <MetricPill
                     icon={CalendarDays}
-                    label={lang('userpanel.label.completed_appointments')}
+                    label={t('userpanel.label.completed_appointments')}
                     value={targetUser.citasCompletas || 0}
                 />
                 <MetricPill
                     icon={Trophy}
-                    label={lang('userpanel.label.total_points')}
+                    label={t('userpanel.label.total_points')}
                     value={targetUser.puntosTotales || 0}
                 />
             </Group>

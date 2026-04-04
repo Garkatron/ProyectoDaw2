@@ -1,4 +1,4 @@
-import lang from "../../../../utils/LangManager";
+import { useTranslation } from "react-i18next";
 import ServiceCard from "./cards/ServiceCard";
 import {
   Alert,
@@ -40,6 +40,7 @@ export default function ServicesSection({
   const availableServices = allServices
     .filter((s) => !userServices.some((us) => us.service_id === s.id))
     .map((s) => ({ value: String(s.id), label: s.name }));
+  const { t } = useTranslation();
 
   const price = Number(selectedServicePrice);
   const minutes = Number(selectedServiceMinutes);
@@ -51,7 +52,7 @@ export default function ServicesSection({
   return (
     <Stack gap="md">
       <Title order={2} fw={300} fz="xl">
-        {lang("userpanel.title.services") ?? "Servicios"}
+        {t("userpanel.title.services") ?? "Servicios"}
       </Title>
       <Divider />
 
@@ -68,7 +69,7 @@ export default function ServicesSection({
         </SimpleGrid>
       ) : (
         <Text size="sm" c="dimmed">
-          {lang("userpanel.services.no_services")}
+          {t("userpanel.services.no_services")}
         </Text>
       )}
 
@@ -76,7 +77,7 @@ export default function ServicesSection({
         <Stack gap="sm" pt="sm">
           <Divider />
           <Title order={3} fw={300} fz="lg">
-            {lang("userpanel.services.add_title")}
+            {t("userpanel.services.add_title")}
           </Title>
 
           {serviceError && (
@@ -90,7 +91,7 @@ export default function ServicesSection({
               <Group align="flex-end" gap="sm" wrap="wrap">
                 <Select
                   style={{ flex: 1, minWidth: 180 }}
-                  placeholder={lang("userpanel.services.select_placeholder")}
+                  placeholder={t("userpanel.services.select_placeholder")}
                   data={availableServices}
                   value={selectedServiceId ? String(selectedServiceId) : null}
                   onChange={(val) => setSelectedServiceId(Number(val))}
@@ -99,8 +100,8 @@ export default function ServicesSection({
 
                 <NumberInput
                   w={160}
-                  label={lang("userpanel.services.price_label")}
-                  placeholder={lang("userpanel.services.price_placeholder")}
+                  label={t("userpanel.services.price_label")}
+                  placeholder={t("userpanel.services.price_placeholder")}
                   min={50}
                   decimalScale={2}
                   suffix=" €/h"
@@ -111,9 +112,9 @@ export default function ServicesSection({
 
                 <NumberInput
                   w={180}
-                  label={lang("userpanel.services.duration_label")}
-                  description={lang("userpanel.services.duration_description")}
-                  placeholder={lang("userpanel.services.duration_placeholder")}
+                  label={t("userpanel.services.duration_label")}
+                  description={t("userpanel.services.duration_description")}
+                  placeholder={t("userpanel.services.duration_placeholder")}
                   min={15}
                   max={480}
                   step={15}
@@ -128,7 +129,7 @@ export default function ServicesSection({
                   loading={serviceSubmitting}
                   style={{ alignSelf: "flex-end" }}
                 >
-                  {lang("userpanel.services.add_button")}
+                  {t("userpanel.services.add_button")}
                 </Button>
               </Group>
 
@@ -141,7 +142,7 @@ export default function ServicesSection({
                 >
                   <Text size="sm" c="green" fw={500}>
                     💰{" "}
-                    {lang("userpanel.services.earnings_preview")
+                    {t("userpanel.services.earnings_preview")
                       .replace("{{total}}", gross.toFixed(2))
                       .replace("{{net}}", net.toFixed(2))}
                   </Text>

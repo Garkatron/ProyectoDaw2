@@ -1,6 +1,5 @@
 import { useUserPanel } from "./useUserPanel";
-import { useServices } from "./useServices";
-import { useReviews } from "./useReviews";
+import { useServices } from "../../../hooks/useServices";
 import ProfileHeader from "./components/ProfileHeader";
 import InfoSection from "./components/InfoSection";
 import MetricsBar from "./components/MetricsBar";

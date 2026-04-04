@@ -27,7 +27,6 @@ export default function VerifyEmail() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const email: string = state?.email ?? "";
-  console.log("AAAAAAAAAAAA3: ", email);
 
   useEffect(() => {
     startCooldown();

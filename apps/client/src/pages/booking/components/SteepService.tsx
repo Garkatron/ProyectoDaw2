@@ -2,7 +2,6 @@ import { Paper, Text, SimpleGrid, Skeleton, Stack, Group } from "@mantine/core";
 import { type ProviderService } from "@limpora/common";
 import { ToggleButton } from "./BookingUI";
 import { formatDuration, calculateServicePrice } from "../utils";
-import lang from "../../../../utils/LangManager";
 
 interface StepServiceProps {
   services: ProviderService[];
@@ -14,7 +13,7 @@ interface StepServiceProps {
 export default function StepService({ services, selectedService, loading, onSelect }: StepServiceProps) {
   return (
     <Paper withBorder p="lg" shadow="sm">
-      <Text fw={600} mb="lg">{lang("booking.step2")}</Text>
+      <Text fw={600} mb="lg">{t("booking.step2")}</Text>
 
       {loading ? (
         <Stack gap="xs">

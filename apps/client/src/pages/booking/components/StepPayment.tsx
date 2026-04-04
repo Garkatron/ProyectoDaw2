@@ -2,8 +2,10 @@ import { Alert, Box, Button, Divider, Group, Paper, SimpleGrid, Stack, Text } fr
 import { PaymentMethod, type ProviderService } from "@limpora/common";
 import { ToggleButton } from "./BookingUI";
 import { PAYMENT_METHODS_LIST } from "../utils";
-import lang from "../../../../utils/LangManager";
-import CheckoutForm from "../../../../components/CheckoutForm";
+import { useTranslation } from "react-i18next";
+import lang from "../../../utils/LangManager";
+import CheckoutForm from "../../../components/CheckoutForm";
+
 
 interface StepPaymentProps {
   selectedService: ProviderService;
@@ -30,6 +32,8 @@ export default function StepPayment({
   onConfirmManual,
   onStripeSuccess,
 }: StepPaymentProps) {
+  const { t } = useTranslation();
+  
   return (
     <Paper withBorder p="lg" shadow="sm">
       <Text fw={600} mb="md">{lang("booking.step4")}</Text>

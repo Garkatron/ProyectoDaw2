@@ -3,7 +3,7 @@ import type { App } from "../../../server/src/index.ts";
 
 // In dev, requests go through the Vite proxy (/api → limpora-server:3000)
 // to avoid CORS issues. In production, the client calls the API subdomain directly.
-export const API_BASE_URL =
+const API_BASE_URL =
   import.meta.env.MODE === "production"
     ? "https://api.limpora.xyz"
     : `${window.location.origin}/api`;

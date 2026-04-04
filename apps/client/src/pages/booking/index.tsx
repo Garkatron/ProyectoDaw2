@@ -2,16 +2,17 @@ import { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Stack, Title } from "@mantine/core";
 import { PaymentMethod, type ProviderService } from "@limpora/common";
-import { useBookingData } from "../../../hooks/useBookingData";
 import { computeSlotStates } from "./utils";
-import Base from "../../../layouts/Base";
 import StepCalendar from "./components/SteepCalendar";
 import StepService from "./components/SteepService";
 import StepTime from "./components/StepTime";
 import StepPayment from "./components/StepPayment";
-import lang from "../../../utils/LangManager";
-import { useBookingSubmit } from "../../../hooks/useBookingSubmit";
-import { useAuthStore } from "../../../stores/auth.store";
+import { useAuthStore } from "../../stores/auth.store";
+import { useBookingData } from "../../hooks/useBookingData";
+import { useBookingSubmit } from "../../hooks/useBookingSubmit";
+import { useTranslation } from "react-i18next";
+import Base from "../../layouts/Base";
+
 
 
 
@@ -20,13 +21,12 @@ export default function BookingConfirmation() {
   const currentUser = useAuthStore((s) => s.user);
   const providerId: number | undefined = location.state?.userId;
 
-  // Estado de selección del usuario
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedService, setSelectedService] = useState<ProviderService | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.BankTransfer);
+  const { t } = useTranslation();
 
-  // Datos remotos
   const {
     markedDates,
     providerServices,
@@ -106,7 +106,7 @@ export default function BookingConfirmation() {
     <Base>
       <Stack maw={768} mx="auto" p="lg" gap="lg">
         <Title order={1} fz="1.5rem" fw={600}>
-          {lang("booking.title")}
+          {t("booking.title")}
         </Title>
 
         {/* Paso 1 */}

@@ -1,8 +1,10 @@
-import lang from '../../../../utils/LangManager';
+import { useTranslation } from 'react-i18next';
 import InfoCard from './cards/InfoCard';
 import { Divider, Flex, Group, Title } from '@mantine/core';
 
 export default function InfoSection({ targetUser }) {
+    const { t } = useTranslation();
+
     return (
         <>
             <Flex
