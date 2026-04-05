@@ -18,6 +18,8 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import BookingConfirmation from "./pages/booking";
 import Appointments from "./pages/user/Appointments";
+import Legal from "./pages/limpora/Legal";
+import About from "./pages/limpora/About";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
 
 
@@ -33,6 +35,8 @@ const App = () => {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/about" element={<About />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/panel/:username" element={<UserPanel />} />

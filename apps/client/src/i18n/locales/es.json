@@ -278,5 +278,83 @@
     "securedBy": "Protegido por Stripe",
     "amount": "Importe",
     "retry": "Reintentar"
+  },
+  "about": {
+    "badge": "Sobre nosotros",
+    "title": "¿Qué es Limpora?",
+    "description": "Conoce la plataforma, cómo funciona y cómo contactar con nosotros.",
+    "what": {
+      "title": "La plataforma",
+      "body": "Limpora es una plataforma digital que conecta a particulares y empresas con profesionales de limpieza. Puedes contratar tanto autónomos independientes registrados en la plataforma como trabajadores propios de Limpora, todos accesibles desde un mismo lugar."
+    },
+    "who": {
+      "title": "¿A quién va dirigida?",
+      "body": "A cualquier persona que necesite servicios de limpieza profesional: hogares, vehículos, piscinas, fachadas o artículos de alto valor. También a autónomos del sector que quieran captar clientes de forma sencilla."
+    },
+    "disclaimer": {
+      "title": "Verificación de profesionales",
+      "body": "Actualmente Limpora verifica la identidad de los profesionales mediante confirmación de correo electrónico o inicio de sesión con Google (OAuth). No realizamos verificación documental de identidad en este momento. Recomendamos revisar el perfil y valoraciones antes de contratar."
+    },
+    "contact": {
+      "title": "Contacto",
+      "email_label": "Correo electrónico",
+      "web_label": "Web",
+      "location_label": "País"
+    }
+  },
+  "legal": {
+    "title": "Información legal",
+    "updated": "Última actualización",
+    "nav": {
+      "aviso": "Aviso legal",
+      "privacidad": "Privacidad",
+      "cookies": "Cookies",
+      "terminos": "Términos de uso"
+    },
+    "aviso": {
+      "responsable_title": "Titular de la plataforma",
+      "responsable_body": "Limpora es una plataforma digital operada en España. Para cualquier consulta legal puede contactar en soporte@limpora.es.",
+      "actividad_title": "Actividad",
+      "actividad_body": "Limpora actúa como plataforma de intermediación entre usuarios que solicitan servicios de limpieza y profesionales (autónomos registrados o trabajadores propios de Limpora) que los prestan.",
+      "intermediario_title": "Carácter de intermediario",
+      "intermediario_body": "Limpora no es parte del contrato de prestación de servicios entre el cliente y el profesional autónomo. En el caso de trabajadores propios de Limpora, la responsabilidad recae directamente sobre la plataforma."
+    },
+    "privacidad": {
+      "responsable_title": "Responsable del tratamiento",
+      "responsable_body": "Limpora trata los datos de carácter personal de conformidad con el Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD). Contacto: soporte@limpora.es.",
+      "datos_title": "Datos que recogemos",
+      "datos_body": "Nombre, dirección de correo electrónico, contraseña cifrada (si el registro es por email) y datos de sesión de Google (si el acceso es mediante OAuth). No se recogen datos de pago directamente; el procesamiento se delega en Stripe.",
+      "finalidad_title": "Finalidad",
+      "finalidad_body": "Gestión de cuentas de usuario, prestación del servicio de intermediación, comunicaciones relacionadas con el servicio, y cumplimiento de obligaciones legales.",
+      "base_title": "Base jurídica",
+      "base_body": "Ejecución de contrato (art. 6.1.b RGPD) para la prestación del servicio. Interés legítimo para comunicaciones operativas. Cumplimiento de obligación legal cuando proceda.",
+      "conservacion_title": "Conservación",
+      "conservacion_body": "Los datos se conservan mientras la cuenta esté activa. Tras la baja, se mantienen durante el plazo legalmente exigido y se eliminan posteriormente.",
+      "derechos_title": "Derechos",
+      "derechos_body": "Puede ejercer los derechos de acceso, rectificación, supresión, limitación, portabilidad y oposición escribiendo a",
+      "menores_title": "Menores de edad",
+      "menores_body": "Limpora no está dirigida a menores de 18 años. No recopilamos conscientemente datos de menores.",
+      "verificacion_title": "Verificación de identidad",
+      "verificacion_body": "Actualmente la verificación de identidad de los profesionales se limita a la confirmación de correo electrónico o inicio de sesión mediante Google OAuth. No se realiza verificación documental. Limpora trabaja para implementar niveles adicionales de verificación en el futuro."
+    },
+    "cookies": {
+      "intro": "Limpora utiliza cookies propias y de terceros necesarias para el funcionamiento de la plataforma.",
+      "types_title": "Tipos de cookies utilizadas",
+      "types_body": "Cookies de sesión para mantener el inicio de sesión. Cookies de terceros de ImageKit para la gestión de imágenes. Cookies de seguimiento de email para notificaciones transaccionales. No se utilizan cookies publicitarias.",
+      "control_title": "Control de cookies",
+      "control_body": "Puede gestionar o eliminar las cookies desde la configuración de su navegador. La desactivación de cookies esenciales puede impedir el correcto funcionamiento de la plataforma. Desde Ajustes > Gestionar cookies puede reiniciar las preferencias de cookies en la app."
+    },
+    "terminos": {
+      "uso_title": "Uso de la plataforma",
+      "uso_body": "El acceso y uso de Limpora implica la aceptación de estos términos. La plataforma está destinada a mayores de 18 años residentes en España.",
+      "reservas_title": "Reservas y contratación",
+      "reservas_body": "Las reservas realizadas a través de Limpora constituyen un acuerdo entre el cliente y el profesional o entre el cliente y Limpora (cuando el profesional es empleado propio). Limpora facilita el proceso pero no garantiza la disponibilidad de los profesionales.",
+      "comision_title": "Comisión",
+      "comision_body": "Limpora aplica una comisión del 20% sobre el importe de cada servicio abonado a través de la plataforma. Este importe se descuenta automáticamente del pago al profesional.",
+      "responsabilidad_title": "Limitación de responsabilidad",
+      "responsabilidad_body": "Limpora no se hace responsable de los daños derivados de la actuación de profesionales autónomos registrados en la plataforma. La plataforma actúa como intermediario y no supervisa la ejecución de los servicios in situ.",
+      "ley_title": "Ley aplicable",
+      "ley_body": "Estos términos se rigen por la legislación española. Cualquier controversia se someterá a los juzgados y tribunales del domicilio del usuario, salvo que la normativa aplicable establezca otro fuero."
+    }
   }
 }

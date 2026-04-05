@@ -272,5 +272,83 @@
     "securedBy": "Secured by Stripe",
     "amount": "Amount",
     "retry": "Try again"
+  },
+  "about": {
+    "badge": "About us",
+    "title": "What is Limpora?",
+    "description": "Learn about the platform, how it works, and how to contact us.",
+    "what": {
+      "title": "The platform",
+      "body": "Limpora is a digital platform that connects individuals and businesses with professional cleaners. You can hire independent freelancers registered on the platform or Limpora's own staff — all accessible from one place."
+    },
+    "who": {
+      "title": "Who is it for?",
+      "body": "Anyone who needs professional cleaning services: homes, vehicles, swimming pools, facades, or high-value items. Also for freelance cleaners looking to reach clients easily."
+    },
+    "disclaimer": {
+      "title": "Professional verification",
+      "body": "Limpora currently verifies professionals via email confirmation or Google sign-in (OAuth). We do not perform documentary identity verification at this time. We recommend reviewing profiles and ratings before booking."
+    },
+    "contact": {
+      "title": "Contact",
+      "email_label": "Email",
+      "web_label": "Website",
+      "location_label": "Country"
+    }
+  },
+  "legal": {
+    "title": "Legal information",
+    "updated": "Last updated",
+    "nav": {
+      "aviso": "Legal notice",
+      "privacidad": "Privacy policy",
+      "cookies": "Cookie policy",
+      "terminos": "Terms of use"
+    },
+    "aviso": {
+      "responsable_title": "Platform operator",
+      "responsable_body": "Limpora is a digital platform operated in Spain. For any legal inquiry please contact soporte@limpora.es.",
+      "actividad_title": "Activity",
+      "actividad_body": "Limpora acts as an intermediary platform between users who request cleaning services and professionals (registered freelancers or Limpora's own staff) who provide them.",
+      "intermediario_title": "Intermediary status",
+      "intermediario_body": "Limpora is not a party to the service contract between the client and the self-employed professional. In the case of Limpora's own staff, responsibility lies directly with the platform."
+    },
+    "privacidad": {
+      "responsable_title": "Data controller",
+      "responsable_body": "Limpora processes personal data in accordance with EU Regulation 2016/679 (GDPR) and Spanish Organic Law 3/2018 (LOPDGDD). Contact: soporte@limpora.es.",
+      "datos_title": "Data we collect",
+      "datos_body": "Full name, email address, encrypted password (for email registration), and Google session data (for OAuth sign-in). Payment data is not collected directly — processing is delegated to Stripe.",
+      "finalidad_title": "Purpose",
+      "finalidad_body": "Account management, provision of the intermediary service, service-related communications, and compliance with legal obligations.",
+      "base_title": "Legal basis",
+      "base_body": "Contract performance (Art. 6.1.b GDPR) for service provision. Legitimate interest for operational communications. Legal obligation where applicable.",
+      "conservacion_title": "Retention",
+      "conservacion_body": "Data is retained while the account is active. After deletion, data is kept for the legally required period and then permanently removed.",
+      "derechos_title": "Rights",
+      "derechos_body": "You may exercise your rights of access, rectification, erasure, restriction, portability, and objection by writing to",
+      "menores_title": "Minors",
+      "menores_body": "Limpora is not intended for users under 18. We do not knowingly collect data from minors.",
+      "verificacion_title": "Identity verification",
+      "verificacion_body": "Professional identity verification is currently limited to email confirmation or Google OAuth sign-in. No documentary verification is performed. Limpora is working to implement additional verification levels in the future."
+    },
+    "cookies": {
+      "intro": "Limpora uses first-party and third-party cookies necessary for the platform to function.",
+      "types_title": "Types of cookies used",
+      "types_body": "Session cookies to maintain login state. Third-party ImageKit cookies for image management. Email tracking cookies for transactional notifications. No advertising cookies are used.",
+      "control_title": "Cookie control",
+      "control_body": "You can manage or delete cookies from your browser settings. Disabling essential cookies may prevent the platform from functioning correctly. From Settings > Manage cookies you can reset cookie preferences within the app."
+    },
+    "terminos": {
+      "uso_title": "Use of the platform",
+      "uso_body": "Accessing and using Limpora implies acceptance of these terms. The platform is intended for users over 18 years of age residing in Spain.",
+      "reservas_title": "Bookings and services",
+      "reservas_body": "Bookings made through Limpora constitute an agreement between the client and the professional, or between the client and Limpora (when the professional is a Limpora employee). Limpora facilitates the process but does not guarantee professional availability.",
+      "comision_title": "Commission",
+      "comision_body": "Limpora applies a 20% commission on the amount of each service paid through the platform. This amount is automatically deducted from the professional's payment.",
+      "responsabilidad_title": "Limitation of liability",
+      "responsabilidad_body": "Limpora is not liable for damages arising from the actions of self-employed professionals registered on the platform. The platform acts as an intermediary and does not supervise service execution on site.",
+      "ley_title": "Applicable law",
+      "ley_body": "These terms are governed by Spanish law. Any dispute shall be submitted to the courts of the user's place of residence, unless applicable regulations establish a different jurisdiction."
+    }
   }
 }
