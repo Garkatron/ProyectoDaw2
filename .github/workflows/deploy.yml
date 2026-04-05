@@ -1,9 +1,9 @@
-name: Deploy Develop
+name: Deploy Production
 
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   deploy-client:
@@ -20,7 +20,7 @@ jobs:
             cd /var/www/html/ProyectoDaw2
             git reset --hard
             git clean -fd
-            git pull origin develop
+            git pull origin main
 
             cat > apps/client/.env << 'ENVEOF'
             VITE_STRIPE_PUBLIC_KEY="${{ secrets.STRIPE_FRONTEND_KEY }}"
