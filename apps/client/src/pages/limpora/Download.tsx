@@ -5,6 +5,7 @@ import {
   Paper, Divider, Anchor,
 } from "@mantine/core";
 import { Download, ShieldCheck, Smartphone, Wifi, Star, AlertTriangle } from "lucide-react";
+import Base from "../../layouts/Base";
 
 /* ── Fade-in hook ── */
 const useFadeIn = (delay = 0) => {
@@ -165,78 +166,80 @@ export default function DownloadPage() {
   const refRight = useFadeIn(120);
 
   return (
-    <Box maw={900} mx="auto" p={{ base: "md", sm: "xl" }}>
-      <Stack gap="xl">
+    <Base>
+      <Box maw={900} mx="auto" p={{ base: "md", sm: "xl" }}>
+        <Stack gap="xl">
 
-        {/* Header */}
-        <Stack gap={4}>
-          <Badge variant="light" radius="xl" size="sm" w="fit-content">
-            {t("download.badge")}
-          </Badge>
-          <Title order={2} fz={{ base: "1.5rem", sm: "2rem" }} fw={700} style={{ letterSpacing: "-0.02em" }}>
-            {t("download.title")}
-          </Title>
-          <Text size="sm" style={{ opacity: 0.6 }}>{t("download.subtitle")}</Text>
-        </Stack>
+          {/* Header */}
+          <Stack gap={4}>
+            <Badge variant="light" radius="xl" size="sm" w="fit-content">
+              {t("download.badge")}
+            </Badge>
+            <Title order={2} fz={{ base: "1.5rem", sm: "2rem" }} fw={700} style={{ letterSpacing: "-0.02em" }}>
+              {t("download.title")}
+            </Title>
+            <Text size="sm" style={{ opacity: 0.6 }}>{t("download.subtitle")}</Text>
+          </Stack>
 
-        {/* Main card */}
-        <Paper withBorder radius="xl" p={{ base: "lg", sm: "xl" }}>
-          <Group
-            gap="xl"
-            align="center"
-            wrap="wrap"
-            style={{ flexDirection: "row" }}
-          >
+          {/* Main card */}
+          <Paper withBorder radius="xl" p={{ base: "lg", sm: "xl" }}>
+            <Group
+              gap="xl"
+              align="center"
+              wrap="wrap"
+              style={{ flexDirection: "row" }}
+            >
 
-            {/* Phone mockup */}
-            <Box ref={refLeft} style={{ display: "flex", justifyContent: "center" }}>
-              <PhoneMockup />
-            </Box>
+              {/* Phone mockup */}
+              <Box ref={refLeft} style={{ display: "flex", justifyContent: "center" }}>
+                <PhoneMockup />
+              </Box>
 
-            {/* Right content */}
-            <Stack ref={refRight} gap="lg" style={{ flex: 1, minWidth: 240 }}>
+              {/* Right content */}
+              <Stack ref={refRight} gap="lg" style={{ flex: 1, minWidth: 240 }}>
 
-              <Stack gap={4}>
-                <Text fw={700} fz="1.2rem" style={{ letterSpacing: "-0.01em" }}>
-                  Limpora
-                </Text>
-                <Text size="sm" style={{ opacity: 0.6 }}>
-                  {t("download.app_description")}
-                </Text>
-              </Stack>
-
-              {/* Meta info */}
-              <Stack gap={8}>
-                <InfoRow icon={Smartphone} text={t("download.info.android")} />
-                <InfoRow icon={Wifi} text={t("download.info.size")} />
-                <InfoRow icon={Star} text={t("download.info.version")} />
-                <InfoRow icon={ShieldCheck} text={t("download.info.verified")} />
-              </Stack>
-
-              <Divider />
-
-              {/* Download button */}
-              <DownloadButton
-                href="/limpora.apk"
-                sublabel={t("download.btn.sublabel")}
-                label={t("download.btn.label")}
-              />
-
-              {/* Warning */}
-              <Paper radius="lg" p="sm" style={{ background: "var(--mantine-color-yellow-light)" }}>
-                <Group gap="xs" align="flex-start">
-                  <AlertTriangle size={14} style={{ marginTop: 2, flexShrink: 0, opacity: 0.7 }} />
-                  <Text size="xs" lh={1.6} style={{ opacity: 0.8 }}>
-                    {t("download.warning")}
+                <Stack gap={4}>
+                  <Text fw={700} fz="1.2rem" style={{ letterSpacing: "-0.01em" }}>
+                    Limpora
                   </Text>
-                </Group>
-              </Paper>
+                  <Text size="sm" style={{ opacity: 0.6 }}>
+                    {t("download.app_description")}
+                  </Text>
+                </Stack>
 
-            </Stack>
-          </Group>
-        </Paper>
+                {/* Meta info */}
+                <Stack gap={8}>
+                  <InfoRow icon={Smartphone} text={t("download.info.android")} />
+                  <InfoRow icon={Wifi} text={t("download.info.size")} />
+                  <InfoRow icon={Star} text={t("download.info.version")} />
+                  <InfoRow icon={ShieldCheck} text={t("download.info.verified")} />
+                </Stack>
 
-      </Stack>
-    </Box>
+                <Divider />
+
+                {/* Download button */}
+                <DownloadButton
+                  href="/limpora.apk"
+                  sublabel={t("download.btn.sublabel")}
+                  label={t("download.btn.label")}
+                />
+
+                {/* Warning */}
+                <Paper radius="lg" p="sm" style={{ background: "var(--mantine-color-yellow-light)" }}>
+                  <Group gap="xs" align="flex-start">
+                    <AlertTriangle size={14} style={{ marginTop: 2, flexShrink: 0, opacity: 0.7 }} />
+                    <Text size="xs" lh={1.6} style={{ opacity: 0.8 }}>
+                      {t("download.warning")}
+                    </Text>
+                  </Group>
+                </Paper>
+
+              </Stack>
+            </Group>
+          </Paper>
+
+        </Stack>
+      </Box>
+    </Base>
   );
 }
