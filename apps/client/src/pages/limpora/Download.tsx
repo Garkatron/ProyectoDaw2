@@ -7,6 +7,7 @@ import {
 import { Download, ShieldCheck, Smartphone, Wifi, Star, AlertTriangle } from "lucide-react";
 import Base from "../../layouts/Base";
 
+
 /* ── Fade-in hook ── */
 const useFadeIn = (delay = 0) => {
   const ref = useRef(null);
@@ -26,10 +27,10 @@ const useFadeIn = (delay = 0) => {
 };
 
 /* ── Phone Mockup ── */
-const PhoneMockup = () => (
+const PhoneMockup = ({ src }) => (
   <Box
     style={{
-      width: 200,
+       width: 200,
       height: 390,
       borderRadius: 36,
       border: "3px solid var(--mantine-color-default-border)",
@@ -51,25 +52,43 @@ const PhoneMockup = () => (
         background: "var(--mantine-color-default-border)",
         margin: "0 auto",
         flexShrink: 0,
+        zIndex: 1,
       }}
     />
 
-    {/* Screen — placeholder */}
-    <Box
-      style={{
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: 8,
-        opacity: 0.3,
-      }}
-    >
-      <Smartphone size={40} strokeWidth={1.2} />
-      <Text size="9px" tt="uppercase" style={{ letterSpacing: "0.12em" }}>
-        App screenshot
-      </Text>
+    {/* Screen */}
+    <Box style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+      {src ? (
+        <img
+          src={src}
+          alt="App screenshot"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "top",
+            display: "block",
+          }}
+        />
+      ) : (
+        <Box
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: 8,
+            opacity: 0.3,
+          }}
+        >
+          <Smartphone size={40} strokeWidth={1.2} />
+          <Text size="9px" tt="uppercase" style={{ letterSpacing: "0.12em" }}>
+            App screenshot
+          </Text>
+        </Box>
+      )}
     </Box>
 
     {/* Home bar */}
@@ -192,7 +211,7 @@ export default function DownloadPage() {
 
               {/* Phone mockup */}
               <Box ref={refLeft} style={{ display: "flex", justifyContent: "center" }}>
-                <PhoneMockup />
+                <PhoneMockup src={"/mobile_screenshot.png"}/>
               </Box>
 
               {/* Right content */}
