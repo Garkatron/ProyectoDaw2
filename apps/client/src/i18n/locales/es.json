@@ -35,14 +35,16 @@
     "currency": "Ganancias",
     "appointments": "Citas",
     "inbox": "Notificaciones",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "download": "Descargar"
   },
   "footer": {
     "privacy": "Privacidad",
     "terms": "Términos de uso",
     "cookies": "Política de cookies",
     "legal": "Aviso legal",
-    "rights": "Todos los derechos reservados."
+    "rights": "Todos los derechos reservados.",
+    "about": "Sobre nosotros."
   },
   "time": {
     "just_now": "ahora mismo",

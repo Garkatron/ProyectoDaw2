@@ -34,14 +34,16 @@
     "search": "Search",
     "currency": "Earnings",
     "appointments": "Appointments",
-    "inbox": "Notifications"
+    "inbox": "Notifications",
+    "download": "Download"
   },
   "footer": {
     "privacy": "Privacy",
     "terms": "Terms of use",
     "cookies": "Cookie polotics",
     "legal": "Legal Advice",
-    "rights": "All right reserved."
+    "rights": "All right reserved.",
+    "about": "About Us."
   },
   "time": {
     "just_now": "just now",

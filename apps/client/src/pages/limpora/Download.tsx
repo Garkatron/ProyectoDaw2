@@ -219,7 +219,7 @@ export default function DownloadPage() {
 
                 {/* Download button */}
                 <DownloadButton
-                  href="/limpora.apk"
+                  href="https://github.com/Garkatron/ProyectoDaw2/releases/download/mobile-v1.0.0/Limpora-Universal.apk"
                   sublabel={t("download.btn.sublabel")}
                   label={t("download.btn.label")}
                 />

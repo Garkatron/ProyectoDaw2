@@ -21,6 +21,7 @@ import {
   IconX,
   IconUserCircle,
   IconLanguage,
+  IconDownload,
 } from "@tabler/icons-react";
 import i18n from "../i18n";
 import { IconSettings } from "@tabler/icons-react";
@@ -47,6 +48,7 @@ const allNavItems = [
     providerOnly: false,
   },
   { name: "nav.inbox", to: "/inbox", icon: IconMail, providerOnly: false },
+  { name: "nav.download", to: "/download", icon: IconDownload, providerOnly: false },
   {
     name: "nav.settings",
     to: "/settings",

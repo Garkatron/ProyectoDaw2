@@ -201,7 +201,6 @@ const AboutSection = () => {
   );
 };
 
-/* ─── Header ─── */
 const Header = () => {
   const { t } = useTranslation();
   const ref = useFadeIn(0);
@@ -223,16 +222,16 @@ const Header = () => {
   );
 };
 
-/* ─── Footer ─── */
 const Footer = () => {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   const links = [
-    { label: t("footer.privacy"), href: "/privacy" },
-    { label: t("footer.terms"), href: "/terms" },
-    { label: t("footer.cookies"), href: "/cookies" },
+    { label: t("footer.privacy"), href: "/legal" },
+    { label: t("footer.terms"), href: "/legal" },
+    { label: t("footer.cookies"), href: "/legal" },
     { label: t("footer.legal"), href: "/legal" },
+    { label: t("footer.about"), href: "/about" },
   ];
 
   return (
