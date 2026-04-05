@@ -350,5 +350,22 @@
       "ley_title": "Applicable law",
       "ley_body": "These terms are governed by Spanish law. Any dispute shall be submitted to the courts of the user's place of residence, unless applicable regulations establish a different jurisdiction."
     }
+  },
+  "download": {
+    "badge": "Official download",
+    "title": "Download the app",
+    "subtitle": "Install Limpora directly on your Android device.",
+    "app_description": "Manage bookings, find professionals and receive real-time notifications.",
+    "info": {
+      "android": "Requires Android 8.0 or higher",
+      "size": "Approximate size: 18 MB",
+      "version": "Current version: 1.0.0",
+      "verified": "APK signed by Limpora"
+    },
+    "btn": {
+      "sublabel": "Direct download · Android",
+      "label": "Download APK"
+    },
+    "warning": "Installing an APK outside Google Play requires enabling «Install from unknown sources» in your device settings. Only download from this official page."
   }
 }

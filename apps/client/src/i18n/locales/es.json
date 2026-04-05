@@ -356,5 +356,22 @@
       "ley_title": "Ley aplicable",
       "ley_body": "Estos términos se rigen por la legislación española. Cualquier controversia se someterá a los juzgados y tribunales del domicilio del usuario, salvo que la normativa aplicable establezca otro fuero."
     }
+  },
+  "download": {
+    "badge": "Descarga oficial",
+    "title": "Descarga la app",
+    "subtitle": "Instala Limpora directamente en tu dispositivo Android.",
+    "app_description": "Gestiona tus reservas, encuentra profesionales y recibe notificaciones en tiempo real.",
+    "info": {
+      "android": "Requiere Android 8.0 o superior",
+      "size": "Tamaño aproximado: 18 MB",
+      "version": "Versión actual: 1.0.0",
+      "verified": "APK firmada por Limpora"
+    },
+    "btn": {
+      "sublabel": "Descarga directa · Android",
+      "label": "Descargar APK"
+    },
+    "warning": "Al instalar un APK fuera de Google Play, deberás activar «Instalar apps de fuentes desconocidas» en los ajustes de tu dispositivo. Descarga solo desde esta página oficial."
   }
 }
