@@ -30,6 +30,8 @@ services:
       - apps/server/.env
     environment:
       - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
       - ./apps/server/data:/usr/src/app/data
     restart: unless-stopped
@@ -46,6 +48,14 @@ services:
       - "127.0.0.1:3000:3000"
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=false
+    networks:
+      - limpora-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    restart: unless-stopped
     networks:
       - limpora-network
 

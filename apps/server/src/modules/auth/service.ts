@@ -13,6 +13,8 @@ import { AuthQueries } from "./queries";
 import { NotificationService } from "../notification/service";
 import generateVefCode from "../../utils";
 import { logger } from "../../libs/pino";
+import redis from "../../libs/redis";
+import { UserRole } from "@limpora/common";
 
 const prohibited = [
     /@example\./i,
@@ -121,14 +123,18 @@ export abstract class AuthService {
         return res.json();
     }
 
-    static async register({
-        username,
-        password,
-        email,
-        role,
-        captchaToken,
-    }: AuthModel["registerBody"]): Promise<AuthModel["registerResponse"]> {
+    static async register(
+        {
+            username,
+            password,
+            email,
+            role,
+            captchaToken,
+        }: AuthModel["registerBody"],
+        ip: string,
+    ): Promise<AuthModel["registerResponse"]> {
         logger.info({ email, role }, "register attempt");
+        if (role === UserRole.Admin) throw status(400, "You can't be an admin");
 
         const mx = await resolveMx(email.split("@")[1]).catch(() => []);
         if (mx.length === 0) throw status(400, "Invalid email domain");
@@ -140,15 +146,18 @@ export abstract class AuthService {
             );
         }
 
-        const captcha = await AuthService.verifyTurnstile(captchaToken);
+        // ! CAPTCHA START
 
-        if (!captcha.success) {
-            logger.warn({ email, role }, "failed captcha at register");
-            throw status(
-                400,
-                "Failed captcha" satisfies AuthModel["failedCaptcha"],
-            );
-        }
+        await AuthService.rateLimitIP(ip);
+        await AuthService.rateLimitEmail(email);
+        await AuthService.rateLimitIPEmail(ip, email);
+
+        await AuthService.validateCaptcha({
+            token: captchaToken,
+            ip,
+        });
+
+        // ! CAPTCHA END
 
         const existing = AuthQueries.findByEmail.get({ email: email });
 
@@ -206,11 +215,10 @@ export abstract class AuthService {
         return { username, email };
     }
 
-    static async login({
-        email,
-        password,
-        captchaToken,
-    }: AuthModel["loginBody"]): Promise<AuthModel["loginResponse"]> {
+    static async login(
+        { email, password, captchaToken }: AuthModel["loginBody"],
+        ip: string,
+    ): Promise<AuthModel["loginResponse"]> {
         logger.info({ email }, "login attempt");
 
         const mx = await resolveMx(email.split("@")[1]).catch(() => []);
@@ -223,16 +231,6 @@ export abstract class AuthService {
             );
         }
 
-        const captcha = await AuthService.verifyTurnstile(captchaToken);
-
-        if (!captcha.success) {
-            logger.warn({ email }, "failed captcha at login");
-            throw status(
-                400,
-                "Failed captcha" satisfies AuthModel["failedCaptcha"],
-            );
-        }
-
         if (!email || !password) {
             logger.error(
                 { email },
@@ -240,6 +238,19 @@ export abstract class AuthService {
             );
             throw status(400, "Email and password are required");
         }
+
+        // ! CAPTCHA START
+
+        await AuthService.rateLimitIP(ip);
+        await AuthService.rateLimitEmail(email);
+        await AuthService.rateLimitIPEmail(ip, email);
+
+        await AuthService.validateCaptcha({
+            token: captchaToken,
+            ip,
+        });
+
+        // ! CAPTCHA END
 
         try {
             logger.info({ email }, "fetching firebase user");
@@ -378,6 +389,85 @@ export abstract class AuthService {
             throw status(500, "Internal Server Connection Error");
         }
     }
+    static async rateLimitIP(ip: string, limit = 10, window = 60) {
+        const key = `rl:ip:${ip}`;
+
+        const count = await redis.incr(key);
+
+        if (count === 1) {
+            await redis.expire(key, window);
+        }
+
+        if (count > limit) {
+            throw status(429, "Too many requests (IP)");
+        }
+    }
+    static async rateLimitEmail(email: string, limit = 5, window = 300) {
+        const key = `rl:email:${email}`;
+
+        const count = await redis.incr(key);
+
+        if (count === 1) {
+            await redis.expire(key, window);
+        }
+
+        if (count > limit) {
+            throw status(429, "Too many attempts (email)");
+        }
+    }
+
+    static async rateLimitIPEmail(
+        ip: string,
+        email: string,
+        limit = 5,
+        window = 300,
+    ) {
+        const key = `rl:ip_email:${ip}:${email}`;
+
+        const count = await redis.incr(key);
+
+        if (count === 1) {
+            await redis.expire(key, window);
+        }
+
+        if (count > limit) {
+            throw status(429, "Too many attempts");
+        }
+    }
+
+    static async validateCaptcha({
+        token,
+        ip,
+    }: {
+        token: string;
+        ip?: string;
+    }) {
+        const key = `captcha:${token}`;
+
+        const lock = await redis.set(key, "1", {
+            NX: true,
+            EX: 300,
+        });
+
+        if (lock === null) {
+            throw status(400, "Captcha already used");
+        }
+
+        const captcha = await AuthService.verifyTurnstile(token, ip);
+
+        if (captcha.hostname !== "www.limpora.xyz") {
+            await redis.del(key);
+            throw status(400, "Invalid captcha origin");
+        }
+
+        if (!captcha.success) {
+            await redis.del(key);
+            throw status(400, "Failed captcha");
+        }
+
+        return true;
+    }
+
     static async verifyToken(token: string): Promise<DecodedIdToken> {
         try {
             return await firebaseAuth.verifyIdToken(token);

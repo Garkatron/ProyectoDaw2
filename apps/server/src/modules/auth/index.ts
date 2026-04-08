@@ -7,30 +7,47 @@ import { rateLimit } from "elysia-rate-limit";
 const authPublic = new Elysia({ prefix: "/auth" })
     .use(rateLimit({ duration: 60000, max: 10 }))
 
-    .post(
-        "/verify",
-        ({ body }) => AuthService.verifyEmailCode(body),
-        {
-            body: AuthModel["verifyEmailBody"],
-            response: {
-                404: AuthModel.verificationCodeNotGenerated,
-                401: AuthModel.invalidCode,
-            },
-        },
-    )
-
-    .post("/register", async ({ body }) => AuthService.register(body), {
-        body: AuthModel.registerBody,
+    .post("/verify", ({ body }) => AuthService.verifyEmailCode(body), {
+        body: AuthModel["verifyEmailBody"],
         response: {
-            200: AuthModel.registerResponse,
-            400: AuthModel.registerInvalid,
+            404: AuthModel.verificationCodeNotGenerated,
+            401: AuthModel.invalidCode,
         },
     })
 
     .post(
+        "/register",
+        async ({ body, request }) => {
+            const ip = getIP(request);
+
+            return AuthService.register(
+                {
+                    ...body,
+                },
+                ip,
+            );
+        },
+        {
+            body: AuthModel.registerBody,
+            response: {
+                200: AuthModel.registerResponse,
+                400: AuthModel.registerInvalid,
+            },
+        },
+    )
+
+    .post(
         "/login",
-        async ({ body, cookie: { session } }) => {
-            const response = await AuthService.login(body);
+        async ({ body, cookie: { session }, request }) => {
+            const ip = getIP(request);
+
+            const response = await AuthService.login(
+                {
+                    ...body,
+                },
+                ip,
+            );
+
             session.value = response.token;
             return response;
         },
@@ -63,6 +80,13 @@ const authPrivate = new Elysia({ prefix: "/auth" })
         isAuthenticated: true,
     });
 
-export const authController = new Elysia()
-    .use(authPublic)
-    .use(authPrivate);
+export const authController = new Elysia().use(authPublic).use(authPrivate);
+
+function getIP(request: Request): string {
+    return (
+        request.headers.get("cf-connecting-ip") ||
+        request.headers.get("x-forwarded-for")?.split(",")[0] ||
+        request.headers.get("x-real-ip") ||
+        "unknown"
+    );
+}
