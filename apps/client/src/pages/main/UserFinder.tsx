@@ -28,14 +28,14 @@ type UserSummary = Pick<
 };
 
 export default function UserFinder() {
-  const [users, setUsers] = useState<UserSummary[]>([]); 
+  const [users, setUsers] = useState<UserSummary[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserSummary[]>([]);
-  const [services, setServices] = useState<Service[]>([]); 
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  
+
   const [activeServices, setActiveServices] = useState<string[]>([]);
 
   const { t } = useTranslation();
@@ -47,9 +47,9 @@ export default function UserFinder() {
 
   useEffect(() => {
     const init = async () => {
-        setLoading(true);
-        await Promise.all([fetchUsers(), fetchServices()]);
-        setLoading(false);
+      setLoading(true);
+      await Promise.all([fetchUsers(), fetchServices()]);
+      setLoading(false);
     };
     init();
   }, []);
@@ -59,13 +59,34 @@ export default function UserFinder() {
   }, [debouncedSearch, activeServices, users]);
 
   const fetchUsers = async () => {
-    const { data, error } = await API.user.get();
-    if (!error && data) {
-      const providers = (data as UserSummary[]).filter(
-        (u) => u.role !== "admin" && u.role !== "client"
+    setLoading(true);
+    const { data: userData, error: userError } = await API.user.get();
+
+    if (!userError && userData) {
+      const providers = (userData as UserSummary[]).filter(
+        (u) => u.role === "provider"
       );
-      setUsers(providers);
+
+      const hydratedProviders: UserSummary[] = await Promise.all(
+        providers.map(async (user) => {
+          const { data: sData, error: sError } = await API.providers({
+            provider_id: user.id,
+          }).services.get();
+
+          return {
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            total_points: user.total_points,
+            member_since: user.member_since,
+            provider_services: !sError && sData ? sData : [],
+          };
+        })
+      );
+
+      setUsers(hydratedProviders);
     }
+    setLoading(false);
   };
 
   const fetchServices = async () => {
@@ -85,7 +106,7 @@ export default function UserFinder() {
 
     if (activeServices.length > 0) {
       filtered = filtered.filter((u) => {
-        return u.provider_services?.some((ps) => 
+        return u.provider_services?.some((ps) =>
           activeServices.includes(ps.service_name)
         );
       });
@@ -121,7 +142,7 @@ export default function UserFinder() {
               onChange={(e) => setSearchTerm(e.currentTarget.value)}
               size="md"
             />
-            
+
             <Group gap="xs" wrap="wrap">
               {services.map((s) => {
                 const isActive = activeServices.includes(s.name);
@@ -175,9 +196,9 @@ export default function UserFinder() {
                   style={{ textDecoration: "none" }}
                 >
                   <Box
-                    style={{ 
-                        transition: "transform 0.2s ease",
-                        cursor: 'pointer' 
+                    style={{
+                      transition: "transform 0.2s ease",
+                      cursor: 'pointer'
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}

@@ -3,15 +3,31 @@ export interface Service {
   name: string;
 }
 
-// Representa la relación UserServices + Services
 export interface ProviderService {
   user_id: number;
   service_id: number;
-  price_per_h: number; // El precio que define el autónomo
-  duration_minutes: number; // Duración del servicio en minutos (mínimo 15)
-  is_active: number;
-  created_at: string;
+  price_per_h: number;
+  duration_minutes: number;
+  is_active: boolean;
+  created_at?: string; 
   updated_at: string;
-  // Campos extra (Join con Services)
   service_name: string;
 }
+
+/*
+interface UserService {
+  service_id: number;
+  user_id: number;
+  price_per_h: number;
+  duration_minutes: number;
+  is_active: boolean;
+  updated_at: string;
+  category?: string;
+}
+
+interface Service {
+  id: number;
+  name: string;
+}
+
+*/
