@@ -30,7 +30,7 @@ services:
       - 8.8.8.8
       - 8.8.4.4
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     env_file:
       - apps/server/.env
     environment:
@@ -63,7 +63,13 @@ services:
     restart: unless-stopped
     networks:
       - limpora-network
-
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      
 networks:
   limpora-network:
     name: limpora-network

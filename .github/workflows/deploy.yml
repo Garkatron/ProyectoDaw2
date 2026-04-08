@@ -80,6 +80,8 @@ jobs:
 
             # ? Captcha
             TURNSTILE_SECRET_KEY        = "${{ secrets.TURNSTILE_SECRET_KEY }}"
+            REDIS_PASSWORD              = "${{ secrets.REDIS_PASSWORD }}"
+
 
             # ? Database (old)
             # DB_NAME                   = limpora
