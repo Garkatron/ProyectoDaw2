@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reserva cancelada – Limpora</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap");
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background-color: #f5f5f3; font-family: "DM Sans", sans-serif; font-weight: 300; color: #1a1a1a; }
+      .wrapper { max-width: 520px; margin: 0 auto; padding: 48px 24px; }
+      .header { margin-bottom: 48px; }
+      .logo { font-family: "DM Sans", sans-serif; font-weight: 500; font-size: 18px; letter-spacing: 0.12em; text-transform: uppercase; color: #1a1a1a; }
+      .card { background-color: #ffffff; border: 1px solid #e0e0dc; overflow: hidden; }
+      
+      /* Acento en gris oscuro para cancelaciones */
+      .card-accent { height: 3px; background-color: #888; }
+      
+      .card-body { padding: 48px 40px; }
+      .label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #e57373; margin-bottom: 16px; font-weight: 500; }
+      h1 { font-size: 22px; font-weight: 400; line-height: 1.4; margin-bottom: 8px; color: #1a1a1a; }
+      .subtitle { font-size: 14px; color: #888; margin-bottom: 36px; line-height: 1.6; }
+      .booking-id { display: inline-block; font-family: "DM Mono", monospace; font-size: 11px; letter-spacing: 0.12em; color: #888; background-color: #f5f5f3; border: 1px solid #e0e0dc; padding: 4px 12px; margin-bottom: 36px; }
+      .details { border: 1px solid #e0e0dc; margin-bottom: 32px; }
+      .detail-row { display: flex; align-items: flex-start; padding: 14px 20px; border-bottom: 1px solid #e0e0dc; }
+      .detail-row:last-child { border-bottom: none; }
+      .detail-content { flex: 1; }
+      .detail-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 3px; }
+      .detail-value { font-size: 14px; color: #1a1a1a; font-weight: 400; }
+      .divider { height: 1px; background-color: #e0e0dc; margin-bottom: 28px; }
+      .body-text { font-size: 13px; line-height: 1.75; color: #888; margin-bottom: 8px; }
+      .footer { margin-top: 40px; padding-top: 28px; border-top: 1px solid #e0e0dc; }
+      .footer p { font-size: 12px; color: #aaa; line-height: 1.7; }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="header"><div class="logo">Limpora</div></div>
+      <div class="card">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="label">Aviso de cancelación</div>
+          <h1>Tu reserva ha sido cancelada</h1>
+          <p class="subtitle">Hola, <strong>{{client_name}}</strong>. Te confirmamos que la siguiente reserva ha sido anulada.</p>
+          <div class="booking-id">REF · #{{booking_id}}</div>
+          <div class="details">
+            <div class="detail-row">
+              <div class="detail-content">
+                <div class="detail-label">Servicio</div>
+                <div class="detail-value">{{service_name}}</div>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-content">
+                <div class="detail-label">Fecha original</div>
+                <div class="detail-value">{{date}} a las {{time}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <p class="body-text">Si ya habías realizado el pago, el reembolso se procesará según las políticas de cancelación del proveedor.</p>
+        </div>
+      </div>
+      <div class="footer"><p>© 2026 Limpora · Mensaje automático</p></div>
+    </div>
+  </body>
+</html>

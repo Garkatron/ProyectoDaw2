@@ -1,21 +1,20 @@
 import { t, type UnwrapSchema } from "elysia";
 
 const NotificationSchema = t.Object({
-        id: t.Number(),
-        content: t.String(),
-        read: t.Number(),
-        created_at: t.String(),
-        expires_at: t.String(),
-    });
+    id: t.Number(),
+    content: t.String(),
+    read: t.Number(),
+    created_at: t.String(),
+    expires_at: t.String(),
+});
 
 export const NotificationModel = {
-     notificationResponse: t.Object({
+    notificationResponse: t.Object({
         id: t.Number(),
     }),
- notificationIdParam: t.Object({
+    notificationIdParam: t.Object({
         id: t.Number(),
     }),
-
 
     emailBody: t.Object({
         from: t.String({ format: "email" }),
@@ -57,7 +56,18 @@ export const NotificationModel = {
         expires_at: t.String(),
     }),
 
-   
+    cancellationEmailBody: t.Object({
+        to: t.Union([
+            t.String({ format: "email" }),
+            t.Array(t.String({ format: "email" })),
+        ]),
+        client_name: t.String(),
+        service_name: t.String(),
+        booking_id: t.String(),
+        date: t.String(),
+        time: t.String(),
+    }),
+
     getNotificationsParams: t.Object({
         user_id: t.Numeric({ minimum: 0 }),
     }),

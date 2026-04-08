@@ -17,6 +17,10 @@ const BOOKING_CONFIRMATION_TEMPLATE = await Bun.file(
     import.meta.dir + "/templates/bok.html",
 ).text();
 
+const CANCELLATION_TEMPLATE = await Bun.file(
+    import.meta.dir + "/templates/can.html",
+).text();
+
 export abstract class NotificationService {
     static async sendVerificationEmail({
         to,
@@ -82,6 +86,44 @@ export abstract class NotificationService {
         return response;
     }
 
+    static async sendCancellationEmail({
+        to,
+        client_name,
+        service_name,
+        booking_id,
+        date,
+        time,
+    }: NotificationModel["cancellationEmailBody"]): Promise<
+        NotificationModel["emailResponse"]
+    > {
+        const patterns = {
+            "{{client_name}}": client_name,
+            "{{service_name}}": service_name,
+            "{{date}}": new Date(date).toLocaleDateString("es-ES", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+            }),
+            "{{time}}": time.substring(11, 16),
+            "{{booking_id}}": booking_id,
+        };
+
+        let html = CANCELLATION_TEMPLATE;
+
+        for (const [pattern, value] of Object.entries(patterns)) {
+            html = html.replaceAll(pattern, value);
+        }
+
+        const response = await NotificationService.sendEmail({
+            to,
+            from: process.env.RESEND_NOTIFICATION_EMAIL!,
+            subject: `Cancelación de reserva: ${service_name}`,
+            content: html,
+        });
+
+        return response;
+    }
+
     static async sendEmail({
         from,
         to,
@@ -98,7 +140,6 @@ export abstract class NotificationService {
         });
 
         if (response.error && !response.data) {
-
             throw fail(
                 400,
                 "Error sending Email notifiaction" satisfies NotificationModel["error"],
@@ -148,7 +189,6 @@ export abstract class NotificationService {
         { id }: NotificationModel["notificationIdParam"],
         uid: string,
     ): Promise<NotificationModel["patchResponse"]> {
-        
         await UserService.getMe({ uid });
         const { changes } = NotificationQueries.markAsRead.run({ id });
 
@@ -159,9 +199,10 @@ export abstract class NotificationService {
         { id }: NotificationModel["notificationIdParam"],
         uid: string,
     ): Promise<NotificationModel["patchResponse"]> {
-        
         const user = await UserService.getMe({ uid });
-        const { changes } = NotificationQueries.markAllAsRead.run({ user_id: user.id });
+        const { changes } = NotificationQueries.markAllAsRead.run({
+            user_id: user.id,
+        });
 
         return { changes };
     }

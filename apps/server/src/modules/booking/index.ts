@@ -3,8 +3,16 @@ import { AuthGuard } from "../auth/guard";
 import { UserRole } from "@limpora/common";
 import { BookingService } from "./service";
 import { BookingModel } from "./model";
+import { rateLimit } from "elysia-rate-limit";
 
 export const bookingController = new Elysia({ prefix: "/bookings" })
+    .use(
+        rateLimit({
+            duration: 60000,
+            max: 100, 
+            errorResponse: "Too many request, try later...",
+        }),
+    )
     .use(AuthGuard)
 
     .group("/me", (app) =>
@@ -52,7 +60,8 @@ export const bookingController = new Elysia({ prefix: "/bookings" })
         app
             .get(
                 "/availability",
-                ({ params, query }) => BookingService.getAvailability(params, query),
+                ({ params, query }) =>
+                    BookingService.getAvailability(params, query),
                 {
                     params: BookingModel.providerIdParam,
                     query: BookingModel.availabilityQuery,

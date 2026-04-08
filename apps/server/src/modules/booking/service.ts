@@ -275,16 +275,18 @@ export abstract class BookingService {
             );
 
         // ? Replace full schedule for this provider
-        BookingQueries.deleteScheduleByUser.run({ user_id: provider_id });
+        db.transaction(() => {
+            BookingQueries.deleteScheduleByUser.run({ user_id: provider_id });
 
-        for (const slot of slots) {
-            BookingQueries.insertSchedule.run({
-                user_id: provider_id,
-                day_of_week: slot.day_of_week,
-                start_time: slot.start_time,
-                end_time: slot.end_time,
-            });
-        }
+            for (const slot of slots) {
+                BookingQueries.insertSchedule.run({
+                    user_id: provider_id,
+                    day_of_week: slot.day_of_week,
+                    start_time: slot.start_time,
+                    end_time: slot.end_time,
+                });
+            }
+        });
 
         return BookingQueries.findScheduleByUserId.all({
             user_id: provider_id,
@@ -330,41 +332,76 @@ export abstract class BookingService {
                 "Appointment not found" satisfies BookingModel["notFound"],
             );
 
-        if (appointment.provider_id != user.id)
-            throw status(
-                403,
-                "You can only manage your own appointments" satisfies BookingModel["forbidden"],
-            );
+        const isProvider = appointment.provider_id === user.id;
+        const isClient = appointment.client_id === user.id;
 
-        // ? Validate status transition
-        const VALID_TRANSITIONS: Record<
-            AppointmentStatus,
-            AppointmentStatus[]
+        if (!isProvider && !isClient) {
+            throw status(403, "You doesn't have permission for that");
+        }
+
+        const transitions: Record<
+            UserRole,
+            Partial<Record<AppointmentStatus, AppointmentStatus[]>>
         > = {
-            [AppointmentStatus.PendingPayment]: [
-                AppointmentStatus.Pending,
-                AppointmentStatus.Cancelled,
-            ],
-
-            [AppointmentStatus.Pending]: [
-                AppointmentStatus.InProcess,
-                AppointmentStatus.Cancelled,
-            ],
-            [AppointmentStatus.InProcess]: [
-                AppointmentStatus.Completed,
-                AppointmentStatus.Cancelled,
-            ],
-            [AppointmentStatus.Completed]: [],
-            [AppointmentStatus.Cancelled]: [],
+            [UserRole.Client]: {
+                [AppointmentStatus.PendingPayment]: [
+                    AppointmentStatus.Cancelled,
+                ],
+                [AppointmentStatus.Pending]: [AppointmentStatus.Cancelled],
+            },
+            [UserRole.Provider]: {
+                [AppointmentStatus.PendingPayment]: [
+                    AppointmentStatus.Cancelled,
+                ],
+                [AppointmentStatus.Pending]: [
+                    AppointmentStatus.InProcess,
+                    AppointmentStatus.Cancelled,
+                ],
+                [AppointmentStatus.InProcess]: [
+                    AppointmentStatus.Completed,
+                    AppointmentStatus.Cancelled,
+                ],
+            },
+            [UserRole.Admin]: {},
         };
 
+        const role = isProvider ? UserRole.Provider : UserRole.Client;
         const allowed =
-            VALID_TRANSITIONS[appointment.status as AppointmentStatus] ?? [];
-        if (!allowed.includes(appointment_status))
-            throw status(
-                409,
-                "Invalid status transition" satisfies BookingModel["invalidTransition"],
+            transitions[role][appointment.status as AppointmentStatus] || [];
+
+        if (!allowed.includes(appointment_status)) {
+            throw status(409, "Transición de estado no permitida para tu rol");
+        }
+
+        if (appointment_status === AppointmentStatus.Cancelled && isClient) {
+            logger.info(
+                { appointment_id: id },
+                "Client is cancelling an appointment",
             );
+
+            // TODO: Avoid querie the user two times...
+            // This happens because I use the UserService that doesn't send the Email for security, but I need the Email here to send then notification.
+            const _client = UserQueries.findById.get({ id: user.id });
+
+            NotificationService.sendInbox({
+                user_id: appointment.client_id,
+                content: `Tu cita para "${appointment.service_name}" ha sido cancelada.`,
+                expires_at: new Date(
+                    Date.now() + 7 * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+            });
+
+            NotificationService.sendCancellationEmail({
+                to: _client?.email!,
+                client_name: _client?.name!,
+                service_name: appointment.service_name,
+                booking_id: String(appointment.id),
+                date: appointment.start_time,
+                time: appointment.start_time,
+            }).catch((err) =>
+                logger.error(err, "Error sending cancellation email"),
+            );
+        }
 
         BookingQueries.updateStatus.run({
             id: appointment.id,
