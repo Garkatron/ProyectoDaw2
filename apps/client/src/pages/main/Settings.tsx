@@ -94,7 +94,7 @@ export default function Settings() {
                     ]}
                     radius="xl"
                     size="xs"
-                    mr="xl"
+                    style={ { minWidth: "380px" } }
                   />
                 }
               />
