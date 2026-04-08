@@ -4,7 +4,7 @@ import { useAuthStore } from "../../stores/auth.store";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterSchema from "../../schemas/RegisterSchema";
 import lang from "../../utils/LangManager";
-import Turnstile from "react-turnstile";
+import { Turnstile } from "react-turnstile";
 
 import {
   TextInput, PasswordInput, Select, Button, Paper,

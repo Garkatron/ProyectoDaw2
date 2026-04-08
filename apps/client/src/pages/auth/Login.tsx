@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginSchema from "../../schemas/NewSessionSchema";
 import lang from "../../utils/LangManager";
 import { UserRole } from "@limpora/common";
-import Turnstile from "react-turnstile";
+import { Turnstile } from "react-turnstile";
 
 import {
   TextInput, PasswordInput, Button, Paper, Title,
@@ -96,7 +96,7 @@ export default function Login() {
               onExpire={() => setCaptchaToken(null)}
               refreshExpired="auto"
             />
-            
+
             {error && <Text c="red" size="sm">{error}</Text>}
           </Stack>
 
