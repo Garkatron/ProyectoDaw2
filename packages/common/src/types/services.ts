@@ -1,7 +1,6 @@
 export interface Service {
   id: number;
   name: string;
-  category: string;
 }
 
 // Representa la relación UserServices + Services
@@ -15,5 +14,4 @@ export interface ProviderService {
   updated_at: string;
   // Campos extra (Join con Services)
   service_name: string;
-  category: string;
 }
