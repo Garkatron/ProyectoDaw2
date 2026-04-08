@@ -44,7 +44,7 @@ export default function Register() {
       result.data.email,
       result.data.password,
       role,
-      captchaToken 
+      captchaToken
     );
 
     if (data.success) {
@@ -96,19 +96,18 @@ export default function Register() {
                 { value: "provider", label: lang("register.roles.provider") },
               ]}
             />
-
-            {/* CAPTCHA */}
             <Turnstile
               sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY!}
               onVerify={(token) => setCaptchaToken(token)}
               onExpire={() => setCaptchaToken(null)}
+              refreshExpired="auto"
             />
 
             {error && <Text c="red" size="sm">{error}</Text>}
           </Stack>
 
           <Group grow gap="md">
-            <Button type="submit" variant="default">
+            <Button type="submit" variant="default" disabled={!captchaToken}>
               {lang("register.submit")}
             </Button>
             <Button component={Link} to="/login" variant="subtle">

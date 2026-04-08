@@ -20,7 +20,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [failedAttempts, setFailedAttempts] = useState(0);
 
   const navigate = useNavigate();
 
@@ -42,10 +41,6 @@ export default function Login() {
       return;
     }
 
-    if (failedAttempts >= 3 && !captchaToken) {
-      setError("Verifica que no eres un bot");
-      return;
-    }
 
     const response = await login(
       result.data.email,
@@ -56,7 +51,6 @@ export default function Login() {
     if (response.success) {
       navigate(user?.role === UserRole.Admin ? "/panel/admin" : "/panel/me");
     } else {
-      setFailedAttempts((prev) => prev + 1);
 
       if (response.error?.includes("verified email")) {
         navigate("/verify-email", { state: { email } });
@@ -95,22 +89,20 @@ export default function Login() {
               onChange={(e) => setPassword(e.currentTarget.value)}
             />
 
-            {failedAttempts >= 3 && (
-              <Turnstile
-                sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY!}
-                onVerify={(token) => setCaptchaToken(token)}
-                onExpire={() => setCaptchaToken(null)}
-              />
-            )}
+            <Turnstile
+              sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY!}
+              onVerify={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken(null)}
+              refreshExpired="auto"
+            />
 
             {error && <Text c="red" size="sm">{error}</Text>}
           </Stack>
 
           <Stack gap="sm" mb="md">
-            <Button type="submit" variant="default" fullWidth>
+            <Button type="submit" variant="default" fullWidth disabled={!captchaToken}>
               {lang("login.submit")}
             </Button>
-
             <Button type="button" variant="default" fullWidth onClick={handleOAuth}>
               Google
             </Button>
