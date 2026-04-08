@@ -48,3 +48,4 @@ limpora-wal
 /db
 /data
 
+/delete-users.ts

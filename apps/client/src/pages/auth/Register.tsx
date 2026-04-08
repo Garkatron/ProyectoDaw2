@@ -53,8 +53,6 @@ export default function Register() {
       setError(data.error || lang("register.generic_error"));
     }
   };
-
-  console.log(import.meta.env.VITE_TURNSTILE_SITE_KEY);
   
 
   return (
