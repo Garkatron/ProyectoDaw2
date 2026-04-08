@@ -1,5 +1,5 @@
-import { ActionIcon, Avatar, Box, Button, Group, Text, Skeleton } from '@mantine/core';
-import { LogOut, Pencil, Camera } from 'lucide-react';
+import { ActionIcon, Box, Button, Group, Text, Skeleton, Avatar } from '@mantine/core';
+import { LogOut, Camera } from 'lucide-react'; // Quitamos Pencil
 import { EditProfileImageModal } from '../../../../components/EditProfileImageModal';
 import { useState } from 'react';
 import { useProfileImageMe } from '../../../../hooks/useProfileImage';
@@ -23,6 +23,7 @@ export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
 
     return (
         <>
+            {/* Banner Section */}
             <Box
                 h={300}
                 style={{
@@ -55,6 +56,8 @@ export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
                         </motion.div>
                     )}
                 </AnimatePresence>
+
+                {/* Banner Uploading Overlay */}
                 <AnimatePresence>
                     {bannerSubmitting && (
                         <motion.div
@@ -126,7 +129,14 @@ export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
                     marginTop: -48,
                 }}
             >
-                <Box style={{ position: 'relative', display: 'inline-block' }}>
+                <Box 
+                    style={{ 
+                        position: 'relative', 
+                        display: 'inline-block',
+                        cursor: isSelf ? 'pointer' : 'default'
+                    }}
+                    onClick={isSelf ? () => setAvatarModalOpen(true) : undefined}
+                >
                     <AnimatePresence>
                         {(!imageUrl || !avatarLoaded) && (
                             <motion.div
@@ -144,6 +154,8 @@ export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
                             </motion.div>
                         )}
                     </AnimatePresence>
+
+                    {/* Avatar Uploading Overlay */}
                     <AnimatePresence>
                         {submitting && (
                             <motion.div
@@ -171,39 +183,42 @@ export default function ProfileHeader({ targetUser, isSelf, onLogout }) {
                         )}
                     </AnimatePresence>
 
+                    {/* Avatar Hover Overlay (isSelf) */}
+                    {isSelf && (
+                        <Box
+                            style={{
+                                position: 'absolute', inset: 0,
+                                borderRadius: '50%',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                opacity: 0, transition: 'opacity 0.2s',
+                                background: 'rgba(0,0,0,0.3)',
+                                zIndex: 5,
+                            }}
+                            onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                            onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
+                        >
+                            <Camera size={20} color="white" />
+                        </Box>
+                    )}
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.88 }}
                         animate={avatarLoaded || !imageUrl ? { opacity: 1, scale: 1 } : {}}
-                        transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }} // spring suave
+                        transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
                     >
                         <Avatar
                             size={96}
                             radius="50%"
-                            src={imageUrl}
+                            src={imageUrl || ""}
                             alt={targetUser.name}
-                            style={{ border: '3px solid var(--mantine-color-body)' }}
+                            style={{ 
+                                border: '3px solid var(--mantine-color-body)',
+                            }}
                             onLoad={() => setAvatarLoaded(true)}
                         >
                             {targetUser.name[0].toUpperCase()}
                         </Avatar>
                     </motion.div>
-
-                    {isSelf && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.7 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.3, duration: 0.2, ease: 'backOut' }}
-                            style={{ position: 'absolute', bottom: 2, right: 2 }}
-                        >
-                            <ActionIcon
-                                size="sm" radius="xl" variant="filled"
-                                onClick={() => setAvatarModalOpen(true)}
-                            >
-                                <Pencil size={11} />
-                            </ActionIcon>
-                        </motion.div>
-                    )}
                 </Box>
 
                 {isSelf && (
