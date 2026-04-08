@@ -44,7 +44,7 @@ const securityHeaders = new Elysia({ name: "security-headers" }).onRequest(
                 "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
                 "font-src 'self' https://cdn.jsdelivr.net",
                 "img-src 'self' data: https:",
-                "connect-src 'self'",
+                "connect-src 'self' https://api.limpora.xyz",
             ].join("; ");
         }
     },

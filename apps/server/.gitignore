@@ -49,3 +49,4 @@ limpora-wal
 /data
 
 /delete-users.ts
+/create-admin.ts

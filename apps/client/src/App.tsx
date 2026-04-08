@@ -41,7 +41,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/news" element={<PostsPublicList />} />
-        <Route path="/post-news" element={<PostsManager />} />
+        <Route path="/manage-news" element={<PostsManager />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/panel/:username" element={<UserPanel />} />
