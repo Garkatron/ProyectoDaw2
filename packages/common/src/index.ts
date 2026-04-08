@@ -9,3 +9,4 @@ export * from './types/booking';
 export * from './types/reviews';
 export * from './types/services';
 export * from './types/notification';
+export * from './types/post';

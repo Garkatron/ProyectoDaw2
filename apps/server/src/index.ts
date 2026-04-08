@@ -23,6 +23,7 @@ import { userCurrencyController } from "./modules/currency";
 // ? Logging
 import { logger as pinoLogger } from "./libs/pino";
 import { paymentController } from "./modules/payment";
+import { postServiceController } from "./modules/posts";
 
 
 // import { elysiaHelmet, permission } from 'elysiajs-helmet';
@@ -87,6 +88,7 @@ const app = new Elysia()
     .use(notificationController)
     .use(mediaController)
     .use(paymentController)
+    .use(postServiceController)
     .listen(3000);
 
 console.log(

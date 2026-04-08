@@ -1,8 +1,8 @@
 import Database from "bun:sqlite";
 
 export function migrate(db: Database) {
-  // 1. Users (Clients & Providers)
-  db.run(`
+    // 1. Users (Clients & Providers)
+    db.run(`
         CREATE TABLE IF NOT EXISTS Users (
             id                     INTEGER PRIMARY KEY AUTOINCREMENT,
             firebase_uid           TEXT NOT NULL UNIQUE,
@@ -27,7 +27,7 @@ export function migrate(db: Database) {
         )
     `);
 
-  db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS ProviderProfiles (
             user_id           INTEGER PRIMARY KEY,
             bio               TEXT,
@@ -41,7 +41,7 @@ export function migrate(db: Database) {
         )
     `);
 
-  db.run(`
+    db.run(`
     CREATE TABLE IF NOT EXISTS ProviderSchedule (
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id     INTEGER NOT NULL,
@@ -54,17 +54,17 @@ export function migrate(db: Database) {
     )
 `);
 
-  db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS Badges (
             id   INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE
         )
     `);
 
-  db.run(
-    `CREATE TABLE IF NOT EXISTS Badges (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE)`,
-  );
-  db.run(`
+    db.run(
+        `CREATE TABLE IF NOT EXISTS Badges (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE)`,
+    );
+    db.run(`
         CREATE TABLE IF NOT EXISTS UserBadges (
             user_id INTEGER NOT NULL,
             badge_id INTEGER NOT NULL,
@@ -74,7 +74,7 @@ export function migrate(db: Database) {
         )
     `);
 
-  db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS Services (
             id       INTEGER PRIMARY KEY AUTOINCREMENT,
             name     TEXT NOT NULL UNIQUE,
@@ -82,7 +82,7 @@ export function migrate(db: Database) {
         )
     `);
 
-  db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS UserServices (
             user_id          INTEGER NOT NULL,
             service_id       INTEGER NOT NULL,
@@ -96,21 +96,36 @@ export function migrate(db: Database) {
         )
     `);
 
-  // Migration: rename duration_hours → duration_minutes on existing databases
-  try {
-    db.run(
-      `ALTER TABLE UserServices RENAME COLUMN duration_hours TO duration_minutes`,
-    );
-    // Existing rows stored hours (e.g. 1, 2…) — convert to minutes
-    db.run(
-      `UPDATE UserServices SET duration_minutes = duration_minutes * 60 WHERE duration_minutes <= 24`,
-    );
-    console.log("✅ Migrated UserServices.duration_hours → duration_minutes");
-  } catch {
-    // Column already renamed — nothing to do
-  }
+    db.run(`
+        CREATE TABLE IF NOT EXISTS Posts (
+              id          INTEGER PRIMARY KEY AUTOINCREMENT,
+              user_id     INTEGER NOT NULL,
+              title       TEXT NOT NULL,
+              content     TEXT NOT NULL,
+              status      TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+              created_at  TEXT DEFAULT (datetime('now')),
+              updated_at  TEXT DEFAULT (datetime('now')),
+              FOREIGN KEY (user_id) REFERENCES Users(id)
+        );
+    `);
 
-  db.run(`
+    // Migration: rename duration_hours → duration_minutes on existing databases
+    try {
+        db.run(
+            `ALTER TABLE UserServices RENAME COLUMN duration_hours TO duration_minutes`,
+        );
+        // Existing rows stored hours (e.g. 1, 2…) — convert to minutes
+        db.run(
+            `UPDATE UserServices SET duration_minutes = duration_minutes * 60 WHERE duration_minutes <= 24`,
+        );
+        console.log(
+            "✅ Migrated UserServices.duration_hours → duration_minutes",
+        );
+    } catch {
+        // Column already renamed — nothing to do
+    }
+
+    db.run(`
         CREATE TABLE IF NOT EXISTS Appointments (
             id                INTEGER PRIMARY KEY AUTOINCREMENT,
             client_id         INTEGER NOT NULL,
@@ -136,7 +151,7 @@ export function migrate(db: Database) {
         )
     `);
 
-  db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS Reviews (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
             content     TEXT,
@@ -151,7 +166,7 @@ export function migrate(db: Database) {
         )
     `);
 
-  db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS EmailVerificationCodes (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id    INTEGER NOT NULL,
@@ -164,11 +179,11 @@ export function migrate(db: Database) {
         )
     `);
 
-  /*
+    /*
     This table it's used for keep notifications saved in user inbox before get deleted.
     created_at and read are for auditory.
     */
-  db.run(`
+    db.run(`
         CREATE TABLE IF NOT EXISTS Notifications (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id    INTEGER NOT NULL,
@@ -180,24 +195,24 @@ export function migrate(db: Database) {
         )
     `);
 
-  // Indexes
-  db.run(
-    `CREATE INDEX IF NOT EXISTS idx_email_verification_code    ON EmailVerificationCodes (code)`,
-  );
-  db.run(
-    `CREATE INDEX IF NOT EXISTS idx_email_verification_user    ON EmailVerificationCodes (user_id)`,
-  );
-  db.run(
-    `CREATE INDEX IF NOT EXISTS idx_email_verification_expires ON EmailVerificationCodes (expires_at)`,
-  );
+    // Indexes
+    db.run(
+        `CREATE INDEX IF NOT EXISTS idx_email_verification_code    ON EmailVerificationCodes (code)`,
+    );
+    db.run(
+        `CREATE INDEX IF NOT EXISTS idx_email_verification_user    ON EmailVerificationCodes (user_id)`,
+    );
+    db.run(
+        `CREATE INDEX IF NOT EXISTS idx_email_verification_expires ON EmailVerificationCodes (expires_at)`,
+    );
 
-  db.run(
-    `CREATE INDEX IF NOT EXISTS idx_provider_schedule_user ON ProviderSchedule (user_id, day_of_week)`,
-  );
+    db.run(
+        `CREATE INDEX IF NOT EXISTS idx_provider_schedule_user ON ProviderSchedule (user_id, day_of_week)`,
+    );
 
-  console.log("✅ Migrations done");
+    console.log("✅ Migrations done");
 
-  db.run(`
+    db.run(`
     CREATE TRIGGER IF NOT EXISTS update_userservices_timestamp
     AFTER UPDATE ON UserServices
     FOR EACH ROW

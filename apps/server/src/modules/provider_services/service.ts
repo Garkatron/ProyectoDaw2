@@ -19,7 +19,7 @@ interface UserServiceResponse extends Omit<ProviderService, "is_active"> {
 const transform = (services: ProviderService[]): UserServiceResponse[] => {
     return services.map((service) => ({
         ...service,
-        is_active: service.is_active === 1,
+        is_active: service.is_active === true,
     }));
 };
 

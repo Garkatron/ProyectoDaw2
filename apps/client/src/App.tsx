@@ -21,6 +21,8 @@ import Appointments from "./pages/user/Appointments";
 import Legal from "./pages/limpora/Legal";
 import About from "./pages/limpora/About";
 import DownloadPage from "./pages/limpora/Download";
+import { PostsPublicList } from "./pages/limpora/PostsPublic";
+import PostsManager from "./pages/admin/PostsManager";
 
 const App = () => {
   const location = useLocation();
@@ -38,6 +40,8 @@ const App = () => {
         <Route path="/legal" element={<Legal />} />
         <Route path="/about" element={<About />} />
         <Route path="/download" element={<DownloadPage />} />
+        <Route path="/news" element={<PostsPublicList />} />
+        <Route path="/post-news" element={<PostsManager />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/panel/:username" element={<UserPanel />} />
