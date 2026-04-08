@@ -50,7 +50,7 @@ jobs:
             cat > apps/server/.env << 'ENVEOF'
             NODE_ENV                    = "production"
             PORT                        = "${{ vars.PORT }}"
-            FRONTEND_URL                = "https://www.limpora.xyz"
+            FRONTEND_URL                = https://www.limpora.xyz
             EMAIL_VERIFICATION          = "${{ vars.EMAIL_VERIFICATION }}"
             DB_CONNECTION_LIMIT         = "${{ vars.DB_CONNECTION_LIMIT }}"
 
