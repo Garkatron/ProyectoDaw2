@@ -2,11 +2,14 @@ import { Elysia } from "elysia";
 import { AuthService } from "./service";
 import { AuthModel } from "./model";
 import { AuthGuard } from "./guard";
-export const authController = new Elysia({ prefix: "/auth" })
+import { rateLimit } from "elysia-rate-limit";
+
+const authPublic = new Elysia({ prefix: "/auth" })
+    .use(rateLimit({ duration: 60000, max: 10 }))
 
     .post(
         "/verify",
-        ({ body, params }) => AuthService.verifyEmailCode(body),
+        ({ body }) => AuthService.verifyEmailCode(body),
         {
             body: AuthModel["verifyEmailBody"],
             response: {
@@ -41,8 +44,9 @@ export const authController = new Elysia({ prefix: "/auth" })
                 500: AuthModel.registerInvalid,
             },
         },
-    )
+    );
 
+const authPrivate = new Elysia({ prefix: "/auth" })
     .use(AuthGuard)
 
     .post(
@@ -58,3 +62,7 @@ export const authController = new Elysia({ prefix: "/auth" })
     .get("/me", async ({ user }) => AuthService.getFirebaseUser(user.uid), {
         isAuthenticated: true,
     });
+
+export const authController = new Elysia()
+    .use(authPublic)
+    .use(authPrivate);

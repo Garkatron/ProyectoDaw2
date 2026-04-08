@@ -3,6 +3,7 @@
 // * Responsible for managing sessions using Firebase.
 // * Handles register, login, logout, token refresh and useful queries.
 
+import { resolveMx } from "dns/promises";
 import { status, t } from "elysia";
 import { AuthModel } from "./model";
 import { sql } from "bun";
@@ -83,6 +84,9 @@ export abstract class AuthService {
     }: AuthModel["registerBody"]): Promise<AuthModel["registerResponse"]> {
         logger.info({ email, role }, "register attempt");
 
+        const mx = await resolveMx(email.split("@")[1]).catch(() => []);
+        if (mx.length === 0) throw status(400, "Invalid email domain");
+
         if (prohibited.some((r) => r.test(email))) {
             throw status(
                 400,
@@ -162,6 +166,9 @@ export abstract class AuthService {
         captchaToken,
     }: AuthModel["loginBody"]): Promise<AuthModel["loginResponse"]> {
         logger.info({ email }, "login attempt");
+
+        const mx = await resolveMx(email.split("@")[1]).catch(() => []);
+        if (mx.length === 0) throw status(400, "Invalid email domain");
 
         if (prohibited.some((r) => r.test(email))) {
             throw status(
