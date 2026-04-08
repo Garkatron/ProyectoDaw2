@@ -85,17 +85,18 @@ export default function Settings() {
                 title={t("settings.language.title")}
                 description={t("settings.language.description")}
                 control={
-                  <SegmentedControl
-                    value={i18n.language}
-                    onChange={(val) => i18n.changeLanguage(val)}
-                    data={[
-                      { label: t("settings.language.es"), value: "es" },
-                      { label: t("settings.language.en"), value: "en" },
-                    ]}
-                    radius="xl"
-                    size="xs"
-                    style={ { minWidth: "380px" } }
-                  />
+                  <Box mr={10}> 
+                    <SegmentedControl
+                      value={i18n.language}
+                      onChange={(val) => i18n.changeLanguage(val)}
+                      data={[
+                        { label: t("settings.language.es"), value: "es" },
+                        { label: t("settings.language.en"), value: "en" },
+                      ]}
+                      radius="xl"
+                      size="xs"
+                    />
+                  </Box>
                 }
               />
               <Divider />
