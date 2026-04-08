@@ -25,6 +25,7 @@ jobs:
             cat > apps/client/.env << 'ENVEOF'
             VITE_STRIPE_PUBLIC_KEY="${{ secrets.STRIPE_FRONTEND_KEY }}"
             VITE_API_URL="https://api.limpora.xyz"
+            VITE_TURNSTILE_SITE_KEY="{{ secrets.VITE_TURNSTILE_SITE_KEY }}"
             ENVEOF
 
             docker compose stop limpora-client
@@ -76,6 +77,9 @@ jobs:
 
             # ? Stripe
             STRIPE_KEY                  = "${{ secrets.STRIPE_KEY }}"
+
+            # ? Captcha
+            TURNSTILE_SECRET_KEY        = "${{ secrets.TURNSTILE_SECRET_KEY }}"
 
             # ? Database (old)
             # DB_NAME                   = limpora

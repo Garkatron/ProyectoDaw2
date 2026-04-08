@@ -1,22 +1,39 @@
 import { t, type UnwrapSchema } from "elysia";
 import { UserRole } from "@limpora/common/src/enums/Role.enum";
 
+const PROHIBITED_DOMAINS = [
+    /@example\./i,
+    /@test\.com$/i,
+    /@mailinator\.com$/i,
+    /@yopmail\.com$/i,
+];
+const isAllowedDomain = (email: string) =>
+    !PROHIBITED_DOMAINS.some((regex) => regex.test(email));
+
+const EmailSchema = t.String({
+    format: "email",
+    error: "Invalid email or prohibited one",
+    validate: (value: string) => isAllowedDomain(value),
+});
+
 export const AuthModel = {
     verifyEmailBody: t.Object({
         code: t.String(),
-        email: t.String({ format: "email", error: "Invalid email format" }),
+        email: EmailSchema,
     }),
 
     registerBody: t.Object({
         username: t.String(),
         password: t.String(),
-        email: t.String({ format: "email", error: "Invalid email format" }),
+        email: EmailSchema,
         role: t.Enum(UserRole),
+        captchaToken: t.String({ minLength: 20 }),
     }),
 
     loginBody: t.Object({
         email: t.String({ format: "email" }),
         password: t.String(),
+        captchaToken: t.String({ minLength: 20 }),
     }),
 
     loginResponse: t.Object({
@@ -41,6 +58,10 @@ export const AuthModel = {
     emailNotVerified: t.Literal("User isn't verified email.  Sending email..."),
 
     registerInvalid: t.Literal("Email already in use"),
+    failedCaptcha: t.Literal("Failed captcha"),
+    emailProhibited: t.Literal(
+        "Try again broh. I don't like the domain of your email.",
+    ),
 } as const;
 
 export type AuthModel = {

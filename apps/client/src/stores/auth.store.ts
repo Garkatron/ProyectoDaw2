@@ -22,8 +22,8 @@ interface AuthStore {
     isAuthenticated: boolean;
     error: string | null;
     fetchUser: () => Promise<void>;
-    login: (email: string, password: string) => Promise<AuthResult>;
-    register: (name: string, email: string, password: string, role: string) => Promise<AuthResult>;
+    login: (email: string, password: string, captchaToken: string) => Promise<AuthResult>;
+    register: (name: string, email: string, password: string, role: string, captchaKey: string) => Promise<AuthResult>;
     logout: () => Promise<AuthResult>;
     clearError: () => void;
 }
@@ -65,10 +65,10 @@ export const useAuthStore = create<AuthStore>()(
                 set({ user: data, isAuthenticated: true, error: null });
             },
 
-            login: async (email, password): Promise<AuthResult> => {
+            login: async (email, password, captchaToken): Promise<AuthResult> => {
                 set({ error: null });
 
-                const { data, error } = await API.auth.login.post({ email, password });
+                const { data, error } = await API.auth.login.post({ email, password, captchaToken });
 
                 if (error) {
                     const msg = errorToString(error.value);
@@ -82,7 +82,7 @@ export const useAuthStore = create<AuthStore>()(
                 return { success: true };
             },
 
-            register: async (username, email, password, role = 'client'): Promise<AuthResult> => {
+            register: async (username, email, password, role = 'client', captchaToken): Promise<AuthResult> => {
                 set({ error: null });
                 
                 
@@ -91,6 +91,7 @@ export const useAuthStore = create<AuthStore>()(
                     password,
                     email,
                     role: toUserRole(role),
+                    captchaToken
                 });
                 
                 if (error) {

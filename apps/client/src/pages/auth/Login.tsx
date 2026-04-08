@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import LoginSchema from "../../schemas/NewSessionSchema";
 import lang from "../../utils/LangManager";
 import { UserRole } from "@limpora/common";
+import Turnstile from "react-turnstile";
+
 import {
   TextInput, PasswordInput, Button, Paper, Title,
   Stack, Image, Center, Anchor, Text,
@@ -13,9 +15,13 @@ import {
 export default function Login() {
   const login = useAuthStore((state) => state.login);
   const user = useAuthStore((state) => state.user);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [failedAttempts, setFailedAttempts] = useState(0);
+
   const navigate = useNavigate();
 
   const handleOAuth = () => {
@@ -36,15 +42,27 @@ export default function Login() {
       return;
     }
 
-    const response = await login(result.data.email, result.data.password);
+    if (failedAttempts >= 3 && !captchaToken) {
+      setError("Verifica que no eres un bot");
+      return;
+    }
+
+    const response = await login(
+      result.data.email,
+      result.data.password,
+      captchaToken!
+    );
 
     if (response.success) {
       navigate(user?.role === UserRole.Admin ? "/panel/admin" : "/panel/me");
     } else {
+      setFailedAttempts((prev) => prev + 1);
+
       if (response.error?.includes("verified email")) {
         navigate("/verify-email", { state: { email } });
         return;
       }
+
       setError(response.error ?? lang("login.generic_error"));
     }
   };
@@ -62,34 +80,38 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           <Stack gap="md" mb="xl">
             <TextInput
-              id="email"
               type="email"
               required
               label={lang("login.email")}
-              title={lang("login.tooltip.email")}
               placeholder={lang("login.placeholder.email")}
               value={email}
               onChange={(e) => setEmail(e.currentTarget.value)}
-              size="md"
             />
+
             <PasswordInput
-              id="password"
               required
-              title={lang("login.tooltip.password")}
               label={lang("login.password")}
-              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.currentTarget.value)}
-              size="md"
             />
+
+            {failedAttempts >= 3 && (
+              <Turnstile
+                sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY!}
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
+              />
+            )}
+
             {error && <Text c="red" size="sm">{error}</Text>}
           </Stack>
 
           <Stack gap="sm" mb="md">
-            <Button type="submit" variant="default" size="md" fullWidth>
+            <Button type="submit" variant="default" fullWidth>
               {lang("login.submit")}
             </Button>
-            <Button type="button" variant="default" size="md" fullWidth onClick={handleOAuth}>
+
+            <Button type="button" variant="default" fullWidth onClick={handleOAuth}>
               Google
             </Button>
           </Stack>

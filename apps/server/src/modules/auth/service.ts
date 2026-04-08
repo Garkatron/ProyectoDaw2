@@ -13,14 +13,51 @@ import { NotificationService } from "../notification/service";
 import generateVefCode from "../../utils";
 import { logger } from "../../libs/pino";
 
+
+
 export abstract class AuthService {
+    static async verifyTurnstile(
+        token: string,
+        ip?: string,
+    ): Promise<{
+        success: boolean;
+        challenge_ts?: string;
+        hostname?: string;
+        "error-codes"?: string[];
+    }> {
+        const res = await fetch(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+            {
+                method: "POST",
+                body: new URLSearchParams({
+                    secret: process.env.TURNSTILE_SECRET_KEY!,
+                    response: token,
+                    remoteip: ip ?? "",
+                }),
+            },
+        );
+
+        return res.json();
+    }
+
     static async register({
         username,
         password,
         email,
         role,
+        captchaToken,
     }: AuthModel["registerBody"]): Promise<AuthModel["registerResponse"]> {
         logger.info({ email, role }, "register attempt");
+
+        const captcha = await AuthService.verifyTurnstile(captchaToken);
+
+        if (!captcha.success) {
+            logger.warn({email, role}, "failed captcha at register");
+            throw status(
+                400,
+                "Failed captcha" satisfies AuthModel["failedCaptcha"],
+            );
+        }
 
         const existing = AuthQueries.findByEmail.get({ email: email });
 
@@ -54,7 +91,6 @@ export abstract class AuthService {
             );
         } catch (error) {
             logger.error({ email, error }, "register failed: firebase error");
-            console.error("[Register][Firebase]:");
             console.error(error);
             throw status(500, "Error creating user");
         }
@@ -82,8 +118,20 @@ export abstract class AuthService {
     static async login({
         email,
         password,
+        captchaToken
     }: AuthModel["loginBody"]): Promise<AuthModel["loginResponse"]> {
         logger.info({ email }, "login attempt");
+
+
+        const captcha = await AuthService.verifyTurnstile(captchaToken);
+
+        if (!captcha.success) {
+            logger.warn({email}, "failed captcha at login");
+            throw status(
+                400,
+                "Failed captcha" satisfies AuthModel["failedCaptcha"],
+            );
+        }
 
         if (!email || !password) {
             logger.error(
@@ -282,7 +330,10 @@ export abstract class AuthService {
 
         const isValid = await Bun.password.verify(sent_code, r.code);
         if (!isValid) {
-            logger.error({ email, sent_code }, "email verification failed: invalid verification code");
+            logger.error(
+                { email, sent_code },
+                "email verification failed: invalid verification code",
+            );
 
             throw status(
                 401,
@@ -295,7 +346,6 @@ export abstract class AuthService {
         });
 
         logger.info({ email }, "email verification succed");
-
 
         return {
             success: !!lastInsertRowid,
