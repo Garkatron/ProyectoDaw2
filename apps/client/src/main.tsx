@@ -7,7 +7,6 @@ import "./index.css";
 import "./i18n";
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");

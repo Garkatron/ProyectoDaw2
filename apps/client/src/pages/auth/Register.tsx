@@ -54,6 +54,9 @@ export default function Register() {
     }
   };
 
+  console.log(import.meta.env.VITE_TURNSTILE_SITE_KEY);
+  
+
   return (
     <Center mih="100vh" px="md">
       <Paper w="100%" maw={448} p={40} withBorder>
