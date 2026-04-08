@@ -22,7 +22,6 @@ import Legal from "./pages/limpora/Legal";
 import About from "./pages/limpora/About";
 import DownloadPage from "./pages/limpora/Download";
 
-
 const App = () => {
   const location = useLocation();
   const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
