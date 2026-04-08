@@ -94,10 +94,10 @@ export default function Settings() {
                     ]}
                     radius="xl"
                     size="xs"
+                    style={{ marginRight: 8 }}
                   />
                 }
               />
-
               <Divider />
 
               <SettingRow

@@ -9,7 +9,7 @@ export const servicesController = new Elysia({ prefix: "/services" })
     .use(
         rateLimit({
             duration: 60000,
-            max: 60,
+            max: 120,
             errorResponse: "Too many request, try later...",
         }),
     )

@@ -11,6 +11,7 @@ import '@mantine/core/styles.css';
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");
 
+
 createRoot(root).render(
     <StrictMode>
 
@@ -29,5 +30,4 @@ createRoot(root).render(
           <App />
         </MantineProvider>
       </BrowserRouter>
-    </StrictMode>
-  );
+    </StrictMode>);
