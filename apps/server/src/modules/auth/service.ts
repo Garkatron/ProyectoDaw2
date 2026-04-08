@@ -13,7 +13,41 @@ import { NotificationService } from "../notification/service";
 import generateVefCode from "../../utils";
 import { logger } from "../../libs/pino";
 
-
+const prohibited = [
+    /@example\./i,
+    /@test\.com$/i,
+    /@mailinator\.com$/i,
+    /@yopmail\.com$/i,
+    /@guerrillamail\./i,
+    /@tempmail\./i,
+    /@throwam\.com$/i,
+    /@sharklasers\.com$/i,
+    /@guerrillamailblock\.com$/i,
+    /@grr\.la$/i,
+    /@spam4\.me$/i,
+    /@trashmail\./i,
+    /@dispostable\.com$/i,
+    /@maildrop\.cc$/i,
+    /@fakeinbox\.com$/i,
+    /@mytemp\.email$/i,
+    /@temp-mail\.org$/i,
+    /@10minutemail\./i,
+    /@minutemail\./i,
+    /@discard\.email$/i,
+    /@spamgourmet\.com$/i,
+    /@spamgourmet\.net$/i,
+    /@spamgourmet\.org$/i,
+    /@burnthespam\.info$/i,
+    /@deadaddress\.com$/i,
+    /@spamhole\.com$/i,
+    /@spamoff\.de$/i,
+    /@wegwerfmail\./i,
+    /@mohmal\.com$/i,
+    /@getnada\.com$/i,
+    /@nada\.email$/i,
+    /@filzmail\.com$/i,
+    /@owlpic\.com$/i,
+];
 
 export abstract class AuthService {
     static async verifyTurnstile(
@@ -49,10 +83,17 @@ export abstract class AuthService {
     }: AuthModel["registerBody"]): Promise<AuthModel["registerResponse"]> {
         logger.info({ email, role }, "register attempt");
 
+        if (prohibited.some((r) => r.test(email))) {
+            throw status(
+                400,
+                "Try again broh. I don't like the domain of your email.",
+            );
+        }
+
         const captcha = await AuthService.verifyTurnstile(captchaToken);
 
         if (!captcha.success) {
-            logger.warn({email, role}, "failed captcha at register");
+            logger.warn({ email, role }, "failed captcha at register");
             throw status(
                 400,
                 "Failed captcha" satisfies AuthModel["failedCaptcha"],
@@ -118,15 +159,21 @@ export abstract class AuthService {
     static async login({
         email,
         password,
-        captchaToken
+        captchaToken,
     }: AuthModel["loginBody"]): Promise<AuthModel["loginResponse"]> {
         logger.info({ email }, "login attempt");
 
+        if (prohibited.some((r) => r.test(email))) {
+            throw status(
+                400,
+                "Try again broh. I don't like the domain of your email.",
+            );
+        }
 
         const captcha = await AuthService.verifyTurnstile(captchaToken);
 
         if (!captcha.success) {
-            logger.warn({email}, "failed captcha at login");
+            logger.warn({ email }, "failed captcha at login");
             throw status(
                 400,
                 "Failed captcha" satisfies AuthModel["failedCaptcha"],

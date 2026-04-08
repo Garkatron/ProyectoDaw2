@@ -1,31 +1,17 @@
 import { t, type UnwrapSchema } from "elysia";
 import { UserRole } from "@limpora/common/src/enums/Role.enum";
 
-const PROHIBITED_DOMAINS = [
-    /@example\./i,
-    /@test\.com$/i,
-    /@mailinator\.com$/i,
-    /@yopmail\.com$/i,
-];
-const isAllowedDomain = (email: string) =>
-    !PROHIBITED_DOMAINS.some((regex) => regex.test(email));
-
-const EmailSchema = t.String({
-    format: "email",
-    error: "Invalid email or prohibited one",
-    validate: (value: string) => isAllowedDomain(value),
-});
 
 export const AuthModel = {
     verifyEmailBody: t.Object({
         code: t.String(),
-        email: EmailSchema,
+        email: t.String({ format: "email" }),
     }),
 
     registerBody: t.Object({
         username: t.String(),
         password: t.String(),
-        email: EmailSchema,
+        email: t.String({ format: "email" }),
         role: t.Enum(UserRole),
         captchaToken: t.String({ minLength: 20 }),
     }),
