@@ -90,12 +90,13 @@ export default function Login() {
             />
 
             <Turnstile
+              key="turnstile-register"
               sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY!}
               onVerify={(token) => setCaptchaToken(token)}
               onExpire={() => setCaptchaToken(null)}
               refreshExpired="auto"
             />
-
+            
             {error && <Text c="red" size="sm">{error}</Text>}
           </Stack>
 
