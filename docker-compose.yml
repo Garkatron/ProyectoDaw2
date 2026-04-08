@@ -43,8 +43,8 @@ services:
     networks:
       - limpora-network
     depends_on:
+      - redis
       - loki
-
 
 
   grafana:
