@@ -21,14 +21,7 @@ export const PostModel = {
         content: t.String(),
     })),
 
-    updatePostBody: t.Object({
-        id: t.Number(),
-        title: t.String({
-            minLength: 3,
-            error: "Title must be at least 3 characters",
-        }),
-        content: t.String(),
-    }),
+
 
     postIdQuery: t.Object({
         id: t.String(),

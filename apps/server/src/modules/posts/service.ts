@@ -82,12 +82,13 @@ export abstract class PostService {
     }
 
     static async updatePostsMe(
-        { id, title, content }: PostModel["updatePostBody"],
+        { title, content }: PostModel["postBody"],
+        { id }: PostModel["postIdQuery"],
         uid: string,
     ): Promise<PostModel["postResponse"]> {
         const user = await this.validateAdmin(uid);
 
-        const existing = PostQueries.findById.get({ id });
+        const existing = PostQueries.findById.get({ id: Number(id) });
 
         if (!existing)
             throw fail(
@@ -100,9 +101,9 @@ export abstract class PostService {
                 "You do not have permission to modify this provider's data" satisfies PostModel["errorUnauthorizedAction"],
             );
 
-        PostQueries.update.run({ id, title, content });
+        PostQueries.update.run({ id: Number(id), title, content });
 
-        const updated = PostQueries.findById.get({ id });
+        const updated = PostQueries.findById.get({ id: Number(id) });
         if (!updated)
             throw fail(
                 404,

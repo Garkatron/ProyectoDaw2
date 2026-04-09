@@ -22,8 +22,8 @@ export const postServiceController = new Elysia({ prefix: "/post" })
         },
         isAuthenticated: true,
     })
-    .put("/", ({ user, body }) => PostService.updatePostsMe(body, user.uid), {
-        body: PostModel.updatePostBody,
+    .put("/:id", ({ user, body, params }) => PostService.updatePostsMe(body, params, user.uid), {
+        body: PostModel.postBody,
         response: {
             201: PostModel.postBody,
             403: PostModel.errorUnauthorizedAction,
