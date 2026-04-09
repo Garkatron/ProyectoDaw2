@@ -21,8 +21,8 @@ export const PostQueries = {
         void,
         { user_id: number; title: string; content: string; status: PostStatus }
     >(
-        `INSERT INTO Posts (user_id, title, content)
-     VALUES (:user_id, :title, :content, :status)`,
+        `INSERT INTO Posts (user_id, title, content, status)
+        VALUES (:user_id, :title, :content, :status)`,
     ),
 
     update: db.query<
