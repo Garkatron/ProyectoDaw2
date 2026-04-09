@@ -14,6 +14,7 @@ export const ServicesModel = {
         t.Object({
             id: t.Number(),
             name: t.String(),
+            category: t.String(),
         })
     ),
 
