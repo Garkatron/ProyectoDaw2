@@ -286,7 +286,7 @@ export abstract class BookingService {
                     end_time: slot.end_time,
                 });
             }
-        });
+        })();
 
         return BookingQueries.findScheduleByUserId.all({
             user_id: provider_id,
