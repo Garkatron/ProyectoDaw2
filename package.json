@@ -10,5 +10,8 @@
     "packages/*",
     "apps/client",
     "apps/server"
-  ]
+  ],
+  "dependencies": {
+    "react-markdown": "^10.1.0"
+  }
 }

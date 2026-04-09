@@ -9,7 +9,7 @@ import Base from "../../layouts/Base";
 import { API } from "../../lib/api";
 import type { Post } from "@limpora/common";
 import { motion } from "framer-motion";
-
+import ReactMarkdown from "react-markdown";
 
 function formatDate(iso: string, long = false) {
   return new Date(iso).toLocaleDateString("es-ES", {
@@ -18,7 +18,6 @@ function formatDate(iso: string, long = false) {
     year: "numeric",
   });
 }
-
 
 const MotionDiv = motion.div;
 
@@ -42,9 +41,18 @@ function PostCard({ post, index }: { post: Post; index: number }) {
             )}
           </Group>
 
-          <Text size="sm" lh={1.8} c="dimmed" lineClamp={3}>
-            {post.content}
-          </Text>
+          <div style={{
+            fontSize: 14,
+            lineHeight: 1.8,
+            opacity: 0.75,
+            overflow: "hidden",
+            maxHeight: "4.8em",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+          }}>
+            <ReactMarkdown>{post.content}</ReactMarkdown>
+          </div>
 
           <Divider />
           <Group gap="xs">
@@ -53,7 +61,6 @@ function PostCard({ post, index }: { post: Post; index: number }) {
           </Group>
         </Stack>
       </Paper>
-
     </MotionDiv>
   );
 }
@@ -77,7 +84,11 @@ export function PostsPublicList() {
       <Stack maw={768} mx="auto" p="lg" gap="lg">
         <Title order={1} fz="1.5rem" fw={600}>Publicaciones</Title>
 
-        {error && <Alert icon={<AlertCircle size={16} />} color="red" radius="md">{error}</Alert>}
+        {error && (
+          <Alert icon={<AlertCircle size={16} />} color="red" radius="md">
+            {error}
+          </Alert>
+        )}
 
         {loading ? (
           <Stack gap="sm">
@@ -124,34 +135,42 @@ export function PostPublicDetail() {
         ) : error ? (
           <Alert icon={<AlertCircle size={16} />} color="red" radius="md">{error}</Alert>
         ) : post ? (
-          <>
-            <Stack gap={4}>
-              <Title order={1} fz={{ base: "1.4rem", sm: "1.8rem" }} fw={700}
-                style={{ letterSpacing: "-0.02em" }}>
-                {post.title}
-              </Title>
-              <Group gap="md" align="center">
-                {post.user_id && (
+          <MotionDiv
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            <Stack gap="md">
+              <Stack gap={4}>
+                <Title
+                  order={1}
+                  fz={{ base: "1.4rem", sm: "1.8rem" }}
+                  fw={600}
+                  style={{ letterSpacing: "-0.02em" }}
+                >
+                  {post.title}
+                </Title>
+                <Group gap="md" align="center">
                   <Group gap="xs">
-                    <Avatar size={22} radius="xl" color="blue">{post.user_id}</Avatar>
-                    <Text size="xs" style={{ opacity: 0.55 }}>{post.user_id}</Text>
+                    <Avatar size={22} radius="xl" color="blue">A</Avatar>
+                    <Text size="xs" c="dimmed">Admin · Limpora</Text>
                   </Group>
-                )}
-                {post.created_at && (
-                  <Group gap={4} style={{ opacity: 0.4 }}>
-                    <Calendar size={12} />
-                    <Text size="xs">{formatDate(post.created_at, true)}</Text>
-                  </Group>
-                )}
-              </Group>
-            </Stack>
+                  {post.created_at && (
+                    <Group gap={4} style={{ opacity: 0.4 }}>
+                      <Calendar size={12} />
+                      <Text size="xs">{formatDate(post.created_at, true)}</Text>
+                    </Group>
+                  )}
+                </Group>
+              </Stack>
 
-            <Paper withBorder radius="xl" p={{ base: "lg", sm: "xl" }}>
-              <Text size="sm" lh={1.85} style={{ opacity: 0.8, whiteSpace: "pre-wrap" }}>
-                {post.content}
-              </Text>
-            </Paper>
-          </>
+              <Paper withBorder radius="xl" p={{ base: "lg", sm: "xl" }}>
+                <div style={{ fontSize: 14, lineHeight: 1.85, opacity: 0.85 }}>
+                  <ReactMarkdown>{post.content}</ReactMarkdown>
+                </div>
+              </Paper>
+            </Stack>
+          </MotionDiv>
         ) : null}
       </Stack>
     </Base>
