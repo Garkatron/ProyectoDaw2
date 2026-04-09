@@ -10,6 +10,7 @@ import { API } from "../../lib/api";
 import type { Post } from "@limpora/common";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
 
 function formatDate(iso: string, long = false) {
   return new Date(iso).toLocaleDateString("es-ES", {
@@ -22,6 +23,8 @@ function formatDate(iso: string, long = false) {
 const MotionDiv = motion.div;
 
 function PostCard({ post, index }: { post: Post; index: number }) {
+  const { t } = useTranslation();
+
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 16 }}
@@ -48,7 +51,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
           <Divider />
           <Group gap="xs">
             <Avatar size={24} radius="xl" color="blue">A</Avatar>
-            <Text size="xs" c="dimmed">Admin · Limpora</Text>
+            <Text size="xs" c="dimmed">{t("news-public.author")}</Text>
           </Group>
         </Stack>
       </Paper>
@@ -60,6 +63,7 @@ export function PostsPublicList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t }= useTranslation();
 
   useEffect(() => {
     API.news.get()
@@ -73,12 +77,10 @@ export function PostsPublicList() {
   return (
     <Base>
       <Stack maw={768} mx="auto" p="lg" gap="lg">
-        <Title order={1} fz="1.5rem" fw={600}>Publicaciones</Title>
+        <Title order={1} fz="1.5rem" fw={600}>{ t("news-public.title") }</Title>
 
         {error && (
-          <Alert icon={<AlertCircle size={16} />} color="red" radius="md">
-            {error}
-          </Alert>
+          <Alert icon={<AlertCircle size={16} />} color="red" radius="md">{t("news-public.error")}</Alert>
         )}
 
         {loading ? (
@@ -87,7 +89,7 @@ export function PostsPublicList() {
           </Stack>
         ) : posts.length === 0 ? (
           <Paper withBorder radius="xl" p="xl">
-            <Text size="sm" ta="center" style={{ opacity: 0.55 }}>Sin publicaciones.</Text>
+            <Text size="sm" ta="center" style={{ opacity: 0.55 }}>{t("news-public.empty")}</Text>
           </Paper>
         ) : (
           <Stack gap="sm">
@@ -104,6 +106,7 @@ export function PostPublicDetail() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!id) return;
@@ -144,7 +147,7 @@ export function PostPublicDetail() {
                 <Group gap="md" align="center">
                   <Group gap="xs">
                     <Avatar size={22} radius="xl" color="blue">A</Avatar>
-                    <Text size="xs" c="dimmed">Admin · Limpora</Text>
+                    <Text size="xs" c="dimmed">{t("news-public.author")}</Text>
                   </Group>
                   {post.created_at && (
                     <Group gap={4} style={{ opacity: 0.4 }}>

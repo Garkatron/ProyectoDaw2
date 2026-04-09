@@ -376,5 +376,21 @@
       "label": "Descargar APK"
     },
     "warning": "Al instalar un APK fuera de Google Play, deberás activar «Instalar apps de fuentes desconocidas» en los ajustes de tu dispositivo. Descarga solo desde esta página oficial."
+  },
+  "news-manager": {
+    "title": "Publicaciones",
+    "warning": "eliminar",
+    "empty": "Sin publicaciones todavía...",
+    "button": {
+      "create": "Nueva publicación",
+      "delete": "Eliminar"
+    }
+  },
+  "news-public": {
+    "title": "Publicaciones",
+    "empty": "Sin publicaciones.",
+    "author": "Admin · Limpora",
+    "error": "Error al cargar las publicaciones.",
+    "loading": "Cargando..."
   }
 }

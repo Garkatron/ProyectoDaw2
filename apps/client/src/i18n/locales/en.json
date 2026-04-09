@@ -370,5 +370,21 @@
       "label": "Download APK"
     },
     "warning": "Installing an APK outside Google Play requires enabling «Install from unknown sources» in your device settings. Only download from this official page."
+  },
+  "news-manager": {
+    "title": "News",
+    "warning": "delete",
+    "empty": "Without post yet...",
+    "button": {
+      "create": "New post",
+      "delete": "Delete"
+    }
+  },
+  "news-public": {
+    "title": "Posts",
+    "empty": "No posts yet.",
+    "author": "Admin · Limpora",
+    "error": "Failed to load posts.",
+    "loading": "Loading..."
   }
 }

@@ -47,13 +47,7 @@ export function useUserPanel() {
                     setLoading(false)
                     return
                 }
-                if (currentUser.role === UserRole.Admin) {
-                    setError('Admins cannot access the panel.')
-                    setLoading(false)
-                    return
-                }
-
-                // /user/me ya devuelve el usuario actual
+    
                 const { data, error } = await API.user.me.get()
                 if (error || !data) {
                     setError('Failed to load user profile.')

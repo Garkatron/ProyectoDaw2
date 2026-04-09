@@ -48,8 +48,9 @@ export default function Login() {
     if (response.success) {
       const currentUser = response.user;
 
+      {/* ! No tengo tiempo para crear un panel de admin */}
       if (currentUser?.role === UserRole.Admin) {
-        navigate("/panel/admin");
+        navigate("/panel/me");
       } else {
         navigate("/panel/me");
       }

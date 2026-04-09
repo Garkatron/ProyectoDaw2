@@ -10,6 +10,7 @@ import { useAuthStore } from "../../stores/auth.store";
 import { API } from "../../lib/api";
 import type { Post } from "@limpora/common";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const MotionDiv = motion.div;
 
@@ -77,6 +78,8 @@ export default function PostsManager() {
   const [submitting, setSubmitting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
+  const { t } = useTranslation();
+
   const fetchPosts = async () => {
     setLoading(true);
     setError(null);
@@ -127,10 +130,10 @@ export default function PostsManager() {
     <Base>
       <Stack maw={768} mx="auto" p="lg" gap="lg">
         <Group justify="space-between" align="center">
-          <Title order={1} fz="1.5rem" fw={600}>Posts</Title>
+          <Title order={1} fz="1.5rem" fw={600}>{t("news-manager.title")}</Title>
           {!creating && !editingId && (
             <Button leftSection={<Plus size={15} />} radius="xl" size="sm" onClick={openCreate}>
-              Nuevo post
+              {t("button.create")}
             </Button>
           )}
         </Group>
@@ -169,7 +172,7 @@ export default function PostsManager() {
           </Stack>
         ) : posts.length === 0 && !creating ? (
           <Paper withBorder radius="lg" p="xl">
-            <Text size="sm" ta="center" c="dimmed">Sin posts todavía.</Text>
+            <Text size="sm" ta="center" c="dimmed">{t("news-manager.empty")}</Text>
           </Paper>
         ) : (
           <Stack gap="sm">
@@ -225,7 +228,7 @@ export default function PostsManager() {
         size="sm"
         radius="lg"
       >
-        <Text size="sm" c="dimmed" mb="lg">Esta acción no se puede deshacer.</Text>
+        <Text size="sm" c="dimmed" mb="lg">{t("news-manager.warning.delete")}</Text>
         <Group justify="flex-end" gap="sm">
           <Button variant="subtle" radius="md" onClick={() => setDeleteTarget(null)}>
             Cancelar
@@ -234,7 +237,7 @@ export default function PostsManager() {
             handleDelete(deleteTarget!);
             setDeleteTarget(null);
           }}>
-            Eliminar
+            {t("news-manager.button.delete")}
           </Button>
         </Group>
       </Modal>
