@@ -14,7 +14,6 @@ import {
 
 export default function Login() {
   const login = useAuthStore((state) => state.login);
-  const user = useAuthStore((state) => state.user);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

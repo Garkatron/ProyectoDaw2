@@ -76,7 +76,7 @@ const authPrivate = new Elysia({ prefix: "/auth" })
         { isAuthenticated: true },
     )
 
-    .get("/me", async ({ user }) => AuthService.getFirebaseUser(user.uid), {
+    .get("/me", async ({ user }) => AuthService.getMe(user.uid), {
         isAuthenticated: true,
     });
 

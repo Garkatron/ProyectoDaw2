@@ -541,4 +541,23 @@ export abstract class AuthService {
             success: !!lastInsertRowid,
         };
     }
+    static async getMe(uid: string)  {
+        const dbUser = AuthQueries.findByFirebaseUid.get({
+            firebase_uid: uid,
+        });
+
+        if (!dbUser) {
+            throw new Error("User not found in local database");
+        }
+
+        return {
+            id: dbUser.id,
+            name: dbUser.name,
+            role: dbUser.role,
+            email_verified: dbUser.email_verified,
+            total_points: dbUser.total_points,
+            member_since: dbUser.member_since,
+            email: dbUser.email,
+        };
+    }
 }
