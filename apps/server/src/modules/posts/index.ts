@@ -11,6 +11,7 @@ export const postServiceController = new Elysia({ prefix: "/post" })
         isAuthenticated: false,
     })
     .get("/:id", async ({ params }) => PostService.getPost(params), {
+        params: PostModel.postIdQuery,
         response: { 200: PostModel.postBody },
         isAuthenticated: false,
     })
@@ -22,11 +23,12 @@ export const postServiceController = new Elysia({ prefix: "/post" })
         },
         hasRole: UserRole.Admin,
     })
-    .put(
+    .patch(
         "/:id",
         ({ user, body, params }) =>
             PostService.updatePostsMe(body, params, user.uid),
         {
+            params: PostModel.postIdQuery,
             body: PostModel.postBody,
             response: {
                 201: PostModel.postBody,

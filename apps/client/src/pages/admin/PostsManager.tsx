@@ -110,7 +110,7 @@ export default function PostsManager() {
     if (!form.title.trim() || !form.content.trim()) return;
     setSubmitting(true);
     const { error: err } = editingId
-      ? await API.post({ id: editingId }).put({ title: form.title, content: form.content })
+      ? await API.post({ id: editingId }).patch({ title: form.title, content: form.content })
       : await API.post.post({ title: form.title, content: form.content });
     if (err) setError(String(err));
     else { cancelEdit(); fetchPosts(); }
