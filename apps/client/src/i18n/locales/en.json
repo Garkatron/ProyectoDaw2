@@ -202,6 +202,7 @@
     "provider": "Provider",
     "travel_buffer": "+{{count}} min travel",
     "net": "net",
+    "error_fetch": "Failed to obtain your appointments",
     "mark_as": "Mark as",
     "see_reviews": "See reviews",
     "rate_service": "Rate service",
@@ -361,7 +362,7 @@
     "app_description": "Manage bookings, find professionals and receive real-time notifications.",
     "info": {
       "android": "Requires Android 8.0 or higher",
-      "size": "Approximate size: 18 MB",
+      "size": "Approximate size: 26 MB",
       "version": "Current version: 1.0.0",
       "verified": "APK signed by Limpora"
     },

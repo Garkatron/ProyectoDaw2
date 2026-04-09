@@ -133,7 +133,7 @@ export default function PostsManager() {
           <Title order={1} fz="1.5rem" fw={600}>{t("news-manager.title")}</Title>
           {!creating && !editingId && (
             <Button leftSection={<Plus size={15} />} radius="xl" size="sm" onClick={openCreate}>
-              {t("button.create")}
+              {t("news-manager.button.create")}
             </Button>
           )}
         </Group>
