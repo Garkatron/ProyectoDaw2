@@ -20,22 +20,27 @@ export const postServiceController = new Elysia({ prefix: "/post" })
             201: PostModel.postBody,
             500: PostModel.errorPersistenceFailed,
         },
-        isAuthenticated: true,
+        hasRole: UserRole.Admin,
     })
-    .put("/:id", ({ user, body, params }) => PostService.updatePostsMe(body, params, user.uid), {
-        body: PostModel.postBody,
-        response: {
-            201: PostModel.postBody,
-            403: PostModel.errorUnauthorizedAction,
-            404: PostModel.errorPostNotFound,
+    .put(
+        "/:id",
+        ({ user, body, params }) =>
+            PostService.updatePostsMe(body, params, user.uid),
+        {
+            body: PostModel.postBody,
+            response: {
+                201: PostModel.postBody,
+                403: PostModel.errorUnauthorizedAction,
+                404: PostModel.errorPostNotFound,
+            },
+            hasRole: UserRole.Admin,
         },
-        isAuthenticated: true,
-    })
+    )
     .delete(
         "/:id",
         async ({ params, user }) => PostService.deletePostsMe(params, user.uid),
         {
             params: PostModel.postIdQuery,
-            hasRole: UserRole.Provider,
+            hasRole: UserRole.Admin,
         },
     );

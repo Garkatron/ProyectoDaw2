@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   Stack, Title, Text, Paper, Group, Button,
   TextInput, Textarea, ActionIcon,
-  Skeleton, Alert,
+  Skeleton, Alert, Modal,
 } from "@mantine/core";
 import { Pencil, Trash2, Plus, AlertCircle, X, Check } from "lucide-react";
 import Base from "../../layouts/Base";
@@ -20,6 +20,50 @@ interface PostForm {
 
 const emptyForm: PostForm = { title: "", content: "" };
 
+function PostFormInline({ form, setForm, submitting, editingId, onCancel, onSubmit }: {
+  form: PostForm;
+  setForm: React.Dispatch<React.SetStateAction<PostForm>>;
+  submitting: boolean;
+  editingId: number | null;
+  onCancel: () => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <Paper withBorder radius="lg" p="xl">
+      <Stack gap="md">
+        <TextInput
+          label="Título"
+          radius="md"
+          value={form.title}
+          onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+        />
+        <Textarea
+          label="Contenido"
+          radius="md"
+          autosize
+          minRows={5}
+          value={form.content}
+          onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
+        />
+        <Group justify="flex-end" gap="sm">
+          <Button variant="subtle" radius="md" leftSection={<X size={14} />} onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button
+            radius="md"
+            leftSection={<Check size={14} />}
+            loading={submitting}
+            disabled={!form.title.trim() || !form.content.trim()}
+            onClick={onSubmit}
+          >
+            {editingId ? "Guardar cambios" : "Publicar"}
+          </Button>
+        </Group>
+      </Stack>
+    </Paper>
+  );
+}
+
 export default function PostsManager() {
   const user = useAuthStore((s) => s.user);
 
@@ -31,11 +75,12 @@ export default function PostsManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<PostForm>(emptyForm);
   const [submitting, setSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   const fetchPosts = async () => {
     setLoading(true);
     setError(null);
-    const { data, error: err } = await API.post.get({});
+    const { data, error: err } = await API.post.get();
     if (err) setError(String(err));
     else setPosts((data as Post[]) ?? []);
     setLoading(false);
@@ -73,46 +118,10 @@ export default function PostsManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("¿Eliminar este post?")) return;
     const { error: err } = await API.post({ id }).delete();
     if (err) setError(String(err));
     else fetchPosts();
   };
-
-  const PostFormInline = () => (
-    <Paper withBorder radius="lg" p="xl">
-      <Stack gap="md">
-        <TextInput
-          label="Título"
-          radius="md"
-          value={form.title}
-          onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-        />
-        <Textarea
-          label="Contenido"
-          radius="md"
-          autosize
-          minRows={5}
-          value={form.content}
-          onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-        />
-        <Group justify="flex-end" gap="sm">
-          <Button variant="subtle" radius="md" leftSection={<X size={14} />} onClick={cancelEdit}>
-            Cancelar
-          </Button>
-          <Button
-            radius="md"
-            leftSection={<Check size={14} />}
-            loading={submitting}
-            disabled={!form.title.trim() || !form.content.trim()}
-            onClick={handleSubmit}
-          >
-            {editingId ? "Guardar cambios" : "Publicar"}
-          </Button>
-        </Group>
-      </Stack>
-    </Paper>
-  );
 
   return (
     <Base>
@@ -142,7 +151,14 @@ export default function PostsManager() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <PostFormInline />
+              <PostFormInline
+                form={form}
+                setForm={setForm}
+                submitting={submitting}
+                editingId={editingId}
+                onCancel={cancelEdit}
+                onSubmit={handleSubmit}
+              />
             </MotionDiv>
           )}
         </AnimatePresence>
@@ -167,23 +183,28 @@ export default function PostsManager() {
                   transition={{ duration: 0.25, delay: i * 0.05 }}
                 >
                   {editingId === post.id ? (
-                    <PostFormInline />
+                    <PostFormInline
+                      form={form}
+                      setForm={setForm}
+                      submitting={submitting}
+                      editingId={editingId}
+                      onCancel={cancelEdit}
+                      onSubmit={handleSubmit}
+                    />
                   ) : (
                     <Paper withBorder radius="lg" p="xl">
                       <Stack gap="sm">
                         <Group justify="space-between" align="flex-start" wrap="nowrap">
                           <Text fw={500} size="md" style={{ flex: 1 }}>{post.title}</Text>
-                          {post.user_id === user?.id && (
-                            <Group gap={4} wrap="nowrap">
-                              <ActionIcon variant="subtle" size="sm" onClick={() => openEdit(post)}>
-                                <Pencil size={14} />
-                              </ActionIcon>
-                              <ActionIcon variant="subtle" color="red" size="sm"
-                                onClick={() => handleDelete(post.id)}>
-                                <Trash2 size={14} />
-                              </ActionIcon>
-                            </Group>
-                          )}
+                          <Group gap={4} wrap="nowrap">
+                            <ActionIcon variant="subtle" size="sm" onClick={() => openEdit(post)}>
+                              <Pencil size={14} />
+                            </ActionIcon>
+                            <ActionIcon variant="subtle" color="red" size="sm"
+                              onClick={() => setDeleteTarget(post.id)}>
+                              <Trash2 size={14} />
+                            </ActionIcon>
+                          </Group>
                         </Group>
                         <Text size="sm" lh={1.75} c="dimmed">{post.content}</Text>
                       </Stack>
@@ -195,6 +216,28 @@ export default function PostsManager() {
           </Stack>
         )}
       </Stack>
+
+      <Modal
+        opened={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Eliminar post"
+        centered
+        size="sm"
+        radius="lg"
+      >
+        <Text size="sm" c="dimmed" mb="lg">Esta acción no se puede deshacer.</Text>
+        <Group justify="flex-end" gap="sm">
+          <Button variant="subtle" radius="md" onClick={() => setDeleteTarget(null)}>
+            Cancelar
+          </Button>
+          <Button color="red" radius="md" onClick={() => {
+            handleDelete(deleteTarget!);
+            setDeleteTarget(null);
+          }}>
+            Eliminar
+          </Button>
+        </Group>
+      </Modal>
     </Base>
   );
 }
