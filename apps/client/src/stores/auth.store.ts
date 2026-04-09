@@ -14,6 +14,7 @@ interface User {
 
 interface AuthResult {
     success: boolean;
+    user: User;
     error?: string;
 }
 
@@ -77,9 +78,13 @@ export const useAuthStore = create<AuthStore>()(
                 }
 
                 localStorage.setItem('firebase_token', data.token);
+                
                 await get().fetchUser();
+
+                const updatedUser = get().user;
+
                 set({ isAuthenticated: true });
-                return { success: true };
+                return { success: true, user: updatedUser };
             },
 
             register: async (username, email, password, role = 'client', captchaToken): Promise<AuthResult> => {

@@ -35,12 +35,10 @@ export default function Login() {
     setError("");
 
     const result = LoginSchema.safeParse({ email, password });
-
     if (!result.success) {
       setError(result.error.issues[0]?.message ?? "Validation error");
       return;
     }
-
 
     const response = await login(
       result.data.email,
@@ -49,14 +47,18 @@ export default function Login() {
     );
 
     if (response.success) {
-      navigate(user?.role === UserRole.Admin ? "/panel/admin" : "/panel/me");
-    } else {
+      const currentUser = response.user;
 
+      if (currentUser?.role === UserRole.Admin) {
+        navigate("/panel/admin");
+      } else {
+        navigate("/panel/me");
+      }
+    } else {
       if (response.error?.includes("verified email")) {
         navigate("/verify-email", { state: { email } });
         return;
       }
-
       setError(response.error ?? lang("login.generic_error"));
     }
   };
