@@ -80,7 +80,7 @@ jobs:
 
             # ? Captcha
             TURNSTILE_SECRET_KEY        = "${{ secrets.TURNSTILE_SECRET_KEY }}"
-            REDIS_PASSWORD              = ${{ secrets.REDIS_PASSWORD }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
 
 
             # ? Database (old)
@@ -92,6 +92,7 @@ jobs:
             ENVEOF
 
             docker compose stop redis
+            docker compose rm -f redis
             docker compose --env-file ./apps/server/.env up -d redis
 
             docker compose stop limpora-server
