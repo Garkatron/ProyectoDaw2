@@ -95,11 +95,6 @@ export abstract class PostService {
                 404,
                 "The requested post was not found" satisfies PostModel["errorPostNotFound"],
             );
-        if (existing.user_id !== user.id)
-            throw fail(
-                403,
-                "You do not have permission to modify this provider's data" satisfies PostModel["errorUnauthorizedAction"],
-            );
 
         PostQueries.update.run({ id: Number(id), title, content });
 

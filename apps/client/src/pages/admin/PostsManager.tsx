@@ -111,7 +111,7 @@ export default function PostsManager() {
     setSubmitting(true);
     const { error: err } = editingId
       ? await API.post({ id: editingId }).put({ title: form.title, content: form.content })
-      : await API.post.post(form);
+      : await API.post.post({ title: form.title, content: form.content });
     if (err) setError(String(err));
     else { cancelEdit(); fetchPosts(); }
     setSubmitting(false);
