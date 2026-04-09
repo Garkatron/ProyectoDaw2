@@ -49,6 +49,7 @@ const allNavItems = [
   },
   { name: "nav.inbox", to: "/inbox", icon: IconMail, providerOnly: false },
   { name: "nav.download", to: "/download", icon: IconDownload, providerOnly: false },
+  { name: "nav.news", to: "/news", icon: IconDownload, providerOnly: false },
   {
     name: "nav.settings",
     to: "/settings",

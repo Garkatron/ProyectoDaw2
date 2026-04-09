@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Stack, Title, Text, Paper, Group, Skeleton, Alert, Avatar,
+  Divider
 } from "@mantine/core";
 import { AlertCircle, Calendar } from "lucide-react";
 import Base from "../../layouts/Base";
 import { API } from "../../lib/api";
 import type { Post } from "@limpora/common";
+import { motion } from "framer-motion";
 
 
 function formatDate(iso: string, long = false) {
@@ -17,30 +19,42 @@ function formatDate(iso: string, long = false) {
   });
 }
 
-function PostCard({ post }: { post: Post }) {
+
+const MotionDiv = motion.div;
+
+function PostCard({ post, index }: { post: Post; index: number }) {
   return (
-    <Paper withBorder radius="xl" p="lg">
-      <Stack gap="sm">
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
-          <Text fw={600} size="md" style={{ flex: 1 }}>{post.title}</Text>
-          {post.created_at && (
-            <Group gap={4} style={{ opacity: 0.45, flexShrink: 0 }}>
-              <Calendar size={12} />
-              <Text size="xs">{formatDate(post.created_at)}</Text>
-            </Group>
-          )}
-        </Group>
-        <Text size="sm" lh={1.75} style={{ opacity: 0.72 }} lineClamp={4}>
-          {post.content}
-        </Text>
-        {post.user_id && (
-          <Group gap="xs" mt={4}>
-            <Avatar size={20} radius="xl" color="blue">{post.user_id}</Avatar>
-            <Text size="xs" style={{ opacity: 0.55 }}>{post.user_id}</Text>
+    <MotionDiv
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.07, ease: "easeOut" }}
+      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+    >
+      <Paper withBorder radius="lg" p="xl">
+        <Stack gap="md">
+          <Group justify="space-between" align="center" wrap="nowrap">
+            <Text fw={500} size="md" style={{ flex: 1 }}>{post.title}</Text>
+            {post.created_at && (
+              <Group gap={4} style={{ opacity: 0.5, flexShrink: 0 }}>
+                <Calendar size={12} />
+                <Text size="xs">{formatDate(post.created_at)}</Text>
+              </Group>
+            )}
           </Group>
-        )}
-      </Stack>
-    </Paper>
+
+          <Text size="sm" lh={1.8} c="dimmed" lineClamp={3}>
+            {post.content}
+          </Text>
+
+          <Divider />
+          <Group gap="xs">
+            <Avatar size={24} radius="xl" color="blue">A</Avatar>
+            <Text size="xs" c="dimmed">Admin · Limpora</Text>
+          </Group>
+        </Stack>
+      </Paper>
+
+    </MotionDiv>
   );
 }
 
@@ -75,7 +89,7 @@ export function PostsPublicList() {
           </Paper>
         ) : (
           <Stack gap="sm">
-            {posts.map((p) => <PostCard key={p.id} post={p} />)}
+            {posts.map((p, i) => <PostCard key={p.id} post={p} index={i} />)}
           </Stack>
         )}
       </Stack>
@@ -83,7 +97,6 @@ export function PostsPublicList() {
   );
 }
 
-// ── Detalle ────────────────────────────────────────────────────────────────────
 export function PostPublicDetail() {
   const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<Post | null>(null);
@@ -92,7 +105,7 @@ export function PostPublicDetail() {
 
   useEffect(() => {
     if (!id) return;
-    API.post({ id }).get({ })
+    API.post({ id }).get({})
       .then(({ data, error: err }) => {
         if (err) setError(String(err));
         else setPost(data as Post);

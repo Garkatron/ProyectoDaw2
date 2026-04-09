@@ -27,7 +27,7 @@ import PostsManager from "./pages/admin/PostsManager";
 const App = () => {
   const location = useLocation();
   const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY!);
-  
+
   return (
     <>
       <Routes location={location} key={location.pathname}>
@@ -41,26 +41,29 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/download" element={<DownloadPage />} />
         <Route path="/news" element={<PostsPublicList />} />
-        <Route path="/manage-news" element={<PostsManager />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/panel/:username" element={<UserPanel />} />
           <Route path="/review" element={<AppointmentReviewPage />} />
           <Route path="/inbox" element={<Inbox />} />
-      
+
           <Route element={<RoleRoute roles={["provider"]} />}>
             <Route path="/currency" element={<Currency />} />
           </Route>
-      
+
+          <Route element={<RoleRoute roles={["admin"]} />}>
+            <Route path="/manage-news" element={<PostsManager />} />
+          </Route>
+
           <Route path="/userfinder" element={<UserFinder />} />
-      
+
           <Route path="/booking" element={
             <Elements stripe={stripePromise}>
               <BookingConfirmation />
             </Elements>
           } />
           <Route path="/appointments" element={<Appointments />} />
-      
+
         </Route>
       </Routes>
 
