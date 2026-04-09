@@ -2,13 +2,13 @@ import { Post, PostStatus, UserRole } from "@limpora/common";
 import { fail } from "../../utils";
 import { UserService } from "../user/service";
 import { PostModel } from "./model";
-import { PostQueries } from "./queries";
+import { NewsQueries } from "./queries";
 
-export abstract class PostService {
+export abstract class NewsService {
     static async getPost({
         id,
     }: PostModel["postIdQuery"]): Promise<PostModel["postResponse"]> {
-        const post = PostQueries.findById.get({ id: Number(id) });
+        const post = NewsQueries.findById.get({ id: Number(id) });
 
         if (!post) {
             throw fail(
@@ -26,7 +26,7 @@ export abstract class PostService {
 
     static async getAllPosts(): Promise<PostModel["postResponseAll"]> {
         try {
-            const posts = PostQueries.findAll.all(null);
+            const posts = NewsQueries.findAll.all(null);
 
             return posts.map((post: Post) => ({
                 id: post.id,
@@ -58,14 +58,14 @@ export abstract class PostService {
     ): Promise<PostModel["postResponse"]> {
         const user = await this.validateAdmin(uid);
 
-        const { lastInsertRowid } = PostQueries.create.run({
+        const { lastInsertRowid } = NewsQueries.create.run({
             title,
             content,
             user_id: user.id,
             status: PostStatus.Published,
         });
 
-        const created = PostQueries.findById.get({
+        const created = NewsQueries.findById.get({
             id: Number(lastInsertRowid),
         });
         if (!created)
@@ -88,7 +88,7 @@ export abstract class PostService {
     ): Promise<PostModel["postResponse"]> {
         const user = await this.validateAdmin(uid);
 
-        const existing = PostQueries.findById.get({ id: Number(id) });
+        const existing = NewsQueries.findById.get({ id: Number(id) });
 
         if (!existing)
             throw fail(
@@ -96,9 +96,9 @@ export abstract class PostService {
                 "The requested post was not found" satisfies PostModel["errorPostNotFound"],
             );
 
-        PostQueries.update.run({ id: Number(id), title, content });
+        NewsQueries.update.run({ id: Number(id), title, content });
 
-        const updated = PostQueries.findById.get({ id: Number(id) });
+        const updated = NewsQueries.findById.get({ id: Number(id) });
         if (!updated)
             throw fail(
                 404,
@@ -118,7 +118,7 @@ export abstract class PostService {
     ): Promise<PostModel["postResponse"]> {
         const user = await this.validateAdmin(uid);
 
-        const existing = PostQueries.findById.get({ id: Number(id) });
+        const existing = NewsQueries.findById.get({ id: Number(id) });
 
         if (!existing)
             throw fail(
@@ -131,7 +131,7 @@ export abstract class PostService {
                 "The specified user could not be found in our records" satisfies PostModel["errorUserNotFound"],
             );
 
-        PostQueries.delete.run({ id: Number(id) });
+        NewsQueries.delete.run({ id: Number(id) });
 
         return {
             id: existing.id,

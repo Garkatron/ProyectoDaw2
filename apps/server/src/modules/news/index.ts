@@ -1,21 +1,21 @@
 import Elysia from "elysia";
 import { AuthGuard } from "../auth/guard";
-import { PostService } from "./service";
+import { NewsService } from "./service";
 import { PostModel } from "./model";
 import { UserRole } from "@limpora/common";
 
-export const postServiceController = new Elysia({ prefix: "/post" })
+export const newsServiceController = new Elysia({ prefix: "/news" })
     .use(AuthGuard)
-    .get("/", async () => PostService.getAllPosts(), {
+    .get("/", async () => NewsService.getAllPosts(), {
         response: { 200: PostModel.postResponseAll },
         isAuthenticated: false,
     })
-    .get("/:id", async ({ params }) => PostService.getPost(params), {
+    .get("/:id", async ({ params }) => NewsService.getPost(params), {
         params: PostModel.postIdQuery,
         response: { 200: PostModel.postBody },
         isAuthenticated: false,
     })
-    .post("/", ({ user, body }) => PostService.createPostsMe(body, user.uid), {
+    .post("/", ({ user, body }) => NewsService.createPostsMe(body, user.uid), {
         body: PostModel.postBody,
         response: {
             201: PostModel.postBody,
@@ -26,7 +26,7 @@ export const postServiceController = new Elysia({ prefix: "/post" })
     .patch(
         "/:id",
         ({ user, body, params }) =>
-            PostService.updatePostsMe(body, params, user.uid),
+            NewsService.updatePostsMe(body, params, user.uid),
         {
             params: PostModel.postIdQuery,
             body: PostModel.postBody,
@@ -40,7 +40,7 @@ export const postServiceController = new Elysia({ prefix: "/post" })
     )
     .delete(
         "/:id",
-        async ({ params, user }) => PostService.deletePostsMe(params, user.uid),
+        async ({ params, user }) => NewsService.deletePostsMe(params, user.uid),
         {
             params: PostModel.postIdQuery,
             hasRole: UserRole.Admin,

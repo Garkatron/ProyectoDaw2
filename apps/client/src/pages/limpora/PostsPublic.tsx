@@ -62,7 +62,7 @@ export function PostsPublicList() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    API.post.get()
+    API.news.get()
       .then(({ data, error: err }) => {
         if (err) setError(String(err));
         else setPosts((data as Post[]) ?? []);
@@ -107,7 +107,7 @@ export function PostPublicDetail() {
 
   useEffect(() => {
     if (!id) return;
-    API.post({ id }).get({})
+    API.news({ id }).get({})
       .then(({ data, error: err }) => {
         if (err) setError(String(err));
         else setPost(data as Post);

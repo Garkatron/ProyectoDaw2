@@ -80,7 +80,7 @@ export default function PostsManager() {
   const fetchPosts = async () => {
     setLoading(true);
     setError(null);
-    const { data, error: err } = await API.post.get();
+    const { data, error: err } = await API.news.get();
     if (err) setError(String(err));
     else setPosts((data as Post[]) ?? []);
     setLoading(false);
@@ -110,15 +110,15 @@ export default function PostsManager() {
     if (!form.title.trim() || !form.content.trim()) return;
     setSubmitting(true);
     const { error: err } = editingId
-      ? await API.post({ id: editingId }).patch({ title: form.title, content: form.content })
-      : await API.post.post({ title: form.title, content: form.content });
+      ? await API.news({ id: editingId }).patch({ title: form.title, content: form.content })
+      : await API.news.post({ title: form.title, content: form.content });
     if (err) setError(String(err));
     else { cancelEdit(); fetchPosts(); }
     setSubmitting(false);
   };
 
   const handleDelete = async (id: number) => {
-    const { error: err } = await API.post({ id }).delete();
+    const { error: err } = await API.news({ id }).delete();
     if (err) setError(String(err));
     else fetchPosts();
   };

@@ -2,7 +2,7 @@ import { PostStatus } from "@limpora/common";
 import { db } from "../../libs/db";
 import type { Post } from "@limpora/common/src/types/post";
 
-export const PostQueries = {
+export const NewsQueries = {
     findById: db.query<Post, { id: number }>(
         `SELECT * FROM Posts WHERE id = :id`,
     ),
