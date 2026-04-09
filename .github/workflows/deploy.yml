@@ -93,7 +93,7 @@ jobs:
 
             docker compose stop redis
             docker compose rm -f redis
-            docker compose --env-file ./apps/server/.env up -d redis
+            docker compose up -d redis
 
             docker compose stop limpora-server
             docker compose rm -f limpora-server
