@@ -1,1 +1,53 @@
 @import "tailwindcss";
+
+.md-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--mantine-color-text);
+}
+
+.md-content p {
+  margin: 0 0 0.75rem;
+}
+
+.md-content p:last-child {
+  margin-bottom: 0;
+}
+
+.md-content h1, .md-content h2, .md-content h3 {
+  font-weight: 500;
+  margin: 1rem 0 0.5rem;
+  line-height: 1.3;
+}
+
+.md-content h1 { font-size: 18px; }
+.md-content h2 { font-size: 16px; }
+.md-content h3 { font-size: 14px; }
+
+.md-content ul, .md-content ol {
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.md-content li {
+  margin-bottom: 0.25rem;
+}
+
+.md-content strong {
+  font-weight: 500;
+}
+
+.md-content code {
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 13px;
+  background: var(--mantine-color-default);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.md-content blockquote {
+  border-left: 3px solid var(--mantine-color-default-border);
+  margin: 0.75rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  opacity: 0.75;
+}

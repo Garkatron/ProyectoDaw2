@@ -41,16 +41,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
             )}
           </Group>
 
-          <div style={{
-            fontSize: 14,
-            lineHeight: 1.8,
-            opacity: 0.75,
-            overflow: "hidden",
-            maxHeight: "4.8em",
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-          }}>
+          <div className="md-content">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
 
