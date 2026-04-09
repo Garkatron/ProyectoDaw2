@@ -9,7 +9,7 @@ export const bookingController = new Elysia({ prefix: "/bookings" })
     .use(
         rateLimit({
             duration: 60000,
-            max: 100, 
+            max: 1000, 
             errorResponse: "Too many request, try later...",
         }),
     )

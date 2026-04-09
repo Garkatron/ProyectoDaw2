@@ -389,7 +389,7 @@ export abstract class AuthService {
             throw status(500, "Internal Server Connection Error");
         }
     }
-    static async rateLimitIP(ip: string, limit = 10, window = 60) {
+    static async rateLimitIP(ip: string, limit = 50, window = 60) {
         const key = `rl:ip:${ip}`;
 
         const count = await redis.incr(key);
@@ -399,10 +399,10 @@ export abstract class AuthService {
         }
 
         if (count > limit) {
-            throw status(429, "Too many requests (IP)");
+            throw status(429, "Tryi again later... (IP)");
         }
     }
-    static async rateLimitEmail(email: string, limit = 5, window = 300) {
+    static async rateLimitEmail(email: string, limit = 15, window = 120) {
         const key = `rl:email:${email}`;
 
         const count = await redis.incr(key);
@@ -412,15 +412,15 @@ export abstract class AuthService {
         }
 
         if (count > limit) {
-            throw status(429, "Too many attempts (email)");
+            throw status(429, "Try again later... (email)");
         }
     }
 
     static async rateLimitIPEmail(
         ip: string,
         email: string,
-        limit = 5,
-        window = 300,
+        limit = 20,
+        window = 60,
     ) {
         const key = `rl:ip_email:${ip}:${email}`;
 
@@ -431,7 +431,7 @@ export abstract class AuthService {
         }
 
         if (count > limit) {
-            throw status(429, "Too many attempts");
+            throw status(429, "Try again later.");
         }
     }
 

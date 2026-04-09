@@ -5,7 +5,7 @@ import { AuthGuard } from "./guard";
 import { rateLimit } from "elysia-rate-limit";
 
 const authPublic = new Elysia({ prefix: "/auth" })
-    .use(rateLimit({ duration: 60000, max: 100 }))
+    .use(rateLimit({ duration: 60000, max: 200 }))
 
     .post("/verify", ({ body }) => AuthService.verifyEmailCode(body), {
         body: AuthModel["verifyEmailBody"],

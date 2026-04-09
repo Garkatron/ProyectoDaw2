@@ -8,7 +8,7 @@ import {
   Wrench, User, Clock, Banknote, Star 
 } from "lucide-react";
 import { AppointmentStatus, type Appointment } from "@limpora/common";
-import { STATUS_CONFIG, NEXT_STATUSES } from "../appointments.constants";
+import { STATUS_CONFIG, NEXT_STATUSES_PROVIDER, NEXT_STATUSES_CLIENT } from "../appointments.constants";
 import { useReviews } from "../../../../hooks/useReviews";
 
 interface Props {
@@ -31,7 +31,9 @@ export const AppointmentCard = ({ appointment, isProvider, onReviewSuccess, onSt
   const Icon = config.icon;
   const date = new Date(appointment.start_time);
   const end = new Date(appointment.end_time);
-  const nextStatuses = NEXT_STATUSES[appointment.status] ?? [];
+const nextStatuses = isProvider
+  ? (NEXT_STATUSES_PROVIDER[appointment.status] ?? [])
+  : (NEXT_STATUSES_CLIENT[appointment.status] ?? []);
 
   const handleStatusUpdate = async (status: AppointmentStatus) => {
     setUpdating(true);
@@ -87,7 +89,7 @@ export const AppointmentCard = ({ appointment, isProvider, onReviewSuccess, onSt
           <Text size="xs" c="dimmed" fs="italic">{appointment.payment_method}</Text>
         </Group>
 
-        {isProvider && nextStatuses.length > 0 && (
+      {nextStatuses.length > 0 && (
           <Group gap="xs" mt={4}>
             {nextStatuses.map((s) => (
               <Button
