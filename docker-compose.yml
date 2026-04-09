@@ -65,7 +65,7 @@ services:
     restart: unless-stopped
     networks:
       - limpora-network
-    entrypoint: ["sh", "-c", "redis-server --requirepass $$REDIS_PASSWORD"]
+    entrypoint: ["sh", "-c", "redis-server --requirepass $REDIS_PASSWORD"]
     environment:
       - NODE_ENV=production
       - REDIS_HOST=redis
