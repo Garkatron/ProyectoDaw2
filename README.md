@@ -1,7 +1,10 @@
+Aquí está el README sin los iconos:
+
+---
+
 <p align="center">
     <img width="400" height="419" alt="limporapng" src="https://github.com/user-attachments/assets/c2c07497-48e6-4c02-865f-2dbd93ebc842" />
 </p> 
-
 <h3>
     <p align="center">
         Cleaning, Safety and Clarity
@@ -35,14 +38,11 @@ Limpora is a web application and service that connects clients with freelance cl
 
 ### Backend
 The backend uses Bun as the runtime and ElysiaJS as the framework, leveraging TypeScript's native speed to deliver a high-performance REST API.
-
 - **Database:** SQLite
 - **Validation:** TypeBox
 - **Authentication:** Firebase & googleapis (Email auth + OAuth)
 
-
 ## API Architecture
-
 The API is organized into independent modules. Each module encapsulates all its logic in the following files. Modules may not always have a Router, Queries, or specific Middleware — but they will always have a `service` and a `model`.
 
 ```
@@ -56,7 +56,6 @@ modules/
     └── test.ts        # Integration and unit tests
 ```
 
-
 | File | Responsibility |
 |---|---|
 | `index.ts` | Defines HTTP routes and connects endpoints to handlers |
@@ -66,14 +65,7 @@ modules/
 | `guard.ts` | Verifies and validates the access token before reaching the handler |
 | `test.ts` | Integration and unit tests for both endpoints and service logic |
 
-
 ## Security
-
-<p align="center">
-  <img alt="Shield icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/shield-lock.svg" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img alt="Firewall icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/lock-shield.svg" />
-</p>
 - Email verification for non-OAuth accounts
 - CORS
 - HPP (HTTP Parameter Pollution protection)
@@ -82,25 +74,14 @@ modules/
 - Role management with Firebase
 - Endpoint authentication via Firebase tokens
 
-
 ## Observability & Logging
-
-<p align="center">
-  <img alt="Logs icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/clipboard-data.svg" />
-</p>
 - **pino** + **pino-http**
 
-
 ## Documentation (localhost:port/docs)
-
-<p align="center">
-  <img alt="Docs icon" height="40" src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/filled/file-description.svg" />
-</p>
 - Interactive and auto-generated API docs
 - Easy frontend integration
 - OpenAPI standard
 - Designed for low maintenance and easy extension
-
 
 ## Development Tools
 - **eslint-define-config**: Linting configuration
