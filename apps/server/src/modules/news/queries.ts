@@ -25,15 +25,11 @@ export const NewsQueries = {
         VALUES (:user_id, :title, :content, :status)`,
     ),
 
-    update: db.query<
-        void,
-        { id: number; title?: string; content?: string; status?: PostStatus }
-    >(
+    update: db.query<void, { id: number; title?: string; content?: string }>(
         `UPDATE Posts
      SET
        title   = COALESCE(:title, title),
        content = COALESCE(:content, content),
-       status  = COALESCE(:status, status),
        updated_at = datetime('now')
      WHERE id = :id`,
     ),
